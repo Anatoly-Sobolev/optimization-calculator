@@ -14,8 +14,6 @@ header{background:linear-gradient(120deg,#1a2040 0%,#242d5a 100%);color:#fff;pad
 .over{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#9aa3d6}
 header h1{margin:3px 0 0;font-size:27px;font-weight:650;letter-spacing:.2px;line-height:1.2}
 header p{margin:6px 0 0;color:#b9bfdc;font-size:14.5px}
-#helpbtn{margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:999px;padding:5px 14px 5px 11px;font:inherit;font-size:13.5px;cursor:pointer;transition:background .15s}
-#helpbtn:hover{background:rgba(255,255,255,.2)}#helpbtn.on{background:#fff;color:#1d2340;border-color:#fff}
 .people{display:flex;margin:0}
 .people>div{padding-left:18px;margin-left:18px;border-left:2px solid rgba(255,255,255,.16)}
 .people>div:first-child{margin-left:0;padding-left:0;border-left:0}
@@ -23,7 +21,6 @@ header p{margin:6px 0 0;color:#b9bfdc;font-size:14.5px}
 .people dd{margin:0;font-size:15.5px;font-weight:600;white-space:nowrap}.people dd.sub{font-weight:400;font-size:13px;color:#c9cdea;margin-top:2px}
 @media(max-width:900px){header{padding:16px 14px}header h1{font-size:22px}.hdr{grid-template-columns:minmax(0,1fr);align-items:start}.people{flex-direction:column;gap:12px}.people>div{margin-left:0;padding-left:0;border-left:0}.people dd{white-space:normal}#controls .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}#controls .tab{flex:none}.srcsw .seg2 .btn{padding:5px 10px}}
 section.sol{scroll-margin-top:14px}@media(max-width:900px){section.sol{scroll-margin-top:72px}}
-#help{display:none;max-width:1240px;margin:16px auto 0;padding:0 16px}#help.open{display:block}
 .wrap{max-width:1240px;margin:0 auto;padding:18px 16px 60px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px}
 main{min-width:0}
 #secnav{position:sticky;top:12px;align-self:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
@@ -175,7 +172,7 @@ input.trin{width:64px;font:inherit;font-size:14px;text-align:center;border:1px s
 @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 body.trainer section.spoiler:not(.peek){position:relative}
 body.trainer section.spoiler:not(.peek)>:not(h3){filter:blur(7px);pointer-events:none;user-select:none}
-body.trainer section.spoiler:not(.peek)::after{content:"🎯 Скрыто в режиме тренажёра — нажмите, чтобы открыть";position:absolute;left:50%;top:50%;transform:translate(-50%,-30%);background:#fff;border:1px solid #f4a300;border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}
+body.trainer section.spoiler:not(.peek)::after{content:"Ответ скрыт — нажмите, чтобы открыть";position:absolute;left:50%;top:50%;transform:translate(-50%,-30%);background:#fff;border:1px solid #f4a300;border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap}
 body.trainer section.spoiler:not(.peek){cursor:pointer;min-height:90px}
 .whatif{margin:8px 0;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff}.whatif summary{font-size:14.5px}
 .wrow{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:6px;font-size:14px;margin:3px 0}.wrow .wv{text-align:right;font-family:"Cambria Math",serif}
@@ -191,7 +188,7 @@ select.qok{background:var(--ok-soft);border-color:#1f9d6b}select.qbad{background
   body{background:#fff;font-size:11pt}
   header{background:none!important;color:#000;border-bottom:2px solid #000;padding:0 0 8px;margin-bottom:10px}
   header .over,header p,.people dt,.people dd.sub{color:#333!important}.people>div{border-color:#999!important}
-  #helpbtn,#secnav,#controls,#help,footer,.btnrow,.ptool,.stepbox,.clist,.testbox,.tclear,.whatif,.lvlrow,.stepper,.p3info,.ptrain,.legend .kbd,.howd,.coord{display:none!important}
+  #secnav,#controls,footer,.btnrow,.ptool,.stepbox,.clist,.testbox,.tclear,.whatif,.lvlrow,.stepper,.p3info,.ptrain,.legend .kbd,.howd,.coord{display:none!important}
   .wrap{display:block;padding:0;max-width:none}main{display:block}
   .card{border:1px solid #bbb;box-shadow:none;border-radius:6px;padding:10px 12px;margin:0 0 10px}
   .sumcard{background:#fff;animation:none}
@@ -208,6 +205,12 @@ select.qok{background:var(--ok-soft);border-color:#1f9d6b}select.qbad{background
 @media(max-width:900px){.guide.on{scroll-margin-top:72px}}
 .plot .lp3{fill:#e8456b;fill-opacity:.16;stroke:#e8456b;stroke-width:1.6;stroke-dasharray:6 4}
 .plot .v3.big{fill:#e08a00;stroke:#fff;stroke-width:1.5}
+.opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.opt{text-align:left;font:inherit;font-size:15px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--accent);background:#f6f7ff}.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:#1f9d6b;font-weight:600}.opt.wrong{background:var(--bad);border-color:var(--pe);opacity:.75;animation:shake .35s}
+.opt .kbd{margin-left:8px}
+table.sx td.zfocus{box-shadow:inset 0 0 0 2px #f4a300;background:#fff7e0}
 footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:13px}
 </style>
 </head>
@@ -218,7 +221,6 @@ footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--muted);fon
       <div class="over">ОмГТУ · расчётно-графическая работа</div>
       <h1>Методы оптимизации</h1>
       <p>Графический метод · симплекс-метод · метод искусственного базиса · двойственная задача</p>
-      <button id="helpbtn">📖 Справочник по методам</button>
     </div>
     <dl class="people">
       <div><dt>Студент</dt><dd>Соболев Анатолий Сергеевич</dd><dd class="sub">группа ПИН-252т</dd></div>
@@ -226,28 +228,6 @@ footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--muted);fon
     </dl>
   </div>
 </header>
-
-<div id="help"><div class="card ref">
-  <h3 style="margin-top:0">Как пользоваться</h3>
-  <p>Выберите задание, затем вариант из методички или «свои коэффициенты». Условие, преобразования, таблицы, графики и проверка строятся из фактических вычислений в точных дробях; конечные десятичные дроби показаны десятичными, остальные — обыкновенными.</p>
-  <p><b>Порядок чтения решения.</b> Сразу под условием — карточка «Итог»: ответ, сверка с источником и ссылки на нужные разделы. Памятка по методу свёрнута («Показать алгоритм»). В пошаговом разборе каждый шаг — три карточки (входит, выходит, ведущий элемент): наведите на карточку — в таблице подсветятся её ячейки; кнопка «▶ Разобрать шаг» показывает их по очереди и открывает новую таблицу. Мини-график рядом показывает, как меняется цель от таблицы к таблице. Если задача помещается на плоскость (x₁; x₂), раздел «Геометрия» показывает, по каким вершинам идёт симплекс-метод; точки кликабельны.</p>
-  <p><b>Графики.</b> Плоскость можно перетаскивать мышью или пальцем, масштаб — кнопками «−»/«+» или Ctrl + колесо; «Вписать» возвращает исходный вид, «±» показывает все четыре четверти. Справа — список ограничений (включая x ≥ 0): наведите на строку, чтобы увидеть полуплоскость; ◐ закрашивает её; флажок убирает ограничение из области — видно, как область меняется без него. Режим «Построить по шагам» добавляет ограничения по одному и объясняет, какую сторону прямой берём и почему (подстановка точки). Щелчок по графику ставит пробную точку и показывает, какие ограничения она нарушает; ползунок двигает линию уровня вручную.</p>
-  <p><b>Режим тренажёра</b> (переключатель рядом с выбором варианта). Ответы размыты — щелчок открывает раздел. В симплекс-таблицах вы сами выбираете ведущий столбец и строку и считаете отмеченные ячейки новой таблицы; на ошибку калькулятор отвечает подсказкой, а не ответом, и считает ошибки. На графике нужно щёлкнуть по оптимальной вершине, а в режиме «по шагам» — по нужной стороне каждой прямой. В двойственной задаче сборника — расставить знаки ограничений и условий на yᵢ.</p>
-  <p><b>Ещё:</b> «🎚 Что если…» под графиком меняет правые части и коэффициенты цели — видно, как сдвигается оптимум, и что изменение f* на единицу ресурса равно двойственной оценке yᵢ. Для задач с тремя переменными строится объёмный многогранник с путём симплекс-метода (вращается мышью). «🖨 Печать / PDF» собирает чистую версию решения со всеми таблицами. Клавиши ← → листают таблицы. Адрес страницы запоминает выбранный вариант — ссылкой можно поделиться.</p>
-  <h3>Задание 1. Графический метод</h3>
-  <p>Каждое ограничение — полуплоскость, граница — прямая через точки (0; b/a₂) и (b/a₁; 0); сторона определяется подстановкой (0; 0). Пересечение полуплоскостей — допустимая область. Линию уровня c₁x₁ + c₂x₂ = const сдвигают по градиенту (c₁; c₂) до последней общей точки с областью; её координаты — решение системы двух граничных прямых.</p>
-  <h3>Задание 2. Симплекс-метод</h3>
-  <p><b>Приведённая задача:</b> все ограничения — равенства, в каждом есть базисная переменная с коэффициентом 1, цель выражена через небазисные, все b ≥ 0. Для «≤» добавляют остатки — они и есть стартовый базис. <b>Базис</b> — переменные, подписанные слева у строк: они равны своему b, остальные равны 0.</p>
-  <ol><li>Нет отрицательных в строке f — решение оптимально.</li><li>Есть столбец с минусом в строке f и без положительных элементов — f не ограничена.</li><li>Ведущий столбец — самое отрицательное число строки f (входит в базис).</li><li>Ведущая строка — минимум b ÷ a при a &gt; 0 (выходит из базиса).</li><li>Ведущую строку делят на ведущий элемент, из остальных вычитают её, умноженную на их число в ведущем столбце.</li></ol>
-  <h3>Задание 3. Метод искусственного базиса</h3>
-  <p>«≥» превращают в равенство, вычитая излишек. Готового базиса нет, поэтому в каждое уравнение добавляют искусственную tᵢ. Этап 1: минимум h = Σtᵢ (в таблице строка −h, так как алгоритм ищет максимум; её числа — минус суммы столбцов). h* &gt; 0 — допустимая область пуста; h* = 0 — t выводят из базиса, их столбцы удаляют. Этап 2: строка −f выражается через небазисные переменные, далее обычный симплекс-метод.</p>
-  <h3>Задание 4. Двойственная задача</h3>
-  <p>Для задачи на max неравенства приводят к «≤». Каждому ограничению — yᵢ ≥ 0, цель g = Σbᵢyᵢ → min; каждому xⱼ ≥ 0 — ограничение Σaᵢⱼyᵢ ≥ cⱼ. <b>Условия дополняющей нежёсткости:</b> в каждой паре сопряжённых условий хотя бы одно — равенство (xⱼ &gt; 0 ⇒ ограничение j двойственной — равенство; ограничение i прямой строгое ⇒ yᵢ = 0). Если уравнений не хватает (вырожденная вершина), оставшиеся ограничения учитывают как неравенства — оптимум двойственной может быть не единственным.</p>
-  <h3>Задачи сборника для практических занятий</h3>
-  <p>Переключатель «Источник задач» открывает разделы 2.2, 2.3, 2.4 и 2.6 сборника заданий (Зыкина и др.). В этих задачах бывают уравнения, разное число переменных и ограничений, свободный член цели и условия на знак переменных. <b>2.2:</b> если переменных больше двух, их выражают из уравнений через x₁ и x₂ (метод Гаусса), условия xⱼ ≥ 0 становятся неравенствами на плоскости. <b>2.3 и 2.4:</b> двухэтапный метод: в «≤» прибавляется остаток, из «≥» вычитается излишек, искусственные переменные добавляются туда, где нет готового базиса (в 2.3 — в каждое уравнение); итог этапа 1 — допустимое базисное решение. <b>2.6:</b> двойственная задача строится по таблице соответствия знаков; xⱼ ≥ 0 и xⱼ ≤ 0 — условия на знак, другие границы — обычные ограничения, переменная без условия на знак — любого знака. Ответы сборника показаны как справочные: в некоторых из них есть опечатки, итог всегда определяется расчётом.</p>
-  <h3>Особые случаи</h3>
-  <p>Калькулятор не выдаёт ответ, если допустимая область пуста, цель не ограничена или алгоритм не может продолжить: в таком месте показывается, что именно произошло. Отдельно отмечаются вырожденные решения и несколько оптимумов. От зацикливания защищает правило Бленда.</p>
-</div></div>
 
 <div class="wrap">
   <nav id="secnav"></nav>
@@ -1121,87 +1101,110 @@ const R = (() => {
       const score = () => `<span class="trscore">ошибок: ${errs}</span>`;
       const msg = (cls, html) => { const b = root.querySelector('.trmsg'); if (!b) return; b.className = 'trmsg ' + cls; b.innerHTML = html; b.classList.remove('reveal'); void b.offsetWidth; b.classList.add('reveal'); root.querySelectorAll('.trscore').forEach(e => e.textContent = 'ошибок: ' + errs); };
       const bad = td => { td.classList.remove('trbad'); void td.offsetWidth; td.classList.add('trbad'); };
-      function pickCells(s, nxt) {
-        const m = s.rows.length, out = [[s.p, -1]];
-        const jA = nxt.cols.find(j => j !== s.q && !nxt.basis.includes(j) && !nxt.rows[s.p].a[j].isZero());
-        if (jA != null) out.push([s.p, jA]);
-        const iO = [...Array(m).keys()].find(i => i !== s.p);
-        if (iO != null) { out.push([iO, -1]); const jB = nxt.cols.find(j => !nxt.basis.includes(j) && j !== jA && !nxt.rows[iO].a[j].isZero()); if (jB != null) out.push([iO, jB]); }
-        out.push([m, -1]);
-        const jZ = nxt.cols.find(j => !nxt.basis.includes(j) && !nxt.z.a[j].isZero());
-        if (jZ != null) out.push([m, jZ]);
-        return out;
+      /* Вопрос с вариантами ответов: у каждого варианта свой комментарий, неверные можно перебирать. */
+      const shuffle = (arr, seed = k + 1) => arr.map((x, i) => [x, Math.sin((i + 1) * 12.9898 * seed) * 43758.5453 % 1]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+      function ask(n, total, q, opts, done) {
+        txt.innerHTML = `<div class="trq ask"><span class="trtag">Тренажёр${total ? ` · вопрос ${n} из ${total}` : ''}</span> ${q} ${score()}</div><div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o.html}</button>`).join('')}</div><div class="trmsg"></div>`;
+        const box = txt.querySelector('.opts'), m = txt.querySelector('.trmsg');
+        box.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+          const o = opts[+b.dataset.i];
+          m.classList.remove('reveal'); void m.offsetWidth; m.classList.add('reveal');
+          if (o.ok) {
+            b.classList.add('right'); box.querySelectorAll('.opt').forEach(x => { x.disabled = true; });
+            m.className = 'trmsg ok reveal'; m.innerHTML = `<b>Верно.</b> ${o.why}<div class="btnrow"><button class="btn primary tr-go">Дальше →</button></div>`;
+            m.querySelector('.tr-go').onclick = done;
+          } else {
+            errs++; b.classList.add('wrong'); b.disabled = true;
+            m.className = 'trmsg bad reveal'; m.innerHTML = `<b>Нет.</b> ${o.why}`;
+            root.querySelectorAll('.trscore').forEach(e => { e.textContent = 'ошибок: ' + errs; });
+          }
+        });
       }
       function renderTrainer() {
-        const s = steps[k], m = s.rows.length, z = zlab(s.z.label);
-        const head = (n, q) => `<div class="trq ask"><span class="trtag">🎯 Тренажёр${n ? ` · ${n} из 3` : ''}</span> ${q} ${score()}</div><div class="trmsg"></div>`;
+        const s = steps[k], m = s.rows.length, z = zlab(s.z.label), ph1 = s.z.label === '−h';
         calc.innerHTML = '';
+        const vn = j => vname(s.vars, j);
+        // ---- итоговая таблица ----
         if (s.q == null) {
           tblBox.innerHTML = table(s, {});
-          if (tr.phase !== 'ok') {
-            txt.innerHTML = head(0, `Посмотрите на строку ${z}. Решение оптимально?`) + `<div class="btnrow"><button class="btn tr-yes">Да, отрицательных чисел нет</button><button class="btn tr-no">Нет, нужна ещё итерация</button></div>`;
-            txt.querySelector('.tr-yes').onclick = () => { tr.phase = 'ok'; renderTrainer(); };
-            txt.querySelector('.tr-no').onclick = () => { errs++; msg('bad', `В строке ${z} все числа ≥ 0 — по шагу 1 базисное решение уже оптимально.`); };
-          } else txt.innerHTML = `<div class="trq ok">✓ Верно — таблица итоговая. ${score()}</div>` + basicSol(s);
+          if (tr.phase === 'col' && ph1) {
+            const hv = s.z.b.neg(), feas = hv.isZero();
+            return ask(1, 1, `В строке −h нет отрицательных чисел, h* = ${fq(hv)}. Что это значит?`, shuffle([
+              { html: 'Найдено допустимое базисное решение — переходим к этапу 2', ok: feas, why: feas ? 'Все искусственные переменные равны 0, значит точка удовлетворяет исходным ограничениям. Теперь можно искать оптимум цели f.' : 'Так было бы при h* = 0. Здесь h* > 0: хотя бы одна искусственная переменная осталась положительной.' },
+              { html: 'Допустимых решений нет', ok: !feas, why: !feas ? 'Минимум суммы искусственных переменных больше 0 — обнулить их нельзя. Точек, удовлетворяющих всем ограничениям, нет.' : 'Так было бы при h* > 0. Здесь h* = 0 — допустимая точка найдена.' },
+              { html: 'Найден оптимум исходной задачи', ok: false, why: 'Этап 1 ищет только допустимую точку: цель f в нём не участвует. Оптимум ищут на этапе 2.' }
+            ]), () => { tr.phase = 'done'; renderTrainer(); });
+          }
+          if (tr.phase === 'col') return ask(1, 2, `В строке ${z} нет отрицательных чисел. Что это значит?`, shuffle([
+            { html: 'Решение оптимально — итерации закончены', ok: true, why: `Отрицательное число в строке ${z} означало бы, что рост этой переменной улучшает цель. Таких нет — улучшать нечего.` },
+            { html: 'Нужна ещё одна итерация', ok: false, why: `Новая итерация нужна, только если в строке ${z} есть отрицательное число.` },
+            { html: 'Цель не ограничена', ok: false, why: 'Неограниченность видна по столбцу с отрицательным числом в строке цели, в котором нет положительных элементов. Здесь отрицательных чисел вообще нет.' }
+          ]), () => { tr.phase = 'read'; renderTrainer(); });
+          if (tr.phase === 'read') return ask(2, 2, 'Как прочитать решение по этой таблице?', shuffle([
+            { html: 'Переменные слева (базис) равны своим числам в столбце b, остальные равны 0', ok: true, why: `Здесь: ${s.basis.map((bj, i) => `${vn(bj)} = ${fq(s.rows[i].b)}`).join(', ')}, остальные — 0. Значение цели стоит в столбце b строки ${z}.` },
+            { html: `Значения переменных — числа строки ${z}`, ok: false, why: `Строка ${z} показывает, как изменится цель при росте каждой переменной, а не значения переменных.` },
+            { html: 'Значения переменных — числа первой строки таблицы', ok: false, why: 'Первая строка — одно из уравнений системы. Решение читается по столбцу b.' }
+          ]), () => { tr.phase = 'done'; renderTrainer(); });
+          txt.innerHTML = `<div class="trq ok"><b>Таблица разобрана.</b> Ошибок: ${errs}.</div>` + basicSol(s);
           return;
         }
+        // ---- вопрос 1: кто входит в базис ----
         if (tr.phase === 'col') {
-          tblBox.innerHTML = table(s, { click: true, clickRow: m });
-          txt.innerHTML = head(1, `Какая переменная <b>входит в базис</b>? Щёлкните по числу в строке ${z}.`);
-          tblBox.querySelectorAll('td.click').forEach(td => td.onclick = () => {
-            const j = +td.dataset.j;
-            if (j < 0) return msg('bad', 'Это столбец b. Нужен столбец переменной.');
-            if (j === s.q) { tr.phase = 'row'; return renderTrainer(); }
-            errs++; bad(td);
+          tblBox.innerHTML = table(s, {});
+          T0zrow();
+          let cand = s.cols.filter(j => !s.basis.includes(j));
+          const neg = cand.filter(j => s.z.a[j].s < 0).sort((a, b) => s.z.a[a].cmp(s.z.a[b]));
+          const nonneg = cand.filter(j => s.z.a[j].s >= 0);
+          cand = [...neg.slice(0, 4), ...nonneg.slice(0, Math.max(1, 5 - Math.min(neg.length, 4)))];
+          if (!cand.includes(s.q)) cand.unshift(s.q);
+          const most = neg[0];
+          return ask(1, 3, `Какая переменная <b>входит в базис</b>? Смотрим на строку ${z} (выделена).`, cand.map(j => {
             const v = s.z.a[j];
-            msg('bad', v.s >= 0 ? `Здесь ${fq(v)} ≥ 0: рост ${vname(s.vars, j)} цель не улучшит. Нужен столбец с <b>отрицательным</b> числом.` : `Отрицательное, но по правилу берём <b>самое отрицательное</b> число строки ${z}.`);
-          });
-          return;
+            return { html: `${vn(j)} <span class="kbd">в строке ${z}: ${fq(v)}</span>`, ok: j === s.q,
+              why: j === s.q ? (j === most ? `${fq(v)} — самое отрицательное число строки ${z}: при росте ${vn(j)} цель улучшается быстрее всего.` : `По правилу Бленда (защита от зацикливания) берём первый столбец с отрицательным числом.`)
+                : v.s >= 0 ? `Здесь ${fq(v)} ≥ 0: рост ${vn(j)} цель не улучшит. Кандидаты — только столбцы с отрицательным числом.`
+                : `Число отрицательное, цель тоже улучшится, но по правилу берём самое отрицательное — ${fq(s.z.a[most])}.` };
+          }), () => { tr.phase = 'row'; renderTrainer(); });
         }
+        // ---- вопрос 2: какая строка выходит (отношения уже посчитаны) ----
         if (tr.phase === 'row') {
-          tblBox.innerHTML = table({ ...s, p: -1 }, { hl: true, click: true });
-          txt.innerHTML = head(2, `Входит ${vname(s.vars, s.q)}. Какая строка <b>выходит</b>? Для строк с a &gt; 0 в столбце ${vname(s.vars, s.q)} посчитайте b ÷ a и щёлкните по строке с наименьшим отношением.`) + `<div class="btnrow"><button class="btn tr-none">Ни одна строка не подходит</button></div>`;
-          txt.querySelector('.tr-none').onclick = () => {
-            if (s.unbounded) { tr.phase = 'unb'; return renderTrainer(); }
-            errs++; msg('bad', `Есть строки с a &gt; 0 в столбце ${vname(s.vars, s.q)} — одна из них выходит.`);
-          };
-          tblBox.querySelectorAll('td.click').forEach(td => td.onclick = () => {
-            const i = +td.dataset.i;
-            if (i === m) return msg('bad', 'Это строка цели — выбираем среди строк ограничений.');
-            if (!s.unbounded && i === s.p) { tr.phase = 'calc'; return renderTrainer(); }
-            errs++; bad(td);
-            const a = s.rows[i].a[s.q];
-            msg('bad', a.s <= 0 ? `В этой строке a = ${fq(a)} ≤ 0 — она не ограничивает рост ${vname(s.vars, s.q)}, её не берём.` : `b ÷ a = ${fq(s.rows[i].b)} ÷ ${fq(a)} = ${fq(s.rows[i].b.div(a))}, но есть строка с отношением меньше.`);
+          tblBox.innerHTML = table({ ...s, p: -1 }, { hl: true, ratio: true });
+          const q = s.q, rmin = s.p != null ? s.ratios[s.p] : null;
+          const opts = s.rows.map((r, i) => {
+            const a = r.a[q], R2 = s.ratios[i];
+            return { html: `строка ${vn(s.basis[i])} <span class="kbd">${R2 ? `b ÷ a = ${fq(r.b)} ÷ ${fq(a)} = ${fq(R2)}${approx(R2)}` : `a = ${fq(a)} ≤ 0`}</span>`, ok: !s.unbounded && i === s.p,
+              why: !s.unbounded && i === s.p ? `Наименьшее отношение: ${vn(q)} может вырасти только до ${fq(R2)}. Дальше ${vn(s.basis[i])} стала бы отрицательной — поэтому она и выходит из базиса.`
+                : !R2 ? `В этой строке a ≤ 0: при росте ${vn(q)} переменная ${vn(s.basis[i])} не уменьшается, строка рост не ограничивает. Такие строки не рассматривают.`
+                : `Если увеличить ${vn(q)} до ${fq(R2)}, переменная ${vn(s.basis[s.p])} из строки с отношением ${fq(rmin)} станет отрицательной. Берут наименьшее отношение.` };
           });
-          return;
+          opts.push({ html: 'ни одна — в столбце нет положительных a', ok: !!s.unbounded,
+            why: s.unbounded ? `${vn(q)} можно увеличивать бесконечно, ни одно ограничение её не остановит — цель не ограничена.` : `В столбце ${vn(q)} есть a > 0 — такие строки ограничивают рост, одна из них выходит.` });
+          return ask(2, 3, `Входит ${vn(q)} (столбец выделен). Какая строка <b>выходит</b> из базиса? Отношения b ÷ a уже посчитаны справа.`, opts, () => { tr.phase = s.unbounded ? 'unb' : 'piv'; renderTrainer(); });
         }
-        if (tr.phase === 'unb') { tblBox.innerHTML = table(s, { hl: true, ratio: true }); txt.innerHTML = `<div class="trq ok">✓ Верно. ${score()}</div>` + stepText(s); return; }
-        // phase 'calc': пересчёт отмеченных ячеек новой таблицы
-        const nxt = steps[k + 1], cells = pickCells(s, nxt), piv = s.rows[s.p].a[s.q];
+        if (tr.phase === 'unb') { tblBox.innerHTML = table(s, { hl: true, ratio: true }); txt.innerHTML = `<div class="trq ok"><b>Цель не ограничена.</b> Ошибок: ${errs}.</div>` + stepText(s); return; }
+        // ---- вопрос 3: как пересчитать таблицу ----
+        const piv = s.rows[s.p].a[s.q], vq = vn(s.q), vp = vn(s.basis[s.p]);
+        if (tr.phase === 'piv') {
+          tblBox.innerHTML = table(s, { hl: true, ratio: true });
+          return ask(3, 3, `Ведущий элемент ${fq(piv)} — на пересечении столбца ${vq} и строки ${vp}. Как получить новую таблицу?`, shuffle([
+            { html: `Ведущую строку разделить на ${fq(piv)}; из остальных строк вычесть её, умноженную на их число в столбце ${vq}`, ok: true, why: `В столбце ${vq} получится 1 в ведущей строке и 0 во всех остальных (включая строку ${z}) — ${vq} становится базисной вместо ${vp}.` },
+            { html: `Разделить на ${fq(piv)} все строки таблицы`, ok: false, why: 'Делится только ведущая строка — чтобы на месте ведущего элемента стала 1. Остальные строки получают 0 в этом столбце вычитанием.' },
+            { html: `Строку ${z} не трогать, пересчитать только строки ограничений`, ok: false, why: `Строку ${z} пересчитывают так же, как остальные: иначе под новой базисной переменной в ней останется ненулевое число.` },
+            { html: `Поменять местами строку ${vp} и строку ${z}`, ok: false, why: 'Строки не переставляют: меняется только подпись базиса у ведущей строки, а числа пересчитываются.' }
+          ]), () => { tr.phase = 'next'; renderTrainer(); });
+        }
+        // ---- результат шага ----
         tblBox.innerHTML = table(s, { hl: true, ratio: true });
-        txt.innerHTML = head(3, `Ведущий элемент ${fq(piv)}. Посчитайте отмеченные ячейки новой таблицы (дробью 3/7, десятичной или целым).`);
-        calc.innerHTML = `<div class="kbd">Новая таблица ${k + 1}:</div>` + table({ ...nxt, q: null }, {}) + `<div class="btnrow"><button class="btn primary tr-check">Проверить</button><button class="btn tr-show">Показать ответы</button><button class="btn tr-next" disabled>Следующая таблица →</button></div><div class="trhints"></div>`;
-        const T2 = calc.querySelector('table.sx');
-        cells.forEach(([i, j]) => { const td = T2.querySelector(`td[data-i="${i}"][data-j="${j}"]`); if (td) { td.dataset.ans = '1'; td.innerHTML = `<input class="trin" aria-label="ячейка">`; } });
-        const left = () => [...T2.querySelectorAll('td[data-ans] input')];
-        const done = () => { if (!left().length) { calc.querySelector('.tr-next').disabled = false; msg('ok', '✓ Таблица посчитана. Переходите к следующей.'); } };
-        const lock = (td, v, cls) => { td.innerHTML = fq(v); td.classList.add(cls); };
-        calc.querySelector('.tr-check').onclick = () => {
-          const hints = [];
-          left().forEach(inp => {
-            const td = inp.closest('td'), i = +td.dataset.i, j = +td.dataset.j, F = cellFormula(s, nxt, i, j);
-            let val = null; try { val = Q.parse(inp.value); } catch (_) { /* пустое или не число */ }
-            if (val && val.eq(F.value)) lock(td, F.value, 'trok');
-            else if (inp.value.trim()) { errs++; bad(td); hints.push(F.html); }
-          });
-          calc.querySelector('.trhints').innerHTML = hints.length ? `<div class="note warn"><b>Есть ошибки — как считается:</b>${hints.map(x => `<div class="calc">${x}</div>`).join('')}</div>` : '';
-          root.querySelectorAll('.trscore').forEach(e => e.textContent = 'ошибок: ' + errs);
-          done();
-        };
-        calc.querySelector('.tr-show').onclick = () => { left().forEach(inp => { const td = inp.closest('td'); lock(td, cellFormula(s, nxt, +td.dataset.i, +td.dataset.j).value, 'trshown'); }); done(); };
+        const nxt = steps[k + 1], zv = st => st.z.label.startsWith('−') ? st.z.b.neg() : st.z.b, nm = s.z.label.replace('−', '');
+        txt.innerHTML = `<div class="trq ok"><b>Шаг разобран.</b> ${vq} входит в базис вместо ${vp}. ${nm}: ${fq(zv(s))} → <b>${fq(zv(nxt))}</b>. Ошибок: ${errs}.</div>`;
+        calc.innerHTML = `<div class="kbd">Новая таблица ${k + 1} (посчитана по правилу из вопроса 3; нажмите на ячейку — покажем расчёт):</div>` + table({ ...nxt, q: null }, { click: true }) + `<div class="calc"></div><div class="btnrow"><button class="btn primary tr-next">Следующая таблица →</button></div>`;
+        const out = calc.querySelector('.calc');
+        calc.querySelectorAll('td.click').forEach(td => td.onclick = () => { calc.querySelectorAll('td.sel').forEach(t => t.classList.remove('sel')); td.classList.add('sel'); out.innerHTML = cellFormula(s, nxt, +td.dataset.i, +td.dataset.j).html; });
         calc.querySelector('.tr-next').onclick = () => show(k + 1);
-        calc.querySelectorAll('input.trin').forEach(inp => inp.onkeydown = e => { if (e.key === 'Enter') calc.querySelector('.tr-check').click(); });
+        calc.classList.remove('reveal'); void calc.offsetWidth; calc.classList.add('reveal');
       }
+      // выделить строку цели в тренажёре (вопрос 1)
+      function T0zrow() { const T = tbl(); if (T) T.querySelectorAll('tr.zrow td').forEach(td => td.classList.add('zfocus')); }
       const show = (kk, quiet) => {
         stop(); k = kk; const s = steps[k];
         root.querySelector('.st-title').innerHTML = `${title} · таблица ${k}${k === 0 ? ' (начальная)' : ''}${s.q == null && !TR.on ? ' (итоговая)' : ''}`;
@@ -1455,7 +1458,7 @@ const R = (() => {
         if (S.mode === 'steps') {
           stepRange.value = S.step;
           stepTxt.innerHTML = S.step === 0 ? 'Шаг 0: ограничений ещё нет — подходит вся плоскость. Нажмите «Следующее ограничение».'
-            : S.await != null ? `<b>Шаг ${S.step} из ${order.length}.</b> 🎯 Прямая ${C[S.await].name}: ${C[S.await].html}. <b>Щёлкните по той стороне прямой, где ограничение выполняется.</b>${stMsg}`
+            : S.await != null ? `<b>Шаг ${S.step} из ${order.length}.</b> Прямая ${C[S.await].name}: ${C[S.await].html}. <b>Щёлкните по той стороне прямой, где ограничение выполняется.</b>${stMsg}`
             : `<b>Шаг ${S.step} из ${order.length}.</b> ${sideText(order[S.step - 1])}<br>Область после шага: <b>${regionKind(order.slice(0, S.step))}</b>.${stMsg}`;
         }
         if (S.test) {
@@ -1468,7 +1471,7 @@ const R = (() => {
           const ask = cfg.sense === 'max' ? 'максимум' : 'минимум';
           trBox.innerHTML = S.revealed
             ? `<div class="trq ok">✓ ${O.status === 'optimal' ? `Верно: ${ask} в точке (${fmtN(O.pt[0])}; ${fmtN(O.pt[1])}), ${fname}* = ${fmtN(O.val + f0)}` : O.status === 'unbounded' ? `Верно: ${fname} не ограничена` : 'Верно: допустимая область пуста'}. <span class="trscore">ошибок: ${S.errs}</span></div>`
-            : `<div class="trq ask"><span class="trtag">🎯 Тренажёр</span> Щёлкните по вершине, где ${fname} достигает ${ask === 'максимум' ? 'максимума' : 'минимума'}. Подсказка: двигайте линию уровня ползунком по направлению стрелки. <span class="trscore">ошибок: ${S.errs}</span></div><div class="btnrow"><button class="btn tr-empty">Область пуста</button><button class="btn tr-unb">${fname} не ограничена</button></div><div class="trmsg ${trMsg ? 'bad' : ''}">${trMsg}</div>`;
+            : `<div class="trq ask"><span class="trtag">Тренажёр</span> Щёлкните по вершине, где ${fname} достигает ${ask === 'максимум' ? 'максимума' : 'минимума'}. Подсказка: двигайте линию уровня ползунком по направлению стрелки. <span class="trscore">ошибок: ${S.errs}</span></div><div class="btnrow"><button class="btn tr-empty">Область пуста</button><button class="btn tr-unb">${fname} не ограничена</button></div><div class="trmsg ${trMsg ? 'bad' : ''}">${trMsg}</div>`;
           const bE = trBox.querySelector('.tr-empty'), bU = trBox.querySelector('.tr-unb');
           if (bE) bE.onclick = () => answerKind('infeasible'); if (bU) bU.onclick = () => answerKind('unbounded');
         }
@@ -1638,7 +1641,7 @@ const R = (() => {
     const list = C.map((Cn, k) => `<label class="ci" data-k="${k}"><input type="checkbox" class="inc" checked title="учитывать в области"><span class="sw" style="--c:${Cn.color}"></span><span class="ct"><b style="color:${Cn.color}">${Cn.axis ? '' : Cn.name + ' '}</b><span class="m">${Cn.html}</span></span><button class="paint" title="закрасить полуплоскость этого ограничения">◐</button></label>`).join('');
     const paths = cfg.paths && cfg.paths.length;
     const rng = (v, attr, lab) => { const m = Math.max(Math.abs(v), 1); return `<label class="wrow"><span class="wl">${lab}</span><input type="range" ${attr} min="${v - m}" max="${v + m}" step="${(2 * m / 200).toPrecision(3)}" value="${v}"><span class="wv">${fmtN(v)}</span></label>`; };
-    const whatif = cfg.whatif ? `<details class="whatif"><summary>🎚 Что если… — меняйте правые части и коэффициенты цели</summary>
+    const whatif = cfg.whatif ? `<details class="whatif"><summary>Что если… изменить правые части и коэффициенты цели</summary>
         ${C.slice(0, nRows).map((Cn, k) => Cn.s === '=' ? '' : rng(Cn.b, `data-wb="${k}"`, `b${k + 1} <span style="color:${Cn.color}">${Cn.name}</span>`)).join('')}
         ${rng(cfg.c[0], 'data-wc="0"', 'c₁')}${rng(cfg.c[1], 'data-wc="1"', 'c₂')}
         <div class="wres"></div><button class="btn wreset">Сбросить</button></details>` : '';
@@ -2385,7 +2388,7 @@ const VIEWS = (() => {
       const qid = 'qz' + Math.random().toString(36).slice(2, 8);
       const sel = (ans, opts) => `<select data-ans="${ans}"><option value="">?</option>${opts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`;
       const SG = [['<=', '≤'], ['>=', '≥'], ['=', '=']], YS = [['>=', '≥ 0'], ['<=', '≤ 0'], ['free', 'любого знака']];
-      bodyB += `<div class="quiz" id="${qid}"><div class="trq ask"><span class="trtag">🎯 Тренажёр</span> Постройте двойственную задачу сами: выберите направление цели, знак каждого ограничения Дj и условие на каждую yᵢ (по таблице в «Как строится»). <span class="trscore">ошибок: 0</span></div>
+      bodyB += `<div class="quiz" id="${qid}"><div class="trq ask"><span class="trtag">Тренажёр</span> Постройте двойственную задачу сами: выберите направление цели, знак каждого ограничения Дj и условие на каждую yᵢ (по таблице в «Как строится»). <span class="trscore">ошибок: 0</span></div>
         <div class="dual"><div class="dl"><i>g</i> = ${withC0(D, lin(D.c, i => yv(i + 1)))} → ${sel(D.sense, [['min', 'min'], ['max', 'max']])}</div>${D.rows.map((r, j) => `<div class="dl">${lin(r.a, i => yv(i + 1))} ${sel(r.s, SG)} ${fq(r.b)} <span class="kbd">(Д${j + 1}; ${P.signs[j] === 'free' ? `${xv(j + 1)} — любого знака` : `${xv(j + 1)} ${sg(P.signs[j])} 0`})</span></div>`).join('')}<div class="dl">${D.signs.map((s, i) => `${yv(i + 1)} ${sel(s, YS)} <span class="kbd">(ограничение (${i + 1}) «${sg(P.rows[i].s)}»)</span>`).join('<br>')}</div></div>
         <div class="btnrow"><button class="btn primary qcheck">Проверить</button><button class="btn qshow">Показать ответ</button></div><div class="trmsg"></div></div><div class="qans" style="display:none"><p><b>Ответ — двойственная задача:</b></p>${dl}</div>`;
       R.hooks.push(() => {
@@ -2435,7 +2438,201 @@ const VIEWS = (() => {
     return S;
   }
 
-  return { graph, simplex, artificial, dual, statusText, graphZ, dualZ, verdictZ };
+  /* =================== Тренажёр: проверочные вопросы по методу =================== */
+  // У каждого варианта ответа — комментарий: почему верно или в чём ошибка.
+  const QB = {
+    graph: [
+      { q: 'Как узнать, какую сторону прямой a₁x₁ + a₂x₂ = b оставляет неравенство «≤ b»?', a: [
+        ['Подставить точку не на прямой, обычно (0; 0): если неравенство верно — берём сторону с этой точкой', 1, 'Это универсальный способ: одна подстановка сразу показывает нужную сторону.'],
+        ['Всегда берём сторону ниже прямой', 0, 'Зависит от знаков коэффициентов: например, −x₂ ≤ −2 означает x₂ ≥ 2 — сторону выше прямой.'],
+        ['Всегда берём сторону с началом координат', 0, 'Только если (0; 0) удовлетворяет неравенству. Для x₁ + x₂ ≥ 1 начало координат не подходит.']] },
+      { q: 'Где достигается оптимум задачи ЛП, если он есть?', a: [
+        ['В вершине допустимой области (иногда — на всей её стороне)', 1, 'Линия уровня последний раз касается многоугольника в вершине или ложится на сторону.'],
+        ['В центре допустимой области', 0, 'Из центра линию уровня всегда можно сдвинуть дальше и улучшить цель.'],
+        ['В точке пересечения прямой с осью', 0, 'Такая точка может быть оптимальной, только если она — вершина области; это частный случай.']] },
+      { q: 'Что такое линия уровня?', a: [
+        ['Прямая c₁x₁ + c₂x₂ = const: во всех её точках цель одинакова', 1, 'Сдвигая её, мы смотрим, какие значения цели достижимы в области.'],
+        ['Граница допустимой области', 0, 'Границы задают ограничения, а линия уровня — цель.'],
+        ['Вектор, указывающий рост цели', 0, 'Это градиент (c₁; c₂). Линия уровня ему перпендикулярна.']] },
+      { q: 'В задаче на минимум линию уровня сдвигают…', a: [
+        ['против градиента (по антиградиенту)', 1, 'Градиент — направление роста цели, для минимума движемся в обратную сторону.'],
+        ['по градиенту', 0, 'Так цель растёт — это для задачи на максимум.'],
+        ['всегда к началу координат', 0, 'Направление зависит от коэффициентов цели, а не от начала координат.']] },
+      { q: 'Линию уровня можно сдвигать бесконечно, и она всё время пересекает область. Значит…', a: [
+        ['цель не ограничена, оптимума нет', 1, 'Цель можно сделать сколь угодно хорошей.'],
+        ['допустимая область пуста', 0, 'Пустая область не пересекается ни с какой прямой.'],
+        ['оптимум в самой дальней вершине', 0, 'Дальней вершины в этом направлении нет — область неограничена.']] },
+      { q: 'Линия уровня в последний момент легла на сторону области. Значит…', a: [
+        ['оптимальны все точки этой стороны', 1, 'Цель на стороне постоянна и равна оптимальной — решений бесконечно много.'],
+        ['решения нет', 0, 'Решение есть, просто оно не единственное.'],
+        ['оптимум только в середине стороны', 0, 'Значение цели одинаково во всех точках стороны, включая концы.']] },
+      { q: 'Как найти точные координаты оптимальной вершины?', a: [
+        ['Решить систему уравнений двух прямых, на пересечении которых она лежит', 1, 'Вершина — точка пересечения двух граничных прямых, поэтому их уравнения задают её точно.'],
+        ['Считать с графика по клеткам', 0, 'Так получается приближение. Ответ должен быть точным.'],
+        ['Подставить (0; 0) в цель', 0, 'Это даёт значение цели в начале координат, а не оптимум.']] }
+    ],
+    simplex: [
+      { q: 'Какой столбец становится ведущим (задача на максимум)?', a: [
+        ['Столбец с самым отрицательным числом в строке f', 1, 'Отрицательное число показывает, что рост этой переменной увеличивает f; самое отрицательное — быстрее всего.'],
+        ['Столбец с наибольшим положительным числом в строке f', 0, 'Положительные числа означают, что рост переменной уменьшит f.'],
+        ['Столбец с наибольшим b', 0, 'Столбец b — значения базисных переменных; ведущий столбец выбирают по строке f.']] },
+      { q: 'Как выбирают ведущую строку?', a: [
+        ['По наименьшему отношению b ÷ a среди строк с a > 0', 1, 'Входящая переменная может вырасти только до этого значения, иначе какая-то базисная станет отрицательной.'],
+        ['По наибольшему отношению b ÷ a', 0, 'Тогда переменная строки с меньшим отношением станет отрицательной — решение выйдет из области.'],
+        ['По наименьшему b', 0, 'Важно отношение b ÷ a: оно показывает, насколько может вырасти входящая переменная.']] },
+      { q: 'Почему строки с a ≤ 0 в ведущем столбце не участвуют в выборе строки?', a: [
+        ['Они не ограничивают рост входящей переменной', 1, 'При a ≤ 0 базисная переменная строки при росте входящей не уменьшается.'],
+        ['На ноль и отрицательные числа нельзя делить', 0, 'На отрицательное делить можно; дело в смысле: такая строка не мешает росту.'],
+        ['Эти строки всегда лишние', 0, 'Строки нужны, просто на этом шаге они не ограничивают рост.']] },
+      { q: 'Когда симплекс-таблица оптимальна?', a: [
+        ['В строке f нет отрицательных чисел', 1, 'Тогда рост любой небазисной переменной не улучшает цель.'],
+        ['Все числа в столбце b положительны', 0, 'Это условие допустимости базисного решения, а не оптимальности.'],
+        ['В базисе нет дополнительных переменных', 0, 'Дополнительные переменные могут оставаться в базисе и в оптимальном решении.']] },
+      { q: 'По какому признаку видно, что цель не ограничена?', a: [
+        ['В столбце с отрицательным числом в строке f нет положительных элементов', 1, 'Переменную этого столбца можно увеличивать бесконечно — ни одна строка её не остановит.'],
+        ['Все числа строки f отрицательны', 0, 'Это просто значит, что итерации нужно продолжать.'],
+        ['В столбце b появился 0', 0, 'Это вырожденное решение, а не неограниченность.']] },
+      { q: 'Зачем в ограничения «≤» добавляют дополнительные (остаточные) переменные?', a: [
+        ['Чтобы получить равенства и готовый стартовый базис', 1, 'При x = 0 остатки равны правым частям — это первое базисное решение.'],
+        ['Чтобы изменить цель', 0, 'В цель остатки входят с коэффициентом 0.'],
+        ['Чтобы сделать правые части отрицательными', 0, 'Наоборот, для стартовой таблицы нужно b ≥ 0.']] },
+      { q: 'Как прочитать ответ из итоговой таблицы?', a: [
+        ['Базисные переменные равны своим b, остальные равны 0', 1, 'Это базисное решение; значение цели — в столбце b строки f.'],
+        ['Значения переменных — числа строки f', 0, 'Строка f показывает изменение цели, а не значения переменных.'],
+        ['Значения переменных — числа ведущего столбца', 0, 'Ведущий столбец нужен только для очередного шага.']] },
+      { q: 'В итоговой строке f под небазисной переменной стоит 0. Что это значит?', a: [
+        ['Есть и другие оптимальные решения', 1, 'Эту переменную можно ввести в базис, не меняя значения цели.'],
+        ['Решение вырожденное', 0, 'Вырожденность — это нулевое значение базисной переменной (0 в столбце b).'],
+        ['Нужна ещё итерация', 0, 'Итерация нужна только при отрицательном числе.']] }
+    ],
+    artificial: [
+      { q: 'Зачем нужны искусственные переменные?', a: [
+        ['Готового базиса нет: излишки входят с минусом, и при x = 0 они были бы отрицательными', 1, 'Искусственные переменные дают стартовый базис с b ≥ 0.'],
+        ['Чтобы увеличить значение цели', 0, 'В исходную цель они не входят.'],
+        ['Чтобы уменьшить число ограничений', 0, 'Число ограничений не меняется — меняется число переменных.']] },
+      { q: 'Что минимизируют на этапе 1?', a: [
+        ['Сумму искусственных переменных h', 1, 'Если её минимум равен 0, все искусственные обнулятся и останется допустимая точка исходной задачи.'],
+        ['Исходную цель f', 0, 'Цель f начинают оптимизировать на этапе 2.'],
+        ['Сумму излишков', 0, 'Излишки — обычные переменные задачи, они могут быть положительными.']] },
+      { q: 'После этапа 1 получилось h* > 0. Значит…', a: [
+        ['у задачи нет допустимых решений', 1, 'Искусственные переменные нельзя обнулить — ограничения несовместны.'],
+        ['цель не ограничена', 0, 'Цель f на этапе 1 вообще не рассматривалась.'],
+        ['нужно повторить этап 1 с другим базисом', 0, 'Симплекс-метод уже нашёл минимум h — другой базис его не уменьшит.']] },
+      { q: 'Почему в таблице записана строка −h, а не h?', a: [
+        ['Алгоритм ищет максимум, а min h = max(−h)', 1, 'Так этап 1 решается теми же правилами, что и обычный симплекс-метод.'],
+        ['Чтобы все числа стали положительными', 0, 'Числа строки −h как раз в основном отрицательные — это и запускает итерации.'],
+        ['Это опечатка', 0, 'Знак минус принципиален: он превращает минимум в максимум.']] },
+      { q: 'Как получить числа строки −h?', a: [
+        ['Взять со знаком минус сумму строк, в которых есть искусственные переменные', 1, 'Так h выражается через небазисные переменные, а в столбцах t остаются нули.'],
+        ['Переписать коэффициенты цели f', 0, 'Цель f используется только на этапе 2.'],
+        ['Поставить −1 под каждой искусственной переменной', 0, 'Под базисными (искусственными) переменными в строке цели должны стоять нули.']] },
+      { q: 'Что делают со столбцами искусственных переменных после этапа 1?', a: [
+        ['Удаляют и переходят к этапу 2 с исходной целью', 1, 'Искусственные переменные равны 0 и больше не нужны.'],
+        ['Оставляют и продолжают минимизировать h', 0, 'h уже равна 0 — этап 1 закончен.'],
+        ['Переносят их в правую часть', 0, 'Они равны нулю и просто вычёркиваются.']] }
+    ],
+    dual: [
+      { q: 'Сколько переменных у двойственной задачи?', a: [
+        ['Столько, сколько ограничений в прямой задаче', 1, 'Каждому ограничению (i) соответствует своя переменная yᵢ.'],
+        ['Столько, сколько переменных в прямой задаче', 0, 'Переменным прямой задачи соответствуют ограничения двойственной.'],
+        ['Всегда две', 0, 'Две бывает только при двух ограничениях в прямой задаче.']] },
+      { q: 'Что становится коэффициентами цели двойственной задачи?', a: [
+        ['Правые части bᵢ ограничений прямой задачи', 1, 'g = Σ bᵢyᵢ.'],
+        ['Коэффициенты цели cⱼ прямой задачи', 0, 'cⱼ становятся правыми частями ограничений двойственной.'],
+        ['Коэффициенты первой строки матрицы', 0, 'Строки матрицы дают столбцы двойственной задачи.']] },
+      { q: 'Прямая задача на максимум, ограничение «≤», xⱼ ≥ 0. Какая двойственная?', a: [
+        ['Цель на минимум, ограничения Σ aᵢⱼyᵢ ≥ cⱼ, все yᵢ ≥ 0', 1, 'Это стандартная пара симметричных двойственных задач.'],
+        ['Цель на максимум, ограничения «≤ cⱼ»', 0, 'Направление цели меняется: max ↔ min.'],
+        ['Цель на минимум, ограничения «≤ cⱼ»', 0, 'При max и xⱼ ≥ 0 ограничения двойственной — «≥ cⱼ».']] },
+      { q: 'Ограничению-равенству прямой задачи соответствует…', a: [
+        ['переменная yᵢ любого знака', 1, 'Равенство можно записать двумя неравенствами — отсюда отсутствие условия на знак.'],
+        ['переменная yᵢ ≥ 0', 0, 'Так для «≤» в задаче на максимум.'],
+        ['переменная yᵢ = 0', 0, 'Нулю равна yᵢ только для строгого в оптимуме неравенства (по УДН).']] },
+      { q: 'В оптимуме ограничение (i) прямой задачи выполняется строго (с запасом). Тогда…', a: [
+        ['yᵢ = 0', 1, 'Условие дополняющей нежёсткости: ресурс с запасом «ничего не стоит».'],
+        ['yᵢ > 0', 0, 'Положительной yᵢ может быть только у ограничения-равенства в оптимуме.'],
+        ['ограничение двойственной (i) — равенство', 0, 'Пара для ограничения (i) — это переменная yᵢ, а не ограничение.']] },
+      { q: 'В оптимуме xⱼ > 0. Что следует для двойственной задачи?', a: [
+        ['j-е ограничение двойственной выполняется как равенство', 1, 'Это вторая половина условий дополняющей нежёсткости.'],
+        ['yⱼ = 0', 0, 'Индексы yᵢ относятся к ограничениям прямой задачи, а не к xⱼ.'],
+        ['двойственная задача не имеет решения', 0, 'Если прямая задача разрешима, двойственная тоже.']] },
+      { q: 'Как связаны оптимальные значения f* и g*?', a: [
+        ['Они равны', 1, 'Первая теорема двойственности — по ней и проверяют решение.'],
+        ['g* всегда больше f*', 0, 'Для допустимых решений g ≥ f (задача на max), но в оптимуме — равенство.'],
+        ['Не связаны', 0, 'Связаны: это главное свойство двойственности.']] },
+      { q: 'Цель прямой задачи не ограничена. Что с двойственной?', a: [
+        ['У неё нет допустимых решений', 1, 'Иначе любое её допустимое решение ограничивало бы цель прямой задачи.'],
+        ['Её цель тоже не ограничена', 0, 'Обе задачи одновременно неограниченными быть не могут.'],
+        ['Она имеет единственный оптимум', 0, 'Оптимумы есть либо у обеих задач, либо ни у одной.']] }
+    ]
+  };
+  /* Вопросы по текущему варианту. */
+  function quizDynamic(method, pr) {
+    const out = [];
+    if (method === 'graph' && pr.n === 2) {
+      const i = pr.rows.findIndex(r => !r.b.isZero() && r.s !== '=');
+      if (i >= 0) {
+        const r = pr.rows[i], ok = r.s === '<=' ? Z().le(r.b) : Z().ge(r.b);
+        out.push({ q: `Ограничение (${i + 1}): ${rowLine(r)}. Оставляет ли оно сторону прямой, где лежит начало координат (0; 0)?`, a: [
+          ['Да', ok ? 1 : 0, ok ? `Подставляем (0; 0): 0 ${sg(r.s)} ${fq(r.b)} — верно.` : `Подставляем (0; 0): 0 ${sg(r.s)} ${fq(r.b)} — неверно, значит берём другую сторону.`],
+          ['Нет', ok ? 0 : 1, ok ? `Подставьте (0; 0): 0 ${sg(r.s)} ${fq(r.b)} — неравенство верно.` : `Верно: 0 ${sg(r.s)} ${fq(r.b)} не выполняется, начало координат вне полуплоскости.`]] });
+      }
+    }
+    if (method === 'simplex' && pr.rows.every(r => r.s === '<=')) {
+      const m = pr.rows.length;
+      out.push({ q: `В этом варианте ${m} ограничения «≤». Сколько остаточных переменных добавляют для приведённой задачи?`, a: [
+        [String(m), 1, 'По одной на каждое ограничение «≤» — они и образуют стартовый базис.'],
+        [String(pr.n), 0, 'Остатки добавляют по числу ограничений, а не переменных.'],
+        [String(m + pr.n), 0, 'Это общее число переменных после приведения, а остатков — по одному на ограничение.']] });
+    }
+    if (method === 'artificial') {
+      const m = pr.rows.length;
+      out.push({ q: `Сколько искусственных переменных вводится в этом варианте (метод добавляет их в каждое уравнение)?`, a: [
+        [String(m), 1, `По одной на каждое из ${m} уравнений.`], [String(pr.n), 0, 'Число искусственных равно числу уравнений, а не исходных переменных.'], ['0', 0, 'Без них не получится стартовый базис.']] });
+    }
+    if (method === 'dual') {
+      const m = pr.rows.length + (pr.bounds ? pr.bounds.filter(B => !B.b.isZero()).length : 0);
+      out.push({ q: `Сколько переменных y будет у двойственной задачи для этого варианта?`, a: [
+        [String(m), 1, `По одной на каждое ограничение прямой задачи (их ${m}${pr.bounds ? ', включая границы на переменные, ставшие ограничениями' : ''}).`],
+        [String(pr.n), 0, 'Это число переменных прямой задачи — им соответствуют ограничения двойственной.'],
+        [String(m + pr.n), 0, 'Сумма ни к чему не относится: y — по ограничениям, ограничения двойственной — по переменным.']] });
+    }
+    return out;
+  }
+  function quiz(method, pr) {
+    const id = 'qz' + Math.random().toString(36).slice(2, 8);
+    R.hooks.push(() => {
+      const root = document.getElementById(id); if (!root) return;
+      let qs = [], i = 0, score = 0, firstTry = true;
+      const deal = () => {
+        const bank = (QB[method] || []).slice().sort(() => Math.random() - 0.5).slice(0, 5);
+        qs = [...quizDynamic(method, pr), ...bank].slice(0, 6).map(q => ({ ...q, a: q.a.slice().sort(() => Math.random() - 0.5) }));
+        i = 0; score = 0; render();
+      };
+      const render = () => {
+        if (i >= qs.length) {
+          root.innerHTML = `<div class="trq ok"><b>Результат: ${score} из ${qs.length}</b> с первой попытки.</div><div class="btnrow"><button class="btn primary qz-again">Ещё раз (другие вопросы)</button></div>`;
+          root.querySelector('.qz-again').onclick = deal; return;
+        }
+        const Qn = qs[i]; firstTry = true;
+        root.innerHTML = `<div class="trq ask"><span class="trtag">Вопрос ${i + 1} из ${qs.length}</span> ${Qn.q} <span class="trscore">верно: ${score}</span></div><div class="opts">${Qn.a.map((o, j) => `<button class="opt" data-j="${j}">${o[0]}</button>`).join('')}</div><div class="trmsg"></div>`;
+        const m = root.querySelector('.trmsg');
+        root.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+          const o = Qn.a[+b.dataset.j];
+          if (o[1]) {
+            if (firstTry) score++;
+            b.classList.add('right'); root.querySelectorAll('.opt').forEach(x => { x.disabled = true; });
+            m.className = 'trmsg ok reveal'; m.innerHTML = `<b>Верно.</b> ${o[2]}<div class="btnrow"><button class="btn primary qz-next">${i < qs.length - 1 ? 'Следующий вопрос →' : 'Итог'}</button></div>`;
+            m.querySelector('.qz-next').onclick = () => { i++; render(); };
+          } else { firstTry = false; b.classList.add('wrong'); b.disabled = true; m.className = 'trmsg bad reveal'; m.innerHTML = `<b>Нет.</b> ${o[2]}`; }
+        });
+      };
+      deal();
+    });
+    return sec('quiz', 'Проверьте себя: идеи метода', `<p class="kbd">Короткие вопросы с вариантами ответов. После выбора — комментарий, почему ответ верный или в чём ошибка.</p><div id="${id}"></div>`);
+  }
+
+  return { graph, simplex, artificial, dual, statusText, graphZ, dualZ, verdictZ, quiz };
 })();
 
 </script>
@@ -2590,8 +2787,8 @@ const APP = (() => {
     h += `<label class="rad"><input type="radio" name="mode" value="db"${state.mode === 'db' ? ' checked' : ''}> ${isZ() ? 'задача из сборника' : 'вариант из методички'}</label>`;
     h += `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${isZ() ? 'задача' : 'вариант'} ${v.v}${v.note && (isZ() || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join('')}</select>`;
     h += `<label class="rad"><input type="radio" name="mode" value="custom"${state.mode === 'custom' ? ' checked' : ''}> свои коэффициенты</label>`;
-    h += `<label class="trsw${state.trainer ? ' on' : ''}" title="Решайте сами: калькулятор проверяет каждый шаг и подсказывает, ответы скрыты"><input type="checkbox" id="trmode"${state.trainer ? ' checked' : ''}> 🎯 Режим тренажёра</label><button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">🖨 Печать / PDF</button></div>`;
-    if (state.trainer) h += `<div class="kbd" style="margin-top:6px">Тренажёр: в таблицах сами выбирайте ведущий столбец и строку и считайте ячейки; на графике — щёлкните по оптимальной вершине; ${state.type === 'dual' && isZ() ? 'в двойственной задаче — расставьте знаки; ' : ''}разделы с ответом размыты — щелчок открывает их.</div>`;
+    h += `<label class="trsw${state.trainer ? ' on' : ''}" title="Вопросы с вариантами ответов на каждом шаге решения"><input type="checkbox" id="trmode"${state.trainer ? ' checked' : ''}> Тренажёр</label><button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
+    if (state.trainer) h += `<div class="kbd" style="margin-top:6px">Тренажёр: вопросы с вариантами ответов — по методу (раздел «Проверьте себя») и на каждом шаге решения. Ответы в разделах скрыты, щелчок открывает их.</div>`;
     if (state.mode === 'custom') h += isZ() ? formZ() : formHTML();
     h += '</div>';
     return h;
@@ -2627,6 +2824,7 @@ const APP = (() => {
       else if (state.type === 'artificial') secs = VIEWS.artificial(pr, meta);
       else secs = VIEWS.dual(pr, meta, state.base, () => { state.type = state.base; if (state.mode === 'custom') state.custom[state.base] = fromProblem(pr); render(); });
     } catch (e) { return `<div class="card note bad">Ошибка вычислений: ${e.message}</div>`; }
+    if (state.trainer) secs.splice(1, 0, VIEWS.quiz(state.type, pr));
     return secs.join('');
   }
   function render() {
@@ -2682,8 +2880,6 @@ const APP = (() => {
     if (q.get('v')) state.v = +q.get('v');
     if (['graph', 'simplex'].includes(q.get('b'))) state.base = q.get('b');
     render();
-    const h = $('#helpbtn'), hp = $('#help');
-    h.onclick = () => { hp.classList.toggle('open'); h.classList.toggle('on'); };
   }
   return { init, state, render };
 })();
