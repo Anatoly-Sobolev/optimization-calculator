@@ -95,7 +95,13 @@ details summary{cursor:pointer;color:var(--accent);margin:8px 0}
 .tv{color:#c2185b}
 .stage{display:grid;gap:6px;background:#f7f8ff;border:1px solid #dfe3fb;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:15px}
 .stage .stk{display:inline-block;min-width:74px;font-weight:700;color:var(--accent);margin-right:8px}
-table.plain.stplan td{text-align:left;vertical-align:top}table.plain.stplan td:first-child{text-align:center;font-weight:700}
+.stflow{display:flex;flex-wrap:wrap;gap:6px 0;margin:4px 0 2px}
+.stc{flex:1 1 120px;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:8px 6px 10px;border-radius:12px;color:inherit;text-decoration:none;transition:background .2s}
+.stc:hover{background:var(--accent-soft)}
+.stc:not(:last-child)::after{content:"";position:absolute;top:25px;left:calc(50% + 22px);right:calc(-50% + 22px);height:2px;background:#d5daf7}
+.stn{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 6px rgba(60,80,200,.25)}
+.stt{font-weight:600;font-size:15px}.str{font-size:13px;color:var(--muted);line-height:1.3}
+@media(max-width:620px){.stflow{flex-direction:column}.stc{flex-direction:row;text-align:left;gap:10px;padding:6px 8px}.stc::after{display:none}.str::before{content:"— "}}
 .demo{border:1px solid #dfe3fb;border-radius:14px;background:linear-gradient(#fbfcff,#fff);padding:10px 14px 12px;margin:4px 0 10px}
 .dmhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
 .dmtag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--accent);border-radius:999px;padding:2px 9px}
@@ -286,6 +292,93 @@ body.trainer .wrap{grid-template-columns:minmax(0,1fr)}body.trainer #secnav{disp
 .qmark{color:#e8456b}
 canvas.fw{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:999}
 footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:13px}
+/* ===== пошаговые объясняющие анимации ===== */
+.demo{margin:8px 0 14px}
+.dmhead .dmdet{margin-left:auto;font:13px "Segoe UI",sans-serif;display:inline-flex;gap:6px;align-items:center;cursor:pointer;background:#eef0ff;border-radius:999px;padding:3px 10px}
+.dmprog{height:4px;background:#e6e9fb;border-radius:2px;overflow:hidden;margin:4px 0 2px}.dmprog i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.dmctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.dmctl .btn{padding:9px 13px;font-size:14px;min-height:42px;touch-action:manipulation}
+.dmctl select{min-height:42px;font-size:14px}
+.dmpos{font-size:13px;color:var(--muted);font-weight:600;min-width:98px;text-align:center}
+.dmleg{display:flex;flex-wrap:wrap;gap:3px 14px;font:12px "Segoe UI",sans-serif;color:var(--muted);margin-top:6px}
+.dmleg .lg{white-space:nowrap}.lg-sel{color:var(--accent)}.lg-act{color:#a87100}.lg-del{color:#b0183f}.lg-ok{color:#0d6a45}
+.dmcap{min-height:30px;line-height:1.4;padding:2px 0}
+@media(max-width:560px){.dmctl .btn{flex:1 1 40%}.dmstage{font-size:16px}.dmpos{flex:1 1 100%;order:-1}}
+/* метки действий (цвет + знак) */
+.demo td.k-sel,.demo th.k-sel{background:#dfe6ff!important;box-shadow:inset 0 0 0 2px var(--accent)}
+.demo th.k-sel::after{content:" ▼";font-size:.8em;color:var(--accent)}
+.demo td.bas.k-sel::before{content:"▶ ";color:var(--accent);font-size:.8em}
+.demo td.k-act,.demo span.k-act{background:#ffe08a!important;box-shadow:inset 0 0 0 2px #f4a300}
+.demo td.k-del,.demo span.k-del{background:#ffd9e2!important;color:#b0183f}
+.demo td.k-del::after{content:" ✕";font-size:.7em;vertical-align:super}
+.demo td.k-ok,.demo span.k-ok{background:#d6f5e6!important;color:#0d6a45}
+.demo td.k-ok::after{content:" ✓";font-size:.7em;vertical-align:super}
+.demo td.k-pe{background:var(--pe)!important;color:#fff!important;font-weight:700}
+.demo td.k-pe::after{content:" ★";font-size:.8em}
+.demo .k-dim{opacity:.38}
+.demo td.zc .cv{color:#9aa0b5}
+.demo .cv:empty::before{content:"·";color:#c7cbe0}
+.demo .cv{display:inline-block;min-width:1ch}
+/* типы переменных */
+.vk-x{color:#2b3fb8}.vk-s{color:#12805a}.vk-e{color:#b86a00}.vk-t{color:#c2185b}
+table.sx th.vk-s{background:#e3f6ec}table.sx th.vk-e{background:#fdeccf}table.sx th.vk-t{background:#fde4ee}
+table.sx th .vtag{display:block;font:600 10px/1.1 "Segoe UI",sans-serif;color:#6b6f7c;letter-spacing:.02em}
+.vleg{display:flex;flex-wrap:wrap;gap:3px 16px;font:13px "Segoe UI",sans-serif;margin-bottom:6px}
+/* таблицы и формулы сцен */
+.pvwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}.pvwrap.one{grid-template-columns:minmax(0,1fr)}
+@media(max-width:820px){.pvwrap{grid-template-columns:minmax(0,1fr)}}
+.demo .tblwrap{overflow-x:auto}
+.demo table.dmsx{font-size:15px}.demo table.dmsx td,.demo table.dmsx th{padding:5px 8px;min-width:38px}
+.pvfm{min-height:46px;background:#f7f8ff;border-radius:10px;padding:6px 12px;margin:8px 0;font-size:19px;line-height:1.8}
+.pvfm .fo,.pvfm .fk,.pvfm .fn,.pvfm .fp,.pvfm .fr,.pvfm .sl0,.pvfm .sl1,.pvfm .sa,.pvfm .sb,.pvfm .sc,.pvfm .fv,.pvfm [class^="h"]{display:inline-block;min-width:28px;text-align:center;border-radius:6px;background:#fff;border:1px dashed #b9c0ee;padding:0 6px}
+.pvfm .fmh{font:600 15px "Segoe UI",sans-serif;color:var(--accent)}.pvfm .fmh.ok{color:var(--ok)}.pvfm .fmh.bad{color:var(--pe)}
+.pvfm .vok{color:var(--ok)}.pvfm .vbad{color:var(--pe)}
+.pvsum{font:16px "Segoe UI",sans-serif;background:var(--ok-soft);border-radius:10px;padding:8px 12px;margin:6px 0}
+.demo .gain{color:var(--ok)}
+.demo .tw{white-space:nowrap}.demo .tw .cf{display:inline-block;min-width:0;border-radius:5px;transition:background .3s}
+.demo .warnchip{display:inline-block;margin-left:8px;border-radius:8px;padding:0 8px;background:#ffd9e2;color:#b0183f;font:600 14px "Segoe UI",sans-serif}
+.demo .bn{margin-left:8px;font-size:15px;font-family:"Segoe UI",sans-serif;color:var(--accent)}
+.demo .cnw{padding-left:34px;font-size:15px}
+.demo .drow.bad{background:var(--bad)}
+.demo .ansr .okc{margin-left:8px}
+.demo .anschips .ch.v{padding:0 6px}
+/* график */
+.gwrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:14px;align-items:start}
+@media(max-width:820px){.gwrap{grid-template-columns:minmax(0,1fr)}}
+.gleft{min-width:0}.gright{min-width:0}
+.gsvg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;display:block;font-family:"Segoe UI",sans-serif}
+.gsvg *{transform-box:fill-box;transform-origin:center}
+.gstack{position:relative}.gstack .gov{position:absolute;left:0;top:0;border:0;background:transparent;pointer-events:none}
+.gsvg .gax-x,.gsvg .gax-y{stroke:#4a4e5c;stroke-width:1.6;fill:none}
+.gsvg .gdraw{stroke-dasharray:1;stroke-dashoffset:0}
+.gsvg .gtk{stroke:#6b6f7c}.gsvg .gtx{font-size:11px;fill:#6b6f7c}.gsvg .gax-l{font:italic 700 14px "Cambria Math",serif;fill:#4a4e5c}
+.gsvg .gl{stroke-width:2.4;fill:none}
+.gsvg .gl.k-hot,.gsvg .gax-x.k-hot,.gsvg .gax-y.k-hot{stroke:#f4a300;stroke-width:5}
+.gsvg .glb{font-size:13px;font-weight:700}
+.gsvg .gside{fill:none;stroke-width:2;opacity:.85}
+.gsvg .gh{fill-opacity:.16}.gsvg .gh.gdim{fill-opacity:.06}
+.gsvg .gr{fill:#1f9d6b;fill-opacity:.28;stroke:#1f9d6b;stroke-width:2.2}
+.gsvg .gpt.fin text{opacity:0}.gsvg .gpt circle{stroke:#fff;stroke-width:1.5}.gsvg .gpt text{font-size:12px;font-weight:600}
+.gsvg .gtp circle{fill:#fff;stroke:#555;stroke-width:2}.gsvg .gtp.k-ok circle{fill:#d6f5e6;stroke:#1f9d6b}.gsvg .gtp.k-del circle{fill:#ffd9e2;stroke:#c0284f}
+.gsvg .gtpm{font-size:17px;font-weight:700}.gsvg .gtp.k-ok .gtpm{fill:#1f9d6b}.gsvg .gtp.k-del .gtpm{fill:#c0284f}
+.gsvg .gvx circle{fill:#1f9d6b;stroke:#fff;stroke-width:2}.gsvg .gvx text{font-size:13px;font-weight:700;fill:#0d6a45}
+.gsvg .gvx.k-act circle{fill:#f4a300}.gsvg .gvx.k-ok circle{fill:#1f9d6b}
+.gsvg .gempty{font-size:17px;font-weight:700;fill:#c0284f}
+.gsvg .ginf text{font-size:14px;font-weight:700;fill:#b86a00}
+.gsvg .glv{stroke:#e8456b;stroke-width:3;stroke-dasharray:9 5}
+.gsvg .ggrad line{stroke:#1f9d6b;stroke-width:3}.gsvg .ggrad polygon{fill:#1f9d6b}.gsvg .ggrad text{font-size:12px;font-weight:700;fill:#0d6a45}
+.gsvg .gopt line{stroke:#1f9d6b;stroke-width:8;opacity:.55;stroke-linecap:round}.gsvg .gopt circle{fill:none;stroke:#1f9d6b;stroke-width:3}
+.demo .gcr.on{background:var(--col);border-left-color:#f4a300}.demo .gcr.done{background:var(--ok-soft)}
+.demo .gsl{padding:2px 8px;font-size:18px}.demo .gsl .mb{color:var(--accent);font-weight:700}
+.demo .gsl.gx{background:#fffaf0;border-left:3px solid #f4a300;border-radius:6px;margin:3px 0}
+.demo .gvr{font-size:16px}.demo .gvr .fvb{display:inline-block;width:80px;height:9px;background:#edf0ff;border-radius:5px;margin-left:8px;vertical-align:middle}.demo .gvr .fvb i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.demo .mprow{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:4px 6px;align-items:center;padding:3px 8px;border-radius:8px;font-size:18px;border-left:3px solid transparent}
+.demo .mprow.on{background:var(--col);border-left-color:#f4a300}.demo .mprow.done{background:var(--ok-soft)}
+.demo .mprow .mpw{grid-column:1/-1;font:13px "Segoe UI",sans-serif;color:var(--accent)}
+.demo .mprow .mpa{text-align:center;color:var(--accent);font-weight:700}
+table.gm td{min-width:44px}
+.stfull{margin-top:8px}
+@media print{.dmctl,.dmleg,.dmprog,.dmhead .dmdet{display:none!important}.demo{border:0;background:none;break-inside:avoid}.dmcap{font-size:13px}}
 </style>
 </head>
 <body>
@@ -1049,9 +1142,19 @@ const R = (() => {
     return s || '0';
   };
   const vec = xs => '(' + xs.map(fq).join('; ') + ')';
+  const WRAPIDS = new Set(['verts', 'reduce', 't0', 'canon', 'hrow', 'ph2s', 'check']);
   const sec = (id, title, body, extra = '') => {
     // памятка по методу одинакова для всех вариантов — по умолчанию свёрнута
     if (id === 'how') body = `<details class="howd"><summary>Показать алгоритм</summary>${body}</details>`;
+    // анимации — основное объяснение; текст и таблицы после них уходят в «Подробно»
+    if (id === 'lines') body = `<details class="dmmore"><summary>Подробно (таблица прямых и точек)</summary>${body}</details>`;
+    else if (WRAPIDS.has(id)) {
+      const k = body.lastIndexOf('<!--dmend-->');
+      if (k >= 0) {
+        const head = body.slice(0, k + 12), tail = body.slice(k + 12);
+        if (tail.trim() && !/class="answer"|class="dmmore"/.test(tail)) body = head + `<details class="dmmore"><summary>Подробно (текст и таблицы)</summary>${tail}</details>`;
+      }
+    }
     if (id === 'all') body = `<details class="alld"><summary>Показать все таблицы одной лентой (для переписывания в тетрадь)</summary>${body}</details>`;
     return `<section class="card sol" id="${id}" data-title="${title}"${extra}><h3>${title}</h3>${body}</section>`;
   };
@@ -1059,7 +1162,7 @@ const R = (() => {
   /* ---------- симплекс-таблица ---------- */
   function table(st, o = {}) {
     const hl = o.hl && st.q != null, rat = o.ratio && st.q != null;
-    let h = '<table class="sx"><thead><tr><th>Базис</th><th>b</th>' + st.cols.map(j => `<th class="${st.vars[j].kind === 't' ? 'tcol' : ''}">${vname(st.vars, j)}</th>`).join('') + (rat ? '<th>b ÷ ведущий столбец</th>' : '') + '</tr></thead><tbody>';
+    let h = '<table class="sx"><thead><tr><th>Базис</th><th>b</th>' + st.cols.map(j => { const v = st.vars[j], kc = v.kind === 'x' ? 'vk-x' : v.kind === 't' ? 'vk-t' : v.sign < 0 ? 'vk-e' : 'vk-s', kt = v.kind === 'x' ? 'исходная' : v.kind === 't' ? 'искусств.' : v.sign < 0 ? 'излишек' : 'остаток'; return `<th class="${v.kind === 't' ? 'tcol ' : ''}${kc}">${vname(st.vars, j)}<span class="vtag">${kt}</span></th>`; }).join('') + (rat ? '<th>b ÷ ведущий столбец</th>' : '') + '</tr></thead><tbody>';
     const m = st.rows.length;
     const cell = (v, i, j) => {
       let c = j < 0 ? 'bcol' : '';
@@ -1111,6 +1214,7 @@ const R = (() => {
   /* Пошаговый просмотр таблиц с расчётом любой ячейки по клику. */
   let uid = 0;
   const hooks = [];
+  const bridge = {};
   const R_last = { id: null };
   // слушатели событий между блоками (степпер ↔ график); снимаются при каждой перерисовке
   const evs = [];
@@ -1141,7 +1245,8 @@ const R = (() => {
       const root = document.getElementById(id); if (!root) return;
       let k = 0, timers = [], tr = null, errs = 0;
       const stop = () => { timers.forEach(clearTimeout); timers = []; };
-      const tblBox = root.querySelector('.st-table'), txt = root.querySelector('.st-text'), calc = root.querySelector('.st-calc');
+      const tblBox = root.querySelector('.st-table'), txt = root.querySelector('.st-text'), calc = root.querySelector('.st-calc'), demoBox = root.querySelector('.st-demo'), fullBox = root.querySelector('.stfull');
+      let dctl = null;
       const tbl = () => tblBox.querySelector('table.sx');
       const focus = what => {
         const T = tbl(); if (!T) return;
@@ -1288,11 +1393,13 @@ const R = (() => {
         const play = root.querySelector('.st-play'); play.disabled = s.q == null || s.unbounded; play.style.display = TR.on ? 'none' : '';
         root.querySelector('.legend').style.display = TR.on ? 'none' : '';
         if (TR.on) { tr = { phase: 'col' }; renderTrainer(); } else renderNormal(s);
+        if (dctl) { dctl.dispose(); dctl = null; }
+        if (TR.on) { demoBox.innerHTML = ''; fullBox.open = true; } else if (bridge.pivot) dctl = bridge.pivot(demoBox, steps, k, !quiet);
         if (!quiet) document.dispatchEvent(new CustomEvent('sxstep', { detail: { id, k } }));
       };
       root.querySelector('.st-play').onclick = () => {
         const s = steps[k]; if (s.q == null || s.unbounded) return;
-        stop(); tblBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        stop(); fullBox.open = true; tblBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         [['col', 0], ['row', 1500], ['pe', 3000], [null, 4500]].forEach(([w, t]) => timers.push(setTimeout(() => focus(w), t)));
         timers.push(setTimeout(() => { calc.classList.remove('reveal'); void calc.offsetWidth; calc.classList.add('reveal'); calc.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 4600));
       };
@@ -1308,7 +1415,7 @@ const R = (() => {
     });
     return `<div class="stepper" id="${id}"><div class="st-head"><div><div class="btnrow"><button class="btn st-prev">← Назад</button>${steps.map((_, i) => `<button class="btn st-btn">${i}</button>`).join('')}<button class="btn st-next">Вперёд →</button><button class="btn primary st-play" title="Подсветить по очереди: ведущий столбец, ведущую строку, ведущий элемент и показать новую таблицу">▶ Разобрать шаг</button></div>
       <h4 class="st-title"></h4></div>${steps.length > 1 ? spark(steps) : ''}</div><div class="legend"><span style="--c:var(--col)">входит в базис</span><span style="--c:var(--row)">выходит из базиса</span><span style="--c:var(--pe)">ведущий элемент</span><span class="kbd" style="margin-left:6px">наведите на карточку шага — подсветятся её ячейки · ← → листают таблицы</span></div>
-      <div class="st-table"></div><div class="st-text"></div><div class="st-calc"></div></div>`;
+      <div class="st-demo"></div><details class="dmmore stfull"><summary>Подробно: таблица, пояснение шага и расчёт любой ячейки</summary><div class="st-table"></div><div class="st-text"></div><div class="st-calc"></div></details></div>`;
   }
   const allTables = (steps, offset = 0) => steps.map((s, i) => `<div class="tcap">Таблица ${i + offset}${s.q != null && !s.unbounded ? ` — входит ${vname(s.vars, s.q)}, выходит ${vname(s.vars, s.basis[s.p])}, ведущий элемент ${fq(s.rows[s.p].a[s.q])}` : s.unbounded ? ' — неограниченность' : ' — итоговая'}</div>${table(s, { hl: true, ratio: true })}`).join('');
 
@@ -1910,7 +2017,7 @@ const R = (() => {
         <div class="legend col"><span style="--c:#c9d1ff">грани допустимой области</span><span style="--c:#e8456b">вершины, которые проходит симплекс-метод (номер = номер таблицы)</span><span style="--c:#e8456b">● оптимальная вершина</span><span style="--c:#f7a8bb">плоскость уровня c·x = const</span></div></div></div></div>`;
   }
 
-  return { fq, approx, par, xv, tv, yv, vname, zlab, sg, lin, vec, sec, table, basicSol, stepText, stepper, allTables, plot, plot3d, hooks, R_last, spark, offAll, TR };
+  return { fq, approx, par, xv, tv, yv, vname, zlab, sg, lin, vec, sec, table, basicSol, stepText, stepper, allTables, plot, plot3d, hooks, R_last, spark, offAll, TR, bridge };
 })();
 
 </script>
@@ -2036,6 +2143,7 @@ const VIEWS = (() => {
       <li>Отмечаем вектор градиента (c₁; c₂) — направление роста f (для задачи на min — антиградиент).</li>
       <li>Сдвигаем линию уровня c₁x₁ + c₂x₂ = const в этом направлении до последней общей точки с областью.</li>
       <li>Координаты этой точки находим из системы уравнений двух прямых, на которых она лежит.</li></ol>`));
+    S.push(sec('anim', 'Построение графика по шагам', demoGraphBuild(pr, G)));
     // прямые
     S.push(sec('lines', 'Граничные прямые и полуплоскости', `<div class="tblwrap"><table class="plain"><tr><th>№</th><th>Ограничение</th><th>Прямая</th><th>Точки на осях</th><th>Точка (0; 0)</th></tr>${G.lines.map(L => `<tr><td>(${L.i + 1})</td><td class="m">${rowLine(pr.rows[L.i])}</td><td class="m">${lin(L.a, j => xv(j + 1))} = ${fq(L.b)}</td><td class="m">${L.iy != null ? `(0; ${fq(L.iy)})` : 'параллельна оси x₂'}${L.ix != null ? `, (${fq(L.ix)}; 0)` : ', параллельна оси x₁'}</td><td>${L.s === '=' ? 'равенство — допустимые точки лежат на самой прямой' : L.origin ? 'удовлетворяет — берём сторону с началом координат' : 'не удовлетворяет — берём противоположную сторону'}</td></tr>`).join('')}</table></div>`));
     // график
@@ -2062,7 +2170,7 @@ const VIEWS = (() => {
     let vt;
     if (!G.verts.length) vt = '<div class="note bad">Ни одна точка пересечения прямых не удовлетворяет всем ограничениям: допустимая область пуста.</div>';
     else vt = `<div class="tblwrap"><table class="plain"><tr><th>Вершина</th><th>Лежит на</th><th>f</th></tr>${G.verts.map(w => `<tr class="${G.f && w.f.eq(G.f) ? 'best' : ''}"><td class="m">${vec(w.p)}</td><td>${w.on.map(o => typeof o === 'number' ? '(' + (o + 1) + ')' : o === 'x1' ? 'оси x₂ (x₁ = 0)' : 'оси x₁ (x₂ = 0)').join(', ')}</td><td class="m">${fq(w.f)}${approx(w.f)}</td></tr>`).join('')}</table></div>`;
-    S.push(sec('verts', 'Вершины допустимой области', vt + (G.status === 'optimal' ? '<p class="kbd">Оптимум ЛП достигается в вершине — это проверка графического решения перебором.</p>' : '')));
+    S.push(sec('verts', 'Вершины допустимой области', (G.verts.length ? demoGraphVerts(pr, G) : '') + vt + (G.status === 'optimal' ? '<p class="kbd">Оптимум ЛП достигается в вершине — это проверка графического решения перебором.</p>' : '')));
     // оптимум
     let oh = '';
     if (G.status === 'optimal') {
@@ -2079,10 +2187,12 @@ const VIEWS = (() => {
       if (G.degenerate) oh += `<div class="note">В точке ${vec(w.p)} сходятся ${w.on.length} границы — вершина <b>вырожденная</b>. Это влияет на двойственную задачу (задание 4).</div>`;
       oh += `<p class="answer"><i>x</i>* = ${vec(G.optVertex.p)}, &nbsp;<i>f</i>* = ${fq(G.f)}</p>`;
     } else oh = `<div class="note bad"><b>${statusText(G.status)[0].toUpperCase() + statusText(G.status).slice(1)}.</b> ${G.status === 'unbounded' ? 'Допустимая область не ограничена в направлении роста f: линию уровня можно сдвигать бесконечно.' : ''}</div>`;
-    S.push(sec('opt', 'Оптимальное решение', oh));
+    const ohCut = (() => { if (G.status !== 'optimal') return -1; const i = oh.indexOf('<div class="note">'); return i < 0 ? oh.indexOf('<p class="answer">') : i; })();
+    const ohBody = ohCut < 0 ? oh : `<details class="dmmore"><summary>Подробно: решение системы (метод Крамера)</summary>${oh.slice(0, ohCut)}</details>${oh.slice(ohCut)}`;
+    S.push(sec('opt', 'Оптимальное решение', (G.verts.length && G.status !== 'infeasible' ? demoGraphObj(pr, G) : '') + ohBody));
     const res = { status: G.status, f: G.f, x: G.status === 'optimal' ? G.optVertex.p : null };
     if (opts.finish) { S.push(...opts.finish(res, G)); return S; }
-    S.push(sec('check', checkTitle(meta), (res.x ? checkTable(pr, res.x) + valueLine(pr, res.x) : noCheck(res)) + compare(pr, res, meta)));
+    S.push(sec('check', checkTitle(meta), (res.x ? demoAnswer(pr, res.x, res.f, null) + checkTable(pr, res.x) + valueLine(pr, res.x) : noCheck(res)) + compare(pr, res, meta)));
     return S;
   }
 
@@ -2102,10 +2212,10 @@ const VIEWS = (() => {
       <li><b>Шаг 5.</b> Ведущую строку делим на ведущий элемент, из остальных вычитаем её, умноженную на их число в ведущем столбце.</li></ol>
       <p class="kbd"><b>Базис</b> — переменные, подписанные слева у строк; они равны своему b, остальные равны 0.</p>`));
     const sl = j => xv(n + j + 1);
-    S.push(sec('reduce', 'Приведённая задача', `<p>Добавляем остатки ${[...Array(m)].map((_, i) => sl(i)).join(', ')} ≥ 0:</p><div class="sys">${pr.rows.map((r, i) => `${lin(r.a, j => xv(j + 1))} + ${sl(i)} = ${fq(r.b)}`).join('<br>')}</div>
+    S.push(sec('reduce', 'Приведённая задача', demoCanon(pr, res) + `<p>Добавляем остатки ${[...Array(m)].map((_, i) => sl(i)).join(', ')} ≥ 0:</p><div class="sys">${pr.rows.map((r, i) => `${lin(r.a, j => xv(j + 1))} + ${sl(i)} = ${fq(r.b)}`).join('<br>')}</div>
       <p>При <span class="m">${[...Array(n)].map((_, j) => xv(j + 1)).join(' = ')} = 0</span> остатки равны правым частям: ${pr.rows.map((r, i) => `${sl(i)} = ${fq(r.b)}`).join(', ')} — стартовый базис.</p>`));
     const steps = res.phase2.steps;
-    S.push(sec('t0', 'Начальная таблица', `<p>Строка f: ${pr.c.map((v, j) => `${fq(v)} → ${fq(v.neg())}`).join(', ')} (знак меняется, так как f − ${lin(pr.c, j => xv(j + 1))} = 0). В b строки f — 0.</p>` + table(steps[0])));
+    S.push(sec('t0', 'Начальная таблица', demoToTable(pr, res, steps[0], true) + `<p>Строка f: ${pr.c.map((v, j) => `${fq(v)} → ${fq(v.neg())}`).join(', ')} (знак меняется, так как f − ${lin(pr.c, j => xv(j + 1))} = 0). В b строки f — 0.</p>` + table(steps[0])));
     let sid = null;
     const stp = steps.length > 1 || res.status !== 'optimal' ? (s0 => { sid = R.R_last.id; return s0; })(stepper(steps, 'Симплекс-метод')) : null;
     S.push(sec('iter', 'Итерации симплекс-метода', (stp ? stp : '<div class="note ok">Начальная таблица уже оптимальна.</div>') + (res.phase2.bland ? '<div class="note">Обнаружен повтор базиса — далее применено правило Бленда, чтобы избежать зацикливания.</div>' : '')));
@@ -2119,7 +2229,7 @@ const VIEWS = (() => {
       if (res.alt.length) rh += `<div class="note">В строке f под небазисной переменной ${res.alt.map(j => vname(last.vars, j)).join(', ')} стоит 0 — есть и другие оптимальные решения с тем же f*.</div>`;
       if (res.degenerate) rh += '<div class="note">Есть базисная переменная, равная 0, — решение <b>вырожденное</b>.</div>';
     } else rh = `<div class="note bad"><b>${statusText(res.status)}.</b></div>`;
-    S.push(sec('res', 'Ответ', rh));
+    S.push(sec('res', 'Ответ', (res.status === 'optimal' ? demoAnswer(pr, res.x, res.f, res.last, { alt: res.alt, degenerate: res.degenerate }) : '') + rh));
     S.push(sec('check', checkTitle(meta), (res.status === 'optimal' ? checkTable(pr, res.x) + valueLine(pr, res.x) : noCheck(res)) + compare(pr, res, meta)));
     return S;
   }
@@ -2156,10 +2266,10 @@ const VIEWS = (() => {
     if (flips.length) ch += `<p><b>Отрицательные правые части.</b> ${flips.map(f => `Уравнение ${f.i + 1} умножаем на −1`).join('; ')}:</p><div class="sys">${flips.map(f => { const r = res.rows[f.i]; return `${lin(r.a, j => xv(j + 1))} + ${VN(res.slackOf[f.i])} = ${fq(r.b)}`; }).join('<br>')}</div>`;
     ch += `<p><b>2. Искусственные переменные</b> (в каждое уравнение):</p><div class="sys">${res.rows.map((r, i) => `${lin(r.a, j => xv(j + 1))} ${r.flipped ? '+' : '−'} ${VN(res.slackOf[i])} + ${VN(res.artOf[i])} = ${fq(r.b)}`).join('<br>')}</div>
       <p>Стартовый базис: ${res.rows.map((r, i) => `${VN(res.artOf[i])} = ${fq(r.b)}`).join(', ')}. Цель этапа 1: h = ${res.artOf.map(VN).join(' + ')} → min.</p>`;
-    S.push(sec('canon', 'Преобразования', ch));
+    S.push(sec('canon', 'Преобразования', demoCanon(pr, res) + ch));
     const p1 = res.phase1, st0 = p1.steps[0];
     const colEx = st0.cols.filter(j => v[j].kind !== 't').map(j => `${VN(j)}: −(${res.rows.map(r => fq(st0.rows[res.rows.indexOf(r)].a[j])).join(' + ').replace(/\+ −/g, '− ')}) = <b>${fq(st0.z.a[j])}</b>`).join('; ');
-    S.push(sec('hrow', 'Строка −h', `<p>Каждое число строки −h = минус сумма своего столбца по строкам с t (в столбцах t — 0). b: −(${res.rows.map(r => fq(r.b)).join(' + ')}) = <b>${fq(st0.z.b)}</b>; ${colEx}.</p>
+    S.push(sec('hrow', 'Строка −h', demoToTable(pr, res, res.phase1.steps[0], false) + demoHRow(pr, res) + `<p>Каждое число строки −h = минус сумма своего столбца по строкам с t (в столбцах t — 0). b: −(${res.rows.map(r => fq(r.b)).join(' + ')}) = <b>${fq(st0.z.b)}</b>; ${colEx}.</p>
       <p class="kbd">Почему −h: алгоритм увеличивает цель, а уменьшить h — то же, что увеличить −h. h ≥ 0, поэтому b строки −h не больше 0; в конце этапа 1 ожидаем там 0 и ни одного отрицательного числа в строке.</p>` + table(st0)));
     const st1 = stepper(p1.steps, 'Этап 1'); res.sid1 = R.R_last.id;
     S.push(sec('ph1', 'Этап 1: минимум h', st1 + `<details><summary>Все таблицы этапа 1</summary>${allTables(p1.steps)}</details>`));
@@ -2178,17 +2288,17 @@ const VIEWS = (() => {
     if (hasArt) ch += `<p><b>2. Искусственные переменные</b> (${all ? 'в каждое уравнение' : `в уравнения ${artRows.map(i => i + 1).join(', ')} — в них нет готовой базисной переменной`}):</p><div class="sys">${res.rows.map((r, i) => `${lin(r.a, j => xv(j + 1))}${slk(i)}${res.artOf[i] !== null ? ' + ' + VN(res.artOf[i]) : ''} = ${fq(r.b)}`).join('<br>')}</div>
       <p>Стартовый базис: ${res.rows.map((r, i) => `${VN(basis0[i])} = ${fq(r.b)}`).join(', ')}. Цель этапа 1: h = ${artRows.map(i => VN(res.artOf[i])).join(' + ')} → min.</p>`;
     else ch += `<div class="note ok">Во всех ограничениях есть остаток с коэффициентом 1 и b ≥ 0 — готовый базис ${res.rows.map((r, i) => `${VN(basis0[i])} = ${fq(r.b)}`).join(', ')}. Искусственные переменные и этап 1 не нужны.</div>`;
-    S.push(sec('canon', 'Преобразования', ch));
+    S.push(sec('canon', 'Преобразования', demoCanon(pr, res) + (!hasArt && res.phase2 ? demoToTable(pr, res, res.phase2.steps[0], true) : '') + ch));
     if (hasArt) {
       const p1 = res.phase1, st0 = p1.steps[0];
       const colEx = st0.cols.filter(j => v[j].kind !== 't').map(j => `${VN(j)}: −(${artRows.map(i => fq(st0.rows[i].a[j])).join(' + ').replace(/\+ −/g, '− ')}) = <b>${fq(st0.z.a[j])}</b>`).join('; ');
-      S.push(sec('hrow', 'Строка −h', `<p>Каждое число строки −h = минус сумма своего столбца по строкам с t (в столбцах t — 0). b: −(${artRows.map(i => fq(res.rows[i].b)).join(' + ')}) = <b>${fq(st0.z.b)}</b>; ${colEx}.</p>` + table(st0)));
+      S.push(sec('hrow', 'Строка −h', demoToTable(pr, res, res.phase1.steps[0], false) + demoHRow(pr, res) + `<p>Каждое число строки −h = минус сумма своего столбца по строкам с t (в столбцах t — 0). b: −(${artRows.map(i => fq(res.rows[i].b)).join(' + ')}) = <b>${fq(st0.z.b)}</b>; ${colEx}.</p>` + table(st0)));
       const st1 = stepper(p1.steps, 'Этап 1'); res.sid1 = R.R_last.id;
       S.push(sec('ph1', 'Этап 1: минимум h', st1 + `<details><summary>Все таблицы этапа 1</summary>${allTables(p1.steps)}</details>`));
     }
     }
     if (res.status === 'infeasible') {
-      S.push(sec('end1', 'Итог этапа 1', `<div class="note bad"><b>h* = ${fq(res.h)} &gt; 0.</b> Искусственные переменные нельзя обнулить: нет допустимого решения, в котором все t = 0. Значит, у исходной задачи <b>допустимая область пуста</b>; этап 2 не выполняется.</div>`));
+      S.push(sec('end1', 'Итог этапа 1', demoPhase1End(pr, res) + `<div class="note bad"><b>h* = ${fq(res.h)} &gt; 0.</b> Искусственные переменные нельзя обнулить: нет допустимого решения, в котором все t = 0. Значит, у исходной задачи <b>допустимая область пуста</b>; этап 2 не выполняется.</div>`));
       S.push(sec('check', checkTitle(meta), noCheck(res) + compare(pr, res, meta)));
       return S;
     }
@@ -2222,7 +2332,8 @@ const VIEWS = (() => {
         ex(-1);
       });
     } else eh += table(res.phase2.steps[0]);
-    S.push(sec('ph2s', 'Переход к этапу 2', eh));
+    const driveDemos = (res.driveOut || []).filter(d => d.kind === 'pivot').map(d => demoDrive(d)).join('');
+    S.push(sec('ph2s', 'Переход к этапу 2', (res.phase1 ? demoPhase1End(pr, res) + driveDemos + demoPhase2Start(pr, res) : '') + eh));
     const p2 = res.phase2.steps;
     let sid2 = null;
     const st2 = p2.length > 1 || res.status !== 'optimal' ? (s0 => { sid2 = R.R_last.id; return s0; })(stepper(p2, 'Этап 2')) : null;
@@ -2240,67 +2351,1172 @@ const VIEWS = (() => {
       || path3d(pr, [{ steps: res.phase1 ? res.phase1.steps : null, from: res.sid1, cls: 'p1', prefix: 'I·', title: 'этап 1, таблица' }, { steps: p2, from: sid2, prefix: res.phase1 ? 'II·' : '', title: 'этап 2, таблица' }], res,
         res.phase1 ? 'Три переменные — область является многогранником. Серые точки — этап 1 (часто вне области: там искусственные переменные ещё не нули), красные — этап 2, переход по рёбрам к оптимуму.' : '');
     if (geo) S.push(geo);
-    S.push(sec('res', 'Ответ', rh));
+    S.push(sec('res', 'Ответ', (res.status === 'optimal' ? demoAnswer(pr, res.x, res.f, res.last, { alt: res.alt, degenerate: res.degenerate }) : '') + rh));
     S.push(sec('check', checkTitle(meta), (res.status === 'optimal' ? checkTable(pr, res.x) + valueLine(pr, res.x) : noCheck(res)) + compare(pr, res, meta)));
     return S;
   }
 
-  /* =================== Анимации «было → стало» для этапов =================== */
-  // demo(подпись, html, сценарий): сцена сразу показывает итог; при появлении на экране сценарий проигрывается с начала.
-  // Сценарий — async (A) => …, A: q/qa (поиск в сцене), wait, anim, pop, hide, swap (перелистывание содержимого), fly (перелёт копии), cls, cap, seq.
-  const DM_STOP = {};
+  /* =================== Движок анимаций: пошаговые сцены =================== */
+  // demo(подпись, html, сценарий[, опции]): сцена в исходном состоянии — html; сценарий — async (A) => …
+  // Границы шагов задаёт A.cap(подпись): «шаг k» = всё, что происходит после k-го вызова cap до (k+1)-го.
+  // Любое состояние восстанавливается прогоном сценария с начала в мгновенном режиме, поэтому доступны
+  // «Заново», «Предыдущий / Следующий шаг», «Играть / Пауза», «Показать итог», скорость.
+  // A: q/qa (поиск в сцене), wait, anim, pop, hide, pulse, swap (переворот), fly (копия числа летит), put (перелёт + запись),
+  //    show, cls, cap, seq, draw (рисование линии), set. A.detail — включён режим «подробно» (если он есть у сцены).
+  const DM_STOP = {}, DM_HALT = {};
   let dmUid = 0;
-  function demo(title, html, script) {
-    const id = 'dm' + (++dmUid);
-    R.hooks.push(() => {
-      const root = document.getElementById(id); if (!root) return;
-      const stage = root.querySelector('.dmstage'), capEl = root.querySelector('.dmcap');
-      let token = 0;
-      const run = async fast => {
-        const my = ++token;
-        stage.innerHTML = html; capEl.innerHTML = '';
-        root.classList.toggle('fast', fast); root.classList.toggle('playing', !fast);
-        const alive = () => { if (my !== token || !root.isConnected) throw DM_STOP; };
-        const kf = (el, frames, o = {}) => el.animate(frames, { duration: fast ? 0 : (o.d || 450), delay: fast ? 0 : (o.delay || 0), easing: o.ease || 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-        const A = {
-          fast,
-          q: s => stage.querySelector(s), qa: s => [...stage.querySelectorAll(s)],
-          wait: ms => fast ? Promise.resolve() : new Promise(r => setTimeout(r, ms)).then(alive),
-          anim: (el, frames, o) => { if (!el) return Promise.resolve(); const a = kf(el, frames, o); return fast ? Promise.resolve() : a.finished.then(alive, alive); },
-          pop: (el, o) => A.anim(el, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.18)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], { d: 420, ...o }),
-          hide: (el, o) => A.anim(el, [{ opacity: 1 }, { opacity: 0 }], { d: 300, ...o }),
-          pulse: (el, o) => A.anim(el, [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { d: 420, ...o }),
-          swap: async (el, h, d = 420) => {
-            if (!el) return; if (fast) { el.innerHTML = h; return; }
-            await el.animate([{ transform: 'rotateX(0)' }, { transform: 'rotateX(90deg)' }], { duration: d / 2, fill: 'forwards' }).finished.then(alive, alive);
-            el.innerHTML = h;
-            await el.animate([{ transform: 'rotateX(90deg)' }, { transform: 'rotateX(0)' }], { duration: d / 2, fill: 'forwards' }).finished.then(alive, alive);
-          },
-          fly: (from, to, h, o = {}) => {
-            if (fast || !from || !to) return Promise.resolve();
-            const sr = stage.getBoundingClientRect(), a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
-            const c = document.createElement('span'); c.className = 'dmfly'; c.innerHTML = h == null ? from.innerHTML : h;
-            c.style.left = (a.left - sr.left) + 'px'; c.style.top = (a.top - sr.top) + 'px'; stage.appendChild(c);
-            const w = c.getBoundingClientRect(), dx = b.left + b.width / 2 - (a.left + w.width / 2), dy = b.top + b.height / 2 - (a.top + w.height / 2);
-            return c.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx / 2}px,${dy / 2 - 28}px) scale(1.3)`, offset: .5 }, { transform: `translate(${dx}px,${dy}px) scale(1)` }],
-              { duration: o.d || 750, delay: o.delay || 0, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove(), () => c.remove()).then(alive);
-          },
-          cls: (el, c, on = true) => { if (el) (Array.isArray(el) ? el : [el]).forEach(e => e.classList.toggle(c, on)); },
-          cap: h => { capEl.innerHTML = h; if (!fast) capEl.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 300 }); },
-          seq: (list, gap, fn) => Promise.all(list.map((x, k) => A.wait(k * gap).then(() => fn(x, k)))),
-        };
-        try { await script(A); } catch (e) { if (e !== DM_STOP) throw e; }
-        if (my === token) root.classList.remove('playing');
+  const DM = { all: new Set(), active: null, listening: false };
+  const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const SPEEDS = [['2.2', 'Медленно'], ['1', 'Обычно'], ['0.45', 'Быстро']];
+  const dmLegend = '<span class="lg lg-sel">▸ синий — выбрано</span><span class="lg lg-act">● жёлтый — действие сейчас</span><span class="lg lg-del">✕ розовый — убирается / искусственная</span><span class="lg lg-ok">✓ зелёный — результат</span><span class="lg lg-dim">○ серый — не участвует</span>';
+
+  function stopAllDemos() {
+    DM.all.forEach(c => c.dispose());
+    DM.all.clear(); DM.active = null;
+  }
+  function dmShell(id, title, o = {}) {
+    return `<div class="demo" id="${id}"><div class="dmhead"><span class="dmtag">${o.tag || 'анимация'}</span><span class="dmtl">${title}</span>${o.detail ? `<label class="dmdet"><input type="checkbox" class="dm-det"> ${o.detail}</label>` : ''}</div>
+      <div class="dmstage"></div><div class="dmcap" aria-live="polite"></div><div class="dmprog"><i></i></div>
+      <div class="dmctl"><button class="btn dm-re" title="Проиграть с начала">↺ Заново</button><button class="btn dm-prev" title="Предыдущий шаг">◀ Назад</button><span class="dmpos">шаг 0 из 0</span><button class="btn dm-next" title="Следующий шаг">Далее ▶</button><button class="btn primary dm-play">▶ Играть</button><button class="btn dm-end" title="Показать итог">⏭ Итог</button>
+      <select class="dm-speed" aria-label="Скорость">${SPEEDS.map(s => `<option value="${s[0]}"${s[0] === '1' ? ' selected' : ''}>${s[1]}</option>`).join('')}</select></div>
+      <div class="dmleg">${dmLegend}</div></div><!--dmend-->`;
+  }
+
+  function mountDemo(root, spec) {
+    const { html, script, opts = {} } = spec;
+    const stage = root.querySelector('.dmstage'), capEl = root.querySelector('.dmcap'), posEl = root.querySelector('.dmpos'), barEl = root.querySelector('.dmprog i');
+    const $b = c => root.querySelector('.' + c);
+    let token = 0, total = 0, cur = 0, playing = false, speed = 1, detail = false, fastNow = true, curCfg = null, rtimer = null, io = null, disposed = false;
+    const pend = new Set();
+    const reduce = reduceMotion();
+    const clearPending = () => { pend.forEach(r => { clearTimeout(r[0]); r[1](); }); pend.clear(); };
+    const ui = () => {
+      posEl.textContent = `шаг ${cur} из ${total}`;
+      barEl.style.width = total ? (100 * cur / total) + '%' : '0';
+      $b('dm-prev').disabled = cur <= 0; $b('dm-next').disabled = cur >= total;
+      const pl = $b('dm-play'); pl.textContent = playing ? '⏸ Пауза' : (cur >= total && total ? '▶ Повторить' : '▶ Играть');
+      root.classList.toggle('playing', playing);
+    };
+    const run = async cfg => {
+      const my = ++token; curCfg = cfg; clearPending();
+      stage.innerHTML = html; capEl.innerHTML = '';
+      let k = 0; fastNow = true;
+      const alive = () => { if (my !== token || disposed || !root.isConnected) throw DM_STOP; };
+      const kf = (el, frames, o = {}) => el.animate(frames, { duration: fastNow ? 0 : (o.d || 450) * speed, delay: fastNow ? 0 : (o.delay || 0) * speed, easing: o.ease || 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+      const A = {
+        get fast() { return fastNow; }, detail,
+        q: s => stage.querySelector(s), qa: s => [...stage.querySelectorAll(s)],
+        wait: ms => (fastNow ? Promise.resolve() : new Promise(res => { const rec = [setTimeout(() => { pend.delete(rec); res(); }, ms * speed), res]; pend.add(rec); })).then(alive),
+        anim: (el, frames, o) => { if (!el) return Promise.resolve(); const a = kf(el, frames, o); return fastNow ? Promise.resolve() : a.finished.then(alive, alive); },
+        pop: (el, o) => { if (el) el.classList.remove('dh'); return A.anim(el, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.18)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], { d: 420, ...o }); },
+        show: (el, o) => { if (el) el.classList.remove('dh'); return A.anim(el, [{ opacity: 0 }, { opacity: 1 }], { d: 320, ...o }); },
+        hide: (el, o) => A.anim(el, [{ opacity: 1 }, { opacity: 0 }], { d: 300, ...o }),
+        pulse: (el, o) => A.anim(el, [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { d: 420, ...o }),
+        swap: async (el, h, d = 420) => {
+          if (!el) return; if (fastNow) { el.innerHTML = h; return; }
+          await el.animate([{ transform: 'rotateX(0)' }, { transform: 'rotateX(90deg)' }], { duration: d / 2 * speed, fill: 'forwards' }).finished.then(alive, alive);
+          el.innerHTML = h;
+          await el.animate([{ transform: 'rotateX(90deg)' }, { transform: 'rotateX(0)' }], { duration: d / 2 * speed, fill: 'forwards' }).finished.then(alive, alive);
+        },
+        set: (el, h) => { if (el) el.innerHTML = h; },
+        fly: (from, to, h, o = {}) => {
+          if (fastNow || !from || !to) return Promise.resolve();
+          const sr = stage.getBoundingClientRect(), a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+          const c = document.createElement('span'); c.className = 'dmfly'; c.innerHTML = h == null ? from.innerHTML : h;
+          c.style.left = (a.left - sr.left) + 'px'; c.style.top = (a.top - sr.top) + 'px'; stage.appendChild(c);
+          const w = c.getBoundingClientRect(), dx = b.left + b.width / 2 - (a.left + w.width / 2), dy = b.top + b.height / 2 - (a.top + w.height / 2);
+          return c.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx / 2}px,${dy / 2 - 28}px) scale(1.3)`, offset: .5 }, { transform: `translate(${dx}px,${dy}px) scale(1)` }],
+            { duration: (o.d || 750) * speed, delay: (o.delay || 0) * speed, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove(), () => c.remove()).then(alive);
+        },
+        // перелёт копии в ячейку и запись в неё значения (h; по умолчанию — содержимое источника)
+        put: async (from, to, h, o) => { await A.fly(from, to, h == null ? null : h, o); if (to) { to.innerHTML = h == null ? from.innerHTML : h; await A.pop(to, { d: 300 }); } },
+        draw: (el, o) => { if (!el) return Promise.resolve(); el.classList.remove('dh'); return A.anim(el, [{ strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, opacity: 1 }], { d: 700, ease: 'ease-in-out', ...o }); },
+        cls: (el, c, on = true) => { if (el) (Array.isArray(el) ? el : [el]).forEach(e => e && e.classList.toggle(c, on)); },
+        cap: h => {
+          k++;
+          if (k > curCfg.stop) throw DM_HALT;
+          fastNow = reduce || k < curCfg.anim;
+          cur = k; capEl.innerHTML = h; ui();
+          if (!fastNow) capEl.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 300 });
+        },
+        seq: (list, gap, fn) => Promise.all(list.map((x, i) => A.wait(i * gap).then(() => fn(x, i)))),
+        // последовательное выполнение действий одно за другим
+        each: async (list, fn) => { for (let i = 0; i < list.length; i++) await fn(list[i], i); }
       };
-      root.querySelector('.dmre').onclick = () => run(false);
-      root.querySelector('.dmend').onclick = () => run(true);
-      run(true);
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); run(false); } }, { threshold: 0.4 });
+      try { await script(A); }
+      catch (e) {
+        if (e !== DM_STOP && e !== DM_HALT) { console.error('Ошибка сцены:', e); (window.__dmErr = window.__dmErr || []).push(String(e && e.stack || e)); }
+      }
+      if (my === token) {
+        if (curCfg.stop === Infinity) { total = Math.max(total, k); if (curCfg.anim === Infinity || k >= total) cur = Math.min(k, total); }
+        playing = false; fastNow = true; ui();
+      }
+    };
+    const halt = () => { token++; clearPending(); clearTimeout(rtimer); rtimer = null; playing = false; };
+    const goTo = (n, animate) => { halt(); n = Math.max(0, Math.min(total, n)); cur = n; ui(); return run({ stop: n, anim: animate ? n : Infinity }); };
+    const toEnd = () => { halt(); return run({ stop: Infinity, anim: Infinity }).then(() => { cur = total; ui(); }); };
+    const playFrom = from => {
+      if (DM.active && DM.active !== ctl) DM.active.settle();
+      DM.active = ctl; halt();
+      if (reduce) {   // без движения: смена состояний по таймеру
+        playing = true; cur = from; ui();
+        const tick = () => { if (!playing) return; if (cur >= total) { playing = false; ui(); return; } goTo(cur + 1, false).then(() => { playing = true; ui(); rtimer = setTimeout(tick, 1500); }); };
+        goTo(from, false).then(() => { playing = true; ui(); rtimer = setTimeout(tick, 900); });
+        return;
+      }
+      playing = true; cur = from; ui();
+      run({ stop: Infinity, anim: from + 1 });
+    };
+    const pause = () => {
+      if (reduce) { halt(); ui(); return; }
+      if (!playing || !curCfg) return;
+      curCfg.stop = cur;           // остановиться на границе текущего шага
+      fastNow = true; clearPending();
+      stage.getAnimations({ subtree: true }).forEach(a => { try { a.finish(); } catch (_) { /* бесконечные не используются */ } });
+    };
+    const ctl = {
+      dispose() { disposed = true; token++; clearPending(); clearTimeout(rtimer); if (io) io.disconnect(); DM.all.delete(ctl); if (DM.active === ctl) DM.active = null; },
+      settle() { if (disposed) return Promise.resolve(); return toEnd(); },
+      pause, play: () => playFrom(0), isPlaying: () => playing, root
+    };
+    DM.all.add(ctl);
+    if (!DM.listening) {
+      DM.listening = true;
+      document.addEventListener('visibilitychange', () => { if (document.hidden && DM.active) DM.active.pause(); });
+      window.addEventListener('beforeprint', () => DM.all.forEach(c => c.settle()));
+    }
+    $b('dm-re').onclick = () => playFrom(0);
+    $b('dm-play').onclick = () => { if (playing) pause(); else playFrom(cur >= total ? 0 : cur); };
+    $b('dm-next').onclick = () => { if (cur < total) { if (DM.active === ctl) DM.active = null; goTo(cur + 1, true); } };
+    $b('dm-prev').onclick = () => { if (cur > 0) goTo(cur - 1, false); };
+    $b('dm-end').onclick = () => toEnd();
+    $b('dm-speed').onchange = e => { speed = +e.target.value; };
+    const det = $b('dm-det');
+    if (det) det.onchange = () => { detail = det.checked; total = 0; toEnd(); };
+    toEnd().then(() => {
+      if (disposed) return;
+      if (opts.autoplay && !reduce) playFrom(0);
+      else if ('IntersectionObserver' in window && !reduce && !opts.manual) {
+        io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); io = null; if (!disposed && !playing) playFrom(0); } }, { threshold: 0.45 });
         io.observe(root);
       }
     });
-    return `<div class="demo" id="${id}"><div class="dmhead"><span class="dmtag">было → стало</span><span class="dmtl">${title}</span><span class="dmbtns"><button class="btn dmre">↺ Заново</button><button class="btn dmend">⏭ Итог</button></span></div><div class="dmstage">${html}</div><div class="dmcap"></div></div>`;
+    return ctl;
+  }
+  function demo(title, html, script, opts = {}) {
+    const id = 'dm' + (++dmUid);
+    R.hooks.push(() => { const root = document.getElementById(id); if (root) mountDemo(root, { html, script, opts }); });
+    return dmShell(id, title, opts);
+  }
+  // динамическая сцена (степпер таблиц): монтируется в готовый контейнер
+  function mountInto(box, title, html, script, opts = {}) {
+    const id = 'dm' + (++dmUid);
+    box.innerHTML = dmShell(id, title, opts);
+    return mountDemo(box.firstElementChild, { html, script, opts });
+  }
+
+  /* =================== Общие помощники сцен =================== */
+  const vkClass = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'vk-x' : v.kind === 't' ? 'vk-t' : v.sign < 0 ? 'vk-e' : 'vk-s'; };
+  const vkTag = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'исходная' : v.kind === 't' ? 'искусств.' : v.sign < 0 ? 'излишек' : 'остаток'; };
+  const vK = (vars, j) => `<span class="${vkClass(vars, j)}">${vname(vars, j)}</span>`;
+  const ft = q => q.toText();                                   // число для подписей SVG (без разметки)
+  const zName = st => st.z.label.replace('−', '');
+
+  // таблица сцены: каждое число — отдельный элемент .cv (его можно копировать и подсвечивать)
+  function dtb(st, o = {}) {
+    const m = st.rows.length, cols = st.cols;
+    const cell = (v, i, j, cls) => `<td class="${cls || ''}" data-i="${i}" data-j="${j}"><span class="cv">${v == null ? '' : fq(v)}</span></td>`;
+    let h = `<div class="tblwrap ${o.cls || ''}"><table class="sx dmsx"><thead><tr><th class="bh">Базис</th><th data-j="-1">b</th>${cols.map(j => `<th data-j="${j}" class="${vkClass(st.vars, j)}">${vname(st.vars, j)}<span class="vtag">${vkTag(st.vars, j)}</span></th>`).join('')}${o.ratio ? '<th class="rth">b ÷ a</th>' : ''}</tr></thead><tbody>`;
+    st.rows.forEach((r, i) => {
+      h += `<tr data-i="${i}"><td class="bas" data-i="${i}" data-j="bas"><span class="cv">${vK(st.vars, st.basis[i])}</span></td>` + cell(o.blank ? null : r.b, i, -1, 'bcol') + cols.map(j => cell(o.blank ? null : r.a[j], i, j)).join('') + (o.ratio ? `<td class="rt" data-i="${i}"><span class="cv dh"></span></td>` : '') + '</tr>';
+    });
+    h += `<tr class="zrow" data-i="${m}"><td class="bas" data-i="${m}" data-j="bas"><span class="cv">${zlab(st.z.label)}</span></td>` + cell(o.blankZ || o.blank ? null : st.z.b, m, -1, 'bcol') + cols.map(j => cell(o.blankZ || o.blank ? null : st.z.a[j], m, j)).join('') + (o.ratio ? '<td class="rt"></td>' : '') + '</tr></tbody></table></div>';
+    return h;
+  }
+  // быстрые доступы внутри сцены: C(t,i,j) — ячейка, V(t,i,j) — её число
+  const sceneTools = A => {
+    const C = (t, i, j) => A.q(`.${t} td[data-i="${i}"][data-j="${j}"]`);
+    const V = (t, i, j) => { const c = C(t, i, j); return c ? c.querySelector('.cv') : null; };
+    const H = (t, j) => A.q(`.${t} th[data-j="${j}"]`);
+    return { C, V, H };
+  };
+
+  /* =================== Пересчёт симплекс-таблицы =================== */
+  // s — таблица с выбранными q, p; nxt — таблица после пересчёта. opts.drive — вывод искусственной переменной.
+  function pivotSpec(s, nxt, o = {}) {
+    const m = s.rows.length, q = s.q, p = s.p, vars = s.vars, cols = s.cols, zl = zlab(s.z.label);
+    const enter = vK(vars, q), leave = p != null ? vK(vars, s.basis[p]) : '';
+    const piv = p != null ? s.rows[p].a[q] : null;
+    const rowLab = i => i === m ? zl : vK(vars, s.basis[i]);
+    const colLab = j => j < 0 ? 'b' : vK(vars, j);
+    const getO = (i, j) => { const r = i === m ? s.z : s.rows[i]; return j < 0 ? r.b : r.a[j]; };
+    const getN = (i, j) => { const r = i === m ? nxt.z : nxt.rows[i]; return j < 0 ? r.b : r.a[j]; };
+    const allJ = [-1, ...cols];
+    const newShell = nxt ? { ...nxt, basis: s.basis } : null;
+    const html = `<div class="pvwrap"><div><div class="dmh">было: таблица</div>${dtb(s, { cls: 'tO', ratio: true })}</div>${nxt ? `<div><div class="dmh">стало: новая таблица</div>${dtb(newShell, { cls: 'tN', blank: true })}</div>` : ''}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const negs = cols.filter(j => s.z.a[j].s < 0);
+    const bland = negs.some(j => s.z.a[j].lt(s.z.a[q]));
+    const script = async A => {
+      const { C, V, H } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      const colAll = j => [H('tO', j), ...[...Array(m + 1).keys()].map(i => C('tO', i, j))];
+      const rowAll = i => [C('tO', i, 'bas'), ...allJ.map(j => C('tO', i, j))];
+      await A.wait(250);
+      if (o.drive) {
+        A.cap(`${leave} осталась в базисе (значение 0) — её нужно вывести`);
+        A.cls(rowAll(p), 'k-sel'); A.cls(C('tO', p, 'bas'), 'k-del');
+        await A.pulse(V('tO', p, 'bas'));
+        A.cap(`В её строке берём ненулевое число ${fq(piv)} в столбце ${enter}`);
+        A.cls(colAll(q), 'k-sel'); A.cls(C('tO', p, q), 'k-pe'); await A.pulse(V('tO', p, q));
+        A.set(fm, `<span class="fmh">Ведущий элемент ${fq(piv)} — столбец ${enter} войдёт в базис вместо ${leave}</span>`);
+      } else {
+        // 1. отрицательные числа в строке цели
+        A.cap(`В строке ${zl} ищем отрицательные числа`);
+        A.cls(cols.map(j => C('tO', m, j)), 'k-dim');
+        await A.each(negs, async j => { A.cls(C('tO', m, j), 'k-dim', false); A.cls(C('tO', m, j), 'k-act'); await A.pulse(V('tO', m, j)); await A.wait(100); });
+        // 2. ведущий столбец
+        A.cap(bland ? `Правило Бленда: берём отрицательный столбец с наименьшим номером — ${enter}` : `Самое отрицательное: ${fq(s.z.a[q])} — столбец ${enter} ведущий`);
+        A.cls(cols.map(j => C('tO', m, j)), 'k-dim', false); A.cls(negs.map(j => C('tO', m, j)), 'k-act', false);
+        A.cls(colAll(q), 'k-sel');
+        await A.pulse(V('tO', m, q));
+        A.set(fm, `<span class="fmh">${enter} войдёт в базис: рост этой переменной сильнее всего улучшает ${zName(s)}</span>`);
+        if (s.unbounded) {
+          A.cap(`В столбце ${enter} нет положительных чисел`);
+          await A.each([...Array(m).keys()], async i => { A.cls(C('tO', i, q), 'k-del'); const rt = A.q(`.tO td.rt[data-i="${i}"] .cv`); A.set(rt, `${fq(s.rows[i].a[q])} ≤ 0 — не ограничивает`); await A.pop(rt, { d: 250 }); });
+          A.cap(`Ничто не останавливает рост ${enter}: ${zName(s)} не ограничена`);
+          A.cls(C('tO', m, q), 'k-del');
+          A.set(fm, `<span class="fmh bad">Ни одно ограничение не мешает увеличивать ${enter} — целевая функция не ограничена, оптимума нет</span>`);
+          await A.pulse(fm);
+          return;
+        }
+        // 3. отношения b ÷ a
+        A.cap(`Делим b на положительные числа столбца ${enter}`);
+        await A.each([...Array(m).keys()], async i => {
+          const rt = A.q(`.tO td.rt[data-i="${i}"] .cv`), r = s.ratios[i];
+          if (r) {
+            A.cls([C('tO', i, -1), C('tO', i, q)], 'k-act');
+            await Promise.all([A.fly(V('tO', i, -1), rt), A.fly(V('tO', i, q), rt)]);
+            A.set(rt, `${fq(s.rows[i].b)} ÷ ${fq(s.rows[i].a[q])} = <b>${fq(r)}</b>`); await A.pop(rt, { d: 300 });
+            A.cls([C('tO', i, -1), C('tO', i, q)], 'k-act', false);
+          } else {
+            A.cls(C('tO', i, q), 'k-del'); A.cls(rowAll(i), 'k-dim');
+            A.set(rt, `${fq(s.rows[i].a[q])} ≤ 0 — не берём`); await A.pop(rt, { d: 250 });
+          }
+        });
+        // 4. минимальное отношение
+        const mn = s.ratios[p], ties = s.ratios.filter(r => r && r.eq(mn)).length;
+        A.cap(ties > 1 ? `Наименьшее ${fq(mn)} в нескольких строках — берём строку с меньшим номером переменной: ${leave}` : `Наименьшее отношение ${fq(mn)} — строка ${leave} ведущая`);
+        s.rows.forEach((r, i) => { if (s.ratios[i] && i !== p) A.cls(A.q(`.tO td.rt[data-i="${i}"]`), 'k-dim'); });
+        A.cls(A.q(`.tO td.rt[data-i="${p}"]`), 'k-ok');
+        A.cls(rowAll(p), 'k-sel'); A.cls(rowAll(p), 'k-dim', false);
+        await A.pulse(V('tO', p, 'bas'));
+        // 5. ведущий элемент
+        A.cap(`Пересечение выбранных строки и столбца — ведущий элемент ${fq(piv)}`);
+        A.cls(C('tO', p, q), 'k-pe'); await A.pulse(V('tO', p, q));
+        A.set(fm, `<span class="fmh">ведущий элемент = <b>${fq(piv)}</b></span>`);
+      }
+      // 6. вход и выход из базиса
+      A.cap(`${enter} входит в базис, ${leave} выходит`);
+      A.cls(C('tO', p, 'bas'), 'k-del');
+      await A.fly(H('tO', q), C('tN', p, 'bas'));
+      A.set(V('tN', p, 'bas'), `${enter}`); A.cls(C('tN', p, 'bas'), 'k-ok'); await A.pop(V('tN', p, 'bas'), { d: 350 });
+      // формулы пересчёта одной ячейки
+      // mode: 'full' — числа летят в формулу по очереди; 'first' — одновременно; 'quick' — формула собрана сразу
+      const cellFlow = async (i, j, mode) => {
+        const old = getO(i, j), nw = getN(i, j), isP = i === p, fl = mode !== 'quick', sq = mode === 'full', d = sq ? 600 : 400;
+        const srcO = V('tO', i, j), ph = (x, f) => fl ? '□' : f(x);
+        A.cls(C('tO', i, j), 'k-act'); A.cls(C('tN', i, j), 'k-act');
+        if (isP) {
+          A.set(fm, `<span class="fo">${ph(old, fq)}</span> ÷ <span class="fp">${ph(piv, par)}</span> = <b class="fr">${ph(nw, fq)}</b>`);
+          if (fl) {
+            const jobs = [() => A.put(srcO, A.q('.pvfm .fo'), fq(old), { d }), () => A.put(V('tO', p, q), A.q('.pvfm .fp'), par(piv), { d })];
+            if (sq) for (const f of jobs) await f(); else await Promise.all(jobs.map(f => f()));
+            await A.swap(A.q('.pvfm .fr'), fq(nw), sq ? 380 : 240);
+          }
+        } else {
+          const kk = getO(i, q), npv = getN(p, j);
+          A.set(fm, `<span class="fo">${ph(old, fq)}</span> − <span class="fk">${ph(kk, par)}</span> × <span class="fn">${ph(npv, par)}</span> = <b class="fr">${ph(nw, fq)}</b>`);
+          if (fl) {
+            A.cls(C('tO', i, q), 'k-sel'); A.cls(C('tN', p, j), 'k-ok');
+            const jobs = [() => A.put(srcO, A.q('.pvfm .fo'), fq(old), { d }), () => A.put(V('tO', i, q), A.q('.pvfm .fk'), par(kk), { d }), () => A.put(V('tN', p, j), A.q('.pvfm .fn'), par(npv), { d })];
+            if (sq) for (const f of jobs) await f(); else await Promise.all(jobs.map(f => f()));
+            A.cls(C('tO', i, q), 'k-sel', false); A.cls(C('tN', p, j), 'k-ok', false); A.cls(C('tN', p, j), 'k-ok');
+            await A.swap(A.q('.pvfm .fr'), fq(nw), sq ? 380 : 240);
+          }
+        }
+        await A.fly(A.q('.pvfm .fr'), V('tN', i, j), null, { d: sq ? 750 : 420 });
+        A.set(V('tN', i, j), fq(nw)); await A.pop(V('tN', i, j), { d: 260 });
+        A.cls(C('tO', i, j), 'k-act', false); A.cls(C('tN', i, j), 'k-act', false); A.cls(C('tN', i, j), 'k-ok');
+      };
+      const copyRow = async i => {
+        await A.seq(allJ, 50, j => { A.set(V('tN', i, j), fq(getN(i, j))); return A.put(V('tO', i, j), V('tN', i, j), fq(getN(i, j)), { d: 500 }); });
+        allJ.forEach(j => A.cls(C('tN', i, j), 'k-ok'));
+      };
+      // 7. ведущая строка
+      const rowsOrder = [p, ...[...Array(m + 1).keys()].filter(i => i !== p)];
+      if (A.detail) {
+        for (const i of rowsOrder) {
+          const kk = i === p ? null : getO(i, q);
+          if (i !== p && kk.isZero()) { A.cap(`Строка ${rowLab(i)}: в ведущем столбце 0 — строка не меняется`); A.set(fm, `<span class="fmh">k = 0 ⇒ новая строка = старая</span>`); await copyRow(i); continue; }
+          for (const j of allJ) {
+            A.cap(i === p ? `Ячейка (${rowLab(i)}; ${colLab(j)}): делим на ${fq(piv)}` : `Ячейка (${rowLab(i)}; ${colLab(j)}): старая − ${fq(kk)} × новая ведущая`);
+            await cellFlow(i, j, 'full');
+          }
+        }
+      } else {
+        A.cap(`Делим ведущую строку на ${fq(piv)}`);
+        A.cls(rowAll(p), 'k-sel');
+        await A.each(allJ, (j, ix) => cellFlow(p, j, ix === 0 ? 'first' : 'quick'));
+        for (const i of rowsOrder.slice(1)) {
+          const kk = getO(i, q);
+          if (kk.isZero()) { A.cap(`Строка ${rowLab(i)}: в ведущем столбце 0 — строка не меняется`); A.set(fm, `<span class="fmh">k = 0 ⇒ новая строка = старая</span>`); await copyRow(i); continue; }
+          A.cap(`Строка ${rowLab(i)}: вычитаем ${fq(kk)} × ведущую строку`);
+          A.cls(C('tO', i, q), 'k-sel');
+          await A.each(allJ, (j, ix) => cellFlow(i, j, ix === 0 ? 'first' : 'quick'));
+          A.cls(C('tO', i, q), 'k-sel', false);
+        }
+      }
+      // 8. итог шага
+      const oldV = realZ(s), newV = realZ(nxt), nm = zName(s), minus = s.z.label.startsWith('−');
+      const dirTxt = nm === 'h' ? 'уменьшается' : minus ? 'уменьшается' : 'растёт';
+      const bs = nxt.basis.map((bj, i) => `${vK(vars, bj)} = ${fq(nxt.rows[i].b)}`).join(', ');
+      A.cap(`Таблица готова: ${nm} ${fq(oldV).replace(/<[^>]+>/g, '')} → ${fq(newV).replace(/<[^>]+>/g, '')}`);
+      A.set(fm, '');
+      A.cls(A.qa('.tN td'), 'k-act', false);
+      sum.innerHTML = `Базис: ${bs}; остальные = 0. &nbsp;<b>${nm}</b>: ${fq(oldV)} → <b class="gain">${fq(newV)}</b> <span class="kbd">(${dirTxt}${newV.eq(oldV) ? ' — не изменилась: вырожденный шаг' : ''})</span>`;
+      await A.show(sum);
+    };
+    return { html, script, opts: { detail: o.drive ? '' : 'разобрать всю таблицу (каждая ячейка)' } };
+  }
+
+  const demoDrive = d => { const sp = pivotSpec({ ...d.before, q: d.q, p: d.p }, d.after, { drive: true }); return demo('вывод искусственной переменной из базиса', sp.html, sp.script, sp.opts); };
+  // конечная таблица: проверка критерия оптимальности
+  function optSpec(s) {
+    const m = s.rows.length, vars = s.vars, cols = s.cols, zl = zlab(s.z.label), ph1 = s.z.label === '−h';
+    const html = `<div class="pvwrap one"><div>${dtb(s, { cls: 'tO' })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const alt = cols.filter(j => s.basis.indexOf(j) < 0 && s.z.a[j].isZero());
+    const script = async A => {
+      const { C, V } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      await A.wait(250);
+      A.cap(`Проверяем строку ${zl}: есть ли в ней отрицательные числа`);
+      await A.each(cols, async j => { A.cls(C('tO', m, j), 'k-act'); await A.wait(60); A.cls(C('tO', m, j), 'k-act', false); A.cls(C('tO', m, j), 'k-ok'); });
+      A.cap(`Отрицательных чисел нет — критерий оптимальности выполнен`);
+      A.cls(C('tO', m, -1), 'k-ok'); A.set(fm, `<span class="fmh ok">Улучшать ${zName(s)} больше нечем — таблица оптимальна</span>`); await A.pulse(fm);
+      A.cap(`Читаем решение: базисные переменные равны своему b, остальные — 0`);
+      await A.each(s.rows.map((_, i) => i), async i => { A.cls([C('tO', i, 'bas'), C('tO', i, -1)], 'k-sel'); await A.pulse(V('tO', i, -1)); });
+      const vals = s.basis.map((bj, i) => `${vK(vars, bj)} = ${fq(s.rows[i].b)}`).join(', ');
+      sum.innerHTML = `${vals}; остальные переменные = 0. &nbsp;${ph1 ? `<b>h* = ${fq(s.z.b.neg())}</b>` : `<b>${zName(s)}</b> = ${fq(realZ(s))}`}`;
+      await A.show(sum);
+      if (!ph1 && alt.length) {
+        A.cap(`Под ${alt.map(j => vK(vars, j)).join(', ')} в строке ${zl} стоит 0 — есть и другие оптимальные решения`);
+        A.cls(alt.map(j => C('tO', m, j)), 'k-act'); await A.seq(alt, 100, j => A.pulse(V('tO', m, j)));
+      }
+      const zb = s.basis.filter((bj, i) => s.rows[i].b.isZero());
+      if (zb.length) {
+        A.cap(`Базисная ${zb.map(j => vK(vars, j)).join(', ')} равна 0 — решение вырожденное`);
+        s.rows.forEach((r, i) => { if (r.b.isZero()) A.cls(C('tO', i, -1), 'k-act'); });
+      }
+    };
+    return { html, script, opts: {} };
+  }
+
+  /* =================== Графический метод: сцены =================== */
+  const GPAL = ['#3b4cca', '#e08a00', '#1f9d6b', '#c0284f', '#7b3fc4', '#0a8aa8', '#a0780a', '#d4508a', '#4f7f2a', '#5b6bd6'];
+  const VLET = k => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[k] || ('V' + (k + 1));
+  const niceTick = r => { const raw = r / 5, p = 10 ** Math.floor(Math.log10(raw)); for (const k of [1, 2, 2.5, 5, 10]) if (k * p >= raw - 1e-12) return k * p; return 10 * p; };
+  function clipV(poly, a, b, s) {
+    if (s === '=') return clipV(clipV(poly, a, b, '<='), a, b, '>=');
+    const f = p => { const v = a[0] * p[0] + a[1] * p[1] - b; return s === '<=' ? -v : v; };
+    const out = [];
+    for (let i = 0; i < poly.length; i++) {
+      const P = poly[i], Cc = poly[(i + 1) % poly.length], fp = f(P), fc = f(Cc);
+      if (fp >= -1e-12) out.push(P);
+      if ((fp >= -1e-12) !== (fc >= -1e-12)) { const t = fp / (fp - fc); out.push([P[0] + t * (Cc[0] - P[0]), P[1] + t * (Cc[1] - P[1])]); }
+    }
+    return out;
+  }
+  const polyArea = pl => { let s = 0; for (let i = 0; i < pl.length; i++) { const a = pl[i], b = pl[(i + 1) % pl.length]; s += a[0] * b[1] - b[0] * a[1]; } return Math.abs(s) / 2; };
+  // слагаемые линейной формы: у каждого свой знак и коэффициент (чтобы числа можно было переносить по отдельности)
+  const eqTerms = (a, lab, blank) => {
+    let first = true, r = '';
+    a.forEach((v, j) => {
+      if (v.isZero()) return; const one = v.abs().eq(new Q(1n));
+      r += `<span class="tw" data-j="${j}"><span class="sgn">${first ? (v.s < 0 ? '−' : '') : (v.s < 0 ? '&nbsp;−&nbsp;' : '&nbsp;+&nbsp;')}</span><span class="cf${blank ? ' dh' : ''}" data-one="${one ? 1 : 0}">${one ? '' : fq(v.abs())}</span>${lab(j)}</span>`;
+      first = false;
+    });
+    return r || '<span class="tw">0</span>';
+  };
+  const gcdB = (a, b) => { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) { [a, b] = [b, a % b]; } return a; };
+
+  // геометрия сцены: единый масштаб по обеим осям
+  function gscene(pr, G) {
+    const N = q => q.toNumber(), m = pr.rows.length;
+    const Ls = pr.rows.map((r, i) => ({ i, a: r.a.map(N), b: N(r.b), s: r.s, q: r }));
+    let vx = 0, vy = 0; G.verts.forEach(w => { vx = Math.max(vx, N(w.p[0])); vy = Math.max(vy, N(w.p[1])); });
+    let ix = 0, iy = 0;
+    Ls.forEach(L => { if (L.a[0] !== 0 && L.b / L.a[0] > 0) ix = Math.max(ix, L.b / L.a[0]); if (L.a[1] !== 0 && L.b / L.a[1] > 0) iy = Math.max(iy, L.b / L.a[1]); });
+    const pick = (v, iM) => v > 0 ? Math.max(v * 1.3, Math.min(iM * 1.08, v * 2.5)) : (iM > 0 ? iM * 1.1 : 5);
+    let X = pick(vx, ix), Y = pick(vy, iy);
+    if (G.status === 'unbounded') { X = Math.max(X, vx * 1.8); Y = Math.max(Y, vy * 1.8); }
+    const ML = 40, MR = 16, MT = 14, MB = 30;
+    let u = Math.min(470 / X, 340 / Y);
+    if (X * u < 220) X = 220 / u;
+    if (Y * u < 150) Y = 150 / u;
+    const W = ML + X * u + MR, H = MT + Y * u + MB;
+    const sx = x => ML + x * u, sy = y => H - MB - y * u, P = (x, y) => `${sx(x).toFixed(1)},${sy(y).toFixed(1)}`;
+    const box = [[0, 0], [X, 0], [X, Y], [0, Y]];
+    const seg = (a, b) => {
+      const pts = [], add = (x, y) => { if (x >= -1e-9 && x <= X + 1e-9 && y >= -1e-9 && y <= Y + 1e-9) pts.push([x, y]); };
+      if (a[1] !== 0) { add(0, b / a[1]); add(X, (b - a[0] * X) / a[1]); }
+      if (a[0] !== 0) { add(b / a[0], 0); add((b - a[1] * Y) / a[0], Y); }
+      if (pts.length < 2) return null;
+      let best = null, bd = -1;
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const d = (pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2; if (d > bd) { bd = d; best = [pts[i], pts[j]]; } }
+      return bd < 1e-12 ? null : best;
+    };
+    // области: после осей и после каждого ограничения
+    const regs = [box];
+    Ls.forEach(L => regs.push(clipV(regs[regs.length - 1], L.a, L.b, L.s)));
+    return { N, m, Ls, X, Y, u, W, H, ML, MR, MT, MB, sx, sy, P, box, seg, regs };
+  }
+  const inBox = (g, p) => p[0] >= -1e-9 && p[0] <= g.X + 1e-9 && p[1] >= -1e-9 && p[1] <= g.Y + 1e-9;
+
+  // SVG-график; o.pre — показать готовые линии, область и вершины (для сцен, где они не строятся)
+  function gSvg(g, G, o = {}) {
+    const hd = o.pre ? '' : ' dh', { sx, sy, P } = g;
+    const step = niceTick(Math.max(g.X, g.Y * g.X / g.Y)), ys = niceTick(g.Y);
+    let s = `<svg class="gsvg" viewBox="0 0 ${g.W.toFixed(0)} ${g.H.toFixed(0)}" role="img" aria-label="Координатная плоскость x₁, x₂"><defs><clipPath id="gclip${o.uid || ''}"><rect x="${sx(0) - 1}" y="${sy(g.Y) - 1}" width="${g.X * g.u + 2}" height="${g.Y * g.u + 2}"/></clipPath></defs>`;
+    // подписи на осях
+    let ticks = '';
+    for (let v = step; v <= g.X + 1e-9; v += step) ticks += `<line x1="${sx(v)}" y1="${sy(0)}" x2="${sx(v)}" y2="${sy(0) + 5}" class="gtk"/><text x="${sx(v)}" y="${sy(0) + 18}" class="gtx" text-anchor="middle">${+v.toFixed(6)}</text>`;
+    for (let v = ys; v <= g.Y + 1e-9; v += ys) ticks += `<line x1="${sx(0) - 5}" y1="${sy(v)}" x2="${sx(0)}" y2="${sy(v)}" class="gtk"/><text x="${sx(0) - 8}" y="${sy(v) + 4}" class="gtx" text-anchor="end">${+v.toFixed(6)}</text>`;
+    s += `<g class="gaxt${o.pre ? '' : ' dh'}">${ticks}<text x="${sx(g.X) - 4}" y="${sy(0) - 8}" class="gax-l" text-anchor="end">x₁</text><text x="${sx(0) + 8}" y="${sy(g.Y) + 12}" class="gax-l">x₂</text></g>`;
+    // полуплоскости и области
+    g.Ls.forEach(L => { const pl = clipV(g.box, L.a, L.b, L.s); if (L.s !== '=' && pl.length > 2) s += `<polygon class="gh${hd}" data-i="${L.i}" fill="${GPAL[L.i % GPAL.length]}" points="${pl.map(p => P(p[0], p[1])).join(' ')}"/>`; });
+    g.regs.forEach((pl, k) => { if (pl.length > 1) s += `<polygon class="gr${(o.pre && k === g.m) ? '' : ' dh'}" data-s="${k}" points="${pl.map(p => P(p[0], p[1])).join(' ')}"/>`; });
+    // оси и прямые
+    s += `<line class="gax-x gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(-0.02 * g.X)}" y1="${sy(0)}" x2="${sx(g.X)}" y2="${sy(0)}"/><line class="gax-y gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(0)}" y1="${sy(-0.02 * g.Y)}" x2="${sx(0)}" y2="${sy(g.Y)}"/>`;
+    g.Ls.forEach(L => {
+      const sg2 = g.seg(L.a, L.b), col = GPAL[L.i % GPAL.length];
+      if (sg2) {
+        s += `<line class="gl gdraw${hd}" pathLength="1" data-i="${L.i}" stroke="${col}" x1="${sx(sg2[0][0]).toFixed(1)}" y1="${sy(sg2[0][1]).toFixed(1)}" x2="${sx(sg2[1][0]).toFixed(1)}" y2="${sy(sg2[1][1]).toFixed(1)}"/>`;
+        const mx = (sg2[0][0] + sg2[1][0]) / 2, my = (sg2[0][1] + sg2[1][1]) / 2;
+        s += `<text class="glb${hd}" data-i="${L.i}" fill="${col}" x="${sx(mx) + 6}" y="${sy(my) - 6}">(${L.i + 1})</text>`;
+        // стрелки в сторону допустимой полуплоскости
+        if (L.s !== '=') {
+          const nl = Math.hypot(L.a[0], L.a[1]) || 1, sgnn = L.s === '<=' ? -1 : 1, dx = sgnn * L.a[0] / nl * 15, dy = -sgnn * L.a[1] / nl * 15;
+          let d = '';
+          [0.25, 0.5, 0.75].forEach(t => { const px = sx(sg2[0][0] + (sg2[1][0] - sg2[0][0]) * t), py = sy(sg2[0][1] + (sg2[1][1] - sg2[0][1]) * t); d += `M${px.toFixed(1)} ${py.toFixed(1)}l${dx.toFixed(1)} ${dy.toFixed(1)}m${(-.4 * dx - .3 * dy).toFixed(1)} ${(-.4 * dy + .3 * dx).toFixed(1)}l${(.4 * dx + .3 * dy).toFixed(1)} ${(.4 * dy - .3 * dx).toFixed(1)}l${(-.4 * dx + .3 * dy).toFixed(1)} ${(-.4 * dy - .3 * dx).toFixed(1)}`; });
+          s += `<path class="gside${hd}" data-i="${L.i}" stroke="${col}" d="${d}"/>`;
+        }
+      }
+    });
+    // построение: точки на осях, пробные точки
+    if (o.build) g.Ls.forEach(L => {
+      const col = GPAL[L.i % GPAL.length];
+      gPts(L.q, g).forEach((st, q) => { const x = g.N(st.pt[0]), y = g.N(st.pt[1]); if (inBox(g, [x, y])) s += `<g class="gpt dh" data-pt="${L.i}_${q}"><circle cx="${sx(x).toFixed(1)}" cy="${sy(y).toFixed(1)}" r="5" fill="${col}"/><text x="${(sx(x) + 8).toFixed(1)}" y="${(sy(y) - 8).toFixed(1)}" fill="${col}">(${ft(st.pt[0])}; ${ft(st.pt[1])})</text></g>`; });
+      if (L.s !== '=') { const T = gTestPoint(L.q); s += `<g class="gtp dh" data-tp="${L.i}"><circle cx="${sx(T.t[0]).toFixed(1)}" cy="${sy(T.t[1]).toFixed(1)}" r="7"/><text class="gtpm" data-tpm="${L.i}" x="${(sx(T.t[0]) + 10).toFixed(1)}" y="${(sy(T.t[1]) - 8).toFixed(1)}"></text></g>`; }
+    });
+    // вершины области
+    G.verts.forEach((w, k) => { const x = g.N(w.p[0]), y = g.N(w.p[1]); s += `<g class="gvx${o.pre ? '' : ' dh'}" data-v="${k}"><circle cx="${sx(x).toFixed(1)}" cy="${sy(y).toFixed(1)}" r="6"/><text x="${(sx(x) + 9).toFixed(1)}" y="${(sy(y) - 9).toFixed(1)}">${VLET(k)}</text></g>`; });
+    s += `<text class="gempty dh" x="${sx(g.X / 2)}" y="${sy(g.Y / 2)}" text-anchor="middle">∅ допустимая область пуста</text>`;
+    s += `<g class="ginf dh"><text x="${sx(g.X) - 6}" y="${sy(g.Y / 2)}" text-anchor="end">→ ∞</text><text x="${sx(g.X / 2)}" y="${sy(g.Y) + 16}" text-anchor="middle">↑ ∞</text></g>`;
+    s += '</svg>';
+    return s;
+  }
+  // точки на осях (и подпись) для построения прямой; X — ширина окна
+  function gPts(r, g) {
+    const [a1, a2] = r.a, b = r.b, z1 = a1.isZero(), z2 = a2.isZero(), out = [];
+    if (z1 && z2) return out;
+    const nb = !b.isZero();
+    if (!z2 && nb) out.push({ cap: `x₁ = 0 ⇒ x₂ = b ÷ a₂`, lhs: 'x₂', parts: [{ k: 'b' }, { k: 'a', j: 1 }], op: '÷', res: b.div(a2), pt: [new Q(0n), b.div(a2)] });
+    if (!z1 && nb) out.push({ cap: `x₂ = 0 ⇒ x₁ = b ÷ a₁`, lhs: 'x₁', parts: [{ k: 'b' }, { k: 'a', j: 0 }], op: '÷', res: b.div(a1), pt: [b.div(a1), new Q(0n)] });
+    if (!nb && !z1 && !z2) {
+      out.push({ cap: 'b = 0 ⇒ прямая проходит через начало координат', lhs: '', parts: [], res: null, pt: [new Q(0n), new Q(0n)], note: 'при x₁ = 0 получаем x₂ = 0: точка (0; 0)' });
+      const t = new Q(BigInt(Math.max(1, Math.round(g.X / 2))));
+      out.push({ cap: `Берём x₁ = ${t.toText()} ⇒ x₂ = −a₁·x₁ ÷ a₂`, lhs: 'x₂', parts: [{ k: 'a', j: 0 }, { k: 'a', j: 1 }], op: 'neg', t, res: a1.mul(t).div(a2).neg(), pt: [t, a1.mul(t).div(a2).neg()] });
+    } else if (!nb && (z1 || z2)) {
+      out.push({ cap: z1 ? 'a₁ = 0, b = 0 ⇒ прямая x₂ = 0 (ось x₁)' : 'a₂ = 0, b = 0 ⇒ прямая x₁ = 0 (ось x₂)', lhs: '', parts: [], res: null, pt: [new Q(0n), new Q(0n)] });
+    }
+    return out;
+  }
+  const gTestPoint = r => { for (const t of [[0, 0], [1, 0], [0, 1], [1, 1]]) { const v = r.a[0].mul(new Q(BigInt(t[0]))).add(r.a[1].mul(new Q(BigInt(t[1])))); if (!v.eq(r.b)) return { t, v }; } return { t: [0, 0], v: new Q(0n) }; };
+
+  // --- построение: оси, прямые, полуплоскости, допустимая область, вершины ---
+  function demoGraphBuild(pr, G) {
+    const g = gscene(pr, G), m = pr.rows.length;
+    const rows = pr.rows.map((r, i) => `<div class="drow gcr" data-i="${i}"><span class="kbd">(${i + 1})</span> <span class="lhs">${eqTerms(r.a, xlab)}</span> <span class="rs">${sg(r.s)}</span> <span class="rb">${fq(r.b)}</span></div>`).join('') + `<div class="drow gcr" data-i="ax"><span class="kbd">(0)</span> ${xv(1)} ≥ 0, ${xv(2)} ≥ 0</div>`;
+    const html = `<div class="gwrap"><div class="gleft"><div class="dmh">ограничения задачи</div>${rows}<div class="pvfm gfm"></div></div><div class="gright">${gSvg(g, G, { uid: 'b', build: true })}</div></div>`;
+    const script = async A => {
+      const fm = A.q('.gfm'), S = sel => A.q('.gsvg ' + sel), SA = sel => A.qa('.gsvg ' + sel);
+      await A.wait(250);
+      A.cap('Рисуем оси координат: x₁ — горизонталь, x₂ — вертикаль');
+      await Promise.all([A.draw(S('.gax-x')), A.draw(S('.gax-y'))]); await A.show(S('.gaxt'));
+      A.cap('Условия x₁ ≥ 0 и x₂ ≥ 0 оставляют только первую четверть');
+      A.cls(A.q('.gcr[data-i="ax"]'), 'on'); await A.show(S('.gr[data-s="0"]'));
+      A.cls(A.q('.gcr[data-i="ax"]'), 'on', false); A.cls(A.q('.gcr[data-i="ax"]'), 'done');
+      for (let i = 0; i < m; i++) {
+        const r = pr.rows[i], row = A.q(`.gcr[data-i="${i}"]`), col = GPAL[i % GPAL.length], pts = gPts(r, g);
+        A.cap(`Ограничение (${i + 1}): берём его коэффициенты и свободный член`);
+        A.cls(row, 'on'); A.set(fm, '');
+        await A.seq([...row.querySelectorAll('.cf:not(:empty)'), row.querySelector('.rb')], 110, el => A.pulse(el));
+        const cfOf = j => row.querySelector(`.tw[data-j="${j}"] .cf`);
+        // точки на осях / вспомогательные точки
+        for (let q = 0; q < pts.length; q++) {
+          const st = pts[q], inside = inBox(g, [g.N(st.pt[0]), g.N(st.pt[1])]);
+          A.cap(st.cap);
+          if (st.parts.length) {
+            const slot = k => A.q(`.gfm .sl${k}`);
+            const f = st.op === 'neg' ? `${st.lhs} = −<span class="fo sl0">□</span> · ${st.t.toText()} ÷ <span class="fo sl1">□</span>` : `${st.lhs.replace('x', 'x')} = <span class="fo sl0">□</span> ${st.op} <span class="fo sl1">□</span>`;
+            A.set(fm, `<span class="fmh">${f.replace('x₁', xv(1)).replace('x₂', xv(2))} = <b class="fr">□</b></span>`);
+            const src = p => p.k === 'b' ? row.querySelector('.rb') : (cfOf(p.j).textContent ? cfOf(p.j) : row.querySelector(`.tw[data-j="${p.j}"]`));
+            const val = p => p.k === 'b' ? fq(r.b) : par(r.a[p.j]);
+            await A.put(src(st.parts[0]), A.q('.gfm .sl0'), val(st.parts[0]));
+            await A.put(src(st.parts[1]), A.q('.gfm .sl1'), val(st.parts[1]));
+            await A.swap(A.q('.gfm .fr'), fq(st.res), 380);
+          } else A.set(fm, `<span class="fmh">${st.note || st.cap}</span>`);
+          const dotSel = `.gpt[data-pt="${i}_${q}"]`;
+          if (inside) {
+            const dot = S(dotSel);
+            await A.fly(A.q('.gfm .fr') || fm, dot, '●');
+            await A.pop(dot);
+          }
+        }
+        // прямая
+        A.cap(`Через эти точки проводим прямую (${i + 1})`);
+        await Promise.all([A.draw(S(`.gl[data-i="${i}"]`)), A.show(S(`.glb[data-i="${i}"]`))]);
+        A.cls(SA(`.gpt[data-pt^="${i}_"]`), 'fin');
+        // проверочная точка
+        if (r.s === '=') {
+          A.cap(`(${i + 1}) — равенство: допустимы только точки самой прямой`);
+          A.cls(S(`.gl[data-i="${i}"]`), 'k-hot'); A.set(fm, `<span class="fmh">знак «=» — полуплоскости нет, допустимые точки лежат на прямой</span>`);
+        } else {
+          const T = gTestPoint(r), ok = r.s === '<=' ? T.v.le(r.b) : T.v.ge(r.b), tp = T.t;
+          A.cap(`Проверяем точку (${tp[0]}; ${tp[1]}): подставляем в неравенство`);
+          const tg = S(`.gtp[data-tp="${i}"]`); await A.pop(tg);
+          A.set(fm, `<span class="fmh"><span class="fo sa">□</span>·${tp[0]} + <span class="fo sb">□</span>·${tp[1]} = <b class="fv">□</b> ${sg(r.s)} <span class="fo sc">□</span> ?</span>`);
+          const aEl = j => (cfOf(j) && cfOf(j).textContent) ? cfOf(j) : row.querySelector(`.tw[data-j="${j}"]`) || row;
+          await Promise.all([A.put(aEl(0), A.q('.gfm .sa'), par(r.a[0])), A.put(aEl(1), A.q('.gfm .sb'), par(r.a[1]))]);
+          await A.swap(A.q('.gfm .fv'), fq(T.v), 380);
+          await A.put(row.querySelector('.rb'), A.q('.gfm .sc'), fq(r.b));
+          A.set(fm, A.q('.gfm').innerHTML + ` <b class="${ok ? 'vok' : 'vbad'}">${ok ? '✓ верно' : '✕ неверно'}</b>`);
+          A.cls(tg, ok ? 'k-ok' : 'k-del'); A.set(S(`[data-tpm="${i}"]`), ok ? '✓' : '✕'); await A.pop(S(`[data-tpm="${i}"]`));
+          A.cap(ok ? `Точка (${tp[0]}; ${tp[1]}) подходит — берём сторону, где она лежит` : `Точка (${tp[0]}; ${tp[1]}) не подходит — берём противоположную сторону`);
+          await Promise.all([A.show(S(`.gh[data-i="${i}"]`)), A.show(S(`.gside[data-i="${i}"]`))]);
+        }
+        A.cls(row, 'on', false); A.cls(row, 'done'); await A.wait(150);
+      }
+      // пересечение
+      let emptyAt = -1;
+      for (let s = 1; s <= m; s++) {
+        const pl = g.regs[s], empty = !G.verts.length && (pl.length < 3 || polyArea(pl) < 1e-9);
+        if (empty && emptyAt < 0) emptyAt = s;
+        if (emptyAt >= 0 && s > emptyAt) break;
+        A.cap(empty ? `Добавляем (${s}): общих точек не осталось — область пуста` : `Оставляем только то, что подходит и под ограничение (${s})`);
+        A.cls(SA('.gh'), 'gdim');
+        const prev = S(`.gr[data-s="${s - 1}"]`), now = S(`.gr[data-s="${s}"]`);
+        if (now && !empty) { await Promise.all([A.hide(prev), A.show(now)]); }
+        else { await A.hide(prev); await A.pop(S('.gempty')); }
+        A.cls(A.q(`.gcr[data-i="${s - 1}"]`), 'on'); await A.wait(120); A.cls(A.q(`.gcr[data-i="${s - 1}"]`), 'on', false);
+      }
+      if (!G.verts.length) {
+        A.cap('Общей области нет: допустимых решений нет');
+        await A.pop(S('.gempty'));
+      } else {
+        A.cap(`Допустимая область готова: вершины ${G.verts.map((_, k) => VLET(k)).join(', ')}`);
+        A.cls(SA('.gh'), 'gdim');
+        await A.seq(SA('.gvx'), 160, el => A.pop(el));
+        if (G.status === 'unbounded') { A.cap('Область уходит за рамку графика — она не ограничена'); await A.pop(S('.ginf')); }
+      }
+    };
+    return demo('оси → прямые → полуплоскости → допустимая область', html, script);
+  }
+
+  // --- пересечение двух прямых: система → исключение → подстановка → точка ---
+  function solve2plan(e1, e2) {
+    const [a11, a12] = e1.a, [a21, a22] = e2.a, b1 = e1.b, b2 = e2.b;
+    const D = a11.mul(a22).sub(a12.mul(a21));
+    const x1 = b1.mul(a22).sub(a12.mul(b2)).div(D), x2 = a11.mul(b2).sub(b1.mul(a21)).div(D);
+    const kind = (a11.isZero() || a21.isZero()) ? 'A' : (a12.isZero() || a22.isZero()) ? 'B' : 'C';
+    return { kind, D, x1, x2 };
+  }
+  const lcmQ = (a, b) => { const x = a.abs(), y = b.abs(); if (x.isInt() && y.isInt()) { const g = gcdB(x.n, y.n); return new Q(x.n / g * y.n); } return null; };
+  const plain = h => String(h).replace(/<[^>]+>/g, '');
+
+  function demoGraphVerts(pr, G) {
+    const g = gscene(pr, G), m = pr.rows.length, Zr = () => new Q(0n), On = () => new Q(1n);
+    const items = [...pr.rows.map((r, i) => ({ a: r.a, b: r.b, s: r.s, name: `(${i + 1})` })), { a: [On(), Zr()], b: Zr(), s: '=', name: '(ось x₂)' }, { a: [Zr(), On()], b: Zr(), s: '=', name: '(ось x₁)' }];
+    const idxOf = o => typeof o === 'number' ? o : o === 'x1' ? m : m + 1;
+    const list = items.map((e, k) => `<div class="drow gcr" data-k="${k}"><span class="kbd">${e.name}</span> <span class="lhs">${eqTerms(e.a, xlab)}</span> <span class="rs">${sg(e.s)}</span> <span class="rb">${fq(e.b)}</span></div>`).join('');
+    const html = `<div class="gwrap"><div class="gleft"><div class="dmh">прямые-границы</div>${list}<div class="dmh" style="margin-top:8px">система для вершины</div><div class="gsys"></div></div><div class="gright">${gSvg(g, G, { pre: true, uid: 'v' })}</div></div>`;
+    const lineEl = (A, k) => k < m ? A.q(`.gsvg .gl[data-i="${k}"]`) : k === m ? A.q('.gsvg .gax-y') : A.q('.gsvg .gax-x');
+    const script = async A => {
+      const sys = A.q('.gsys'), S = sel => A.q('.gsvg ' + sel);
+      A.cls(A.qa('.gsvg .gvx'), 'k-dim');
+      await A.wait(250);
+      const eqLine = (e, r, blank) => `<div class="gsl" data-r="${r}"><span class="kbd">(${r + 1})</span> <span class="lhs">${eqTerms(e.a, xlab, blank)}</span> <span class="rs">${blank ? sg(e.s) : '='}</span> <span class="rb${blank ? ' dh' : ''}">${fq(e.b)}</span><span class="mb dh"></span></div>`;
+      const extra = h => `<div class="gsl gx dh">${h}</div>`;
+      for (let k = 0; k < G.verts.length; k++) {
+        const w = G.verts[k], ids = w.on.map(idxOf), u1 = ids[0], u2 = ids[1], E = [items[u1], items[u2]], pl = solve2plan(E[0], E[1]);
+        const V = VLET(k), dot = S(`.gvx[data-v="${k}"]`), rowOf = u => A.q(`.gcr[data-k="${u}"]`);
+        const x1v = w.p[0], x2v = w.p[1], hot = on => { [u1, u2].forEach(u => { A.cls(lineEl(A, u), 'k-hot', on); A.cls(rowOf(u), 'on', on); }); };
+        A.cap(`Вершина ${V}: здесь пересекаются прямые ${E[0].name} и ${E[1].name}${ids.length > 2 ? ` (и ещё ${ids.slice(2).map(u => items[u].name).join(', ')} — вершина вырожденная)` : ''}`);
+        A.set(sys, ''); A.cls(dot, 'k-dim', false); hot(true); await A.pulse(dot);
+        A.cap('Переносим коэффициенты в систему; знак неравенства заменяем на «=»');
+        A.set(sys, eqLine(E[0], 0, true) + eqLine(E[1], 1, true));
+        for (let r = 0; r < 2; r++) {
+          const row = rowOf(ids[r]), dl = sys.querySelector(`.gsl[data-r="${r}"]`);
+          for (const j of [0, 1]) {
+            const src = row.querySelector(`.tw[data-j="${j}"] .cf`), dst = dl.querySelector(`.tw[data-j="${j}"] .cf`); if (!dst) continue;
+            if (dst.dataset.one === '1') { dst.classList.remove('dh'); await A.pulse(dst.parentNode); } else await A.put(src, dst, fq(E[r].a[j].abs()), { d: 600 });
+          }
+          await A.put(row.querySelector('.rb'), dl.querySelector('.rb'), fq(E[r].b), { d: 600 });
+          await A.swap(dl.querySelector('.rs'), '=', 360);
+        }
+        const L = r => sys.querySelector(`.gsl[data-r="${r}"]`);
+        const addLine = h => { sys.insertAdjacentHTML('beforeend', extra(h)); return sys.lastElementChild; };
+        const showX = async el => { el.classList.remove('dh'); await A.pop(el, { d: 350 }); };
+        if (pl.kind === 'C') {
+          const a11 = E[0].a[0], a12 = E[0].a[1], a21 = E[1].a[0], a22 = E[1].a[1], b1 = E[0].b, b2 = E[1].b;
+          let m1, m2; const lc = lcmQ(a12, a22);
+          if (lc) { m1 = lc.div(a12.abs()); m2 = lc.div(a22.abs()); } else { m1 = a22.abs(); m2 = a12.abs(); }
+          const same = a12.mul(m1).s === a22.mul(m2).s, op = same ? '−' : '+';
+          const n1 = { a: [a11.mul(m1), a12.mul(m1)], b: b1.mul(m1) }, n2 = { a: [a21.mul(m2), a22.mul(m2)], b: b2.mul(m2) };
+          const c1 = same ? n1.a[0].sub(n2.a[0]) : n1.a[0].add(n2.a[0]), R = same ? n1.b.sub(n2.b) : n1.b.add(n2.b);
+          A.cap(`Чтобы исключить ${xv(2)}, умножаем (1) на ${fq(m1)} и (2) на ${fq(m2)}`);
+          for (const r of [0, 1]) { const mb = L(r).querySelector('.mb'); mb.innerHTML = `&nbsp;× ${fq(r ? m2 : m1)}`; await A.pop(mb, { d: 300 }); }
+          await Promise.all([0, 1].map(r => { const nn = r ? n2 : n1; return A.swap(L(r).querySelector('.lhs'), eqTerms(nn.a, xlab), 500).then(() => A.swap(L(r).querySelector('.rb'), fq(nn.b), 400)); }));
+          A.cap(`Коэффициенты при ${xv(2)} ${same ? 'равны — вычитаем' : 'противоположны — складываем'}: (1′) ${op} (2′)`);
+          const bx = addLine(`(1′) ${op} (2′):&nbsp; <span class="lhs">(${fq(n1.a[0])} ${op} ${par(n2.a[0])})${xv(1)} + (${fq(n1.a[1])} ${op} ${par(n2.a[1])})${xv(2)}</span> = ${fq(n1.b)} ${op} ${par(n2.b)}`);
+          await showX(bx);
+          A.cls([L(0).querySelectorAll('.tw')[1], L(1).querySelectorAll('.tw')[1]], 'k-del'); await A.wait(500);
+          await A.swap(bx, `(1′) ${op} (2′):&nbsp; <span class="lhs">${fq(c1)}${xv(1)}</span> = ${fq(R)}`, 600);
+          A.cap(`${xv(2)} исчезла: ${xv(1)} = ${fq(R)} ÷ ${par(c1)} = ${fq(x1v)}`);
+          await showX(addLine(`${xv(1)} = ${fq(R)} ÷ ${par(c1)} = <b class="gain">${fq(x1v)}</b>`));
+          A.cap(`Подставляем ${xv(1)} = ${fq(x1v)} в первое уравнение`);
+          await showX(addLine(`${fq(a11)}·${par(x1v)} + ${par(a12)}·${xv(2)} = ${fq(b1)} &nbsp;⇒&nbsp; ${par(a12)}·${xv(2)} = ${fq(b1.sub(a11.mul(x1v)))}`));
+          A.cap(`${xv(2)} = ${fq(b1.sub(a11.mul(x1v)))} ÷ ${par(a12)} = ${fq(x2v)}`);
+          await showX(addLine(`${xv(2)} = <b class="gain">${fq(x2v)}</b>`));
+        } else if (pl.kind === 'A') {
+          const kz = E[0].a[0].isZero() ? 0 : 1, o = 1 - kz, ez = E[kz], eo = E[o];
+          A.cap(`В уравнении (${kz + 1}) нет ${xv(1)}: сразу ${xv(2)} = ${fq(ez.b)} ÷ ${par(ez.a[1])} = ${fq(x2v)}`);
+          A.cls(L(kz), 'k-ok'); await showX(addLine(`${xv(2)} = ${fq(ez.b)} ÷ ${par(ez.a[1])} = <b class="gain">${fq(x2v)}</b>`));
+          if (!eo.a[1].isZero()) {
+            A.cap(`Подставляем ${xv(2)} = ${fq(x2v)} в уравнение (${o + 1})`);
+            await showX(addLine(`${par(eo.a[0])}·${xv(1)} + ${par(eo.a[1])}·${par(x2v)} = ${fq(eo.b)} &nbsp;⇒&nbsp; ${par(eo.a[0])}·${xv(1)} = ${fq(eo.b.sub(eo.a[1].mul(x2v)))}`));
+            A.cap(`${xv(1)} = ${fq(eo.b.sub(eo.a[1].mul(x2v)))} ÷ ${par(eo.a[0])} = ${fq(x1v)}`);
+          } else A.cap(`В уравнении (${o + 1}) нет ${xv(2)}: ${xv(1)} = ${fq(eo.b)} ÷ ${par(eo.a[0])} = ${fq(x1v)}`);
+          await showX(addLine(`${xv(1)} = <b class="gain">${fq(x1v)}</b>`));
+        } else {
+          const kz = E[0].a[1].isZero() ? 0 : 1, o = 1 - kz, ez = E[kz], eo = E[o];
+          A.cap(`В уравнении (${kz + 1}) нет ${xv(2)}: сразу ${xv(1)} = ${fq(ez.b)} ÷ ${par(ez.a[0])} = ${fq(x1v)}`);
+          A.cls(L(kz), 'k-ok'); await showX(addLine(`${xv(1)} = ${fq(ez.b)} ÷ ${par(ez.a[0])} = <b class="gain">${fq(x1v)}</b>`));
+          if (!eo.a[0].isZero()) {
+            A.cap(`Подставляем ${xv(1)} = ${fq(x1v)} в уравнение (${o + 1})`);
+            await showX(addLine(`${par(eo.a[0])}·${par(x1v)} + ${par(eo.a[1])}·${xv(2)} = ${fq(eo.b)} &nbsp;⇒&nbsp; ${par(eo.a[1])}·${xv(2)} = ${fq(eo.b.sub(eo.a[0].mul(x1v)))}`));
+            A.cap(`${xv(2)} = ${fq(eo.b.sub(eo.a[0].mul(x1v)))} ÷ ${par(eo.a[1])} = ${fq(x2v)}`);
+          } else A.cap(`В уравнении (${o + 1}) нет ${xv(1)}: ${xv(2)} = ${fq(eo.b)} ÷ ${par(eo.a[1])} = ${fq(x2v)}`);
+          await showX(addLine(`${xv(2)} = <b class="gain">${fq(x2v)}</b>`));
+        }
+        A.cap(`Точка ${V} = ${vec(w.p)} попадает на график`);
+        await A.fly(sys.lastElementChild, dot, plain(vec(w.p)));
+        A.cls(dot, 'k-ok'); await A.pulse(dot); hot(false);
+      }
+      A.cap(`Все вершины области (${G.verts.length}) найдены`);
+      A.cls(A.qa('.gsvg .gvx'), 'k-dim', false); A.cls(A.qa('.gsvg .gvx'), 'k-ok');
+    };
+    return demo('вершина = пересечение двух прямых: система → ответ', html, script);
+  }
+
+  // --- значения цели в вершинах и движение линии уровня ---
+  function demoGraphObj(pr, G) {
+    const g = gscene(pr, G), c = pr.c, max = pr.sense === 'max', f0 = pr.c0 || new Q(0n), nv = G.verts.length;
+    const cN = c.map(g.N), cn = Math.hypot(cN[0], cN[1]);
+    const vals = G.verts.map(w => w.f);
+    const lo = vals.reduce((a, b) => b.lt(a) ? b : a), hi = vals.reduce((a, b) => b.gt(a) ? b : a), span = hi.sub(lo).toNumber() || 1;
+    const best = max ? hi : lo, worst = max ? lo : hi;
+    const bestIdx = vals.map((v, k) => v.eq(best) ? k : -1).filter(k => k >= 0);
+    const unb = G.status === 'unbounded';
+    const rows = G.verts.map((w, k) => `<div class="drow gvr" data-k="${k}"><b>${VLET(k)}</b> <span class="vp">(<span class="vx">${fq(w.p[0])}</span>; <span class="vy">${fq(w.p[1])}</span>)</span> <i>f</i> = ${fq(c[0])}·<span class="px">□</span> ${c[1].s < 0 ? '−' : '+'} ${fq(c[1].abs())}·<span class="py">□</span>${f0.isZero() ? '' : (f0.s < 0 ? ' − ' : ' + ') + fq(f0.abs())} = <b class="fvv dh">${fq(w.f)}</b><span class="fvb"><i style="width:${(8 + 92 * (w.f.sub(lo).toNumber() / span)).toFixed(0)}%"></i></span></div>`).join('');
+    const html = `<div class="gwrap"><div class="gleft"><div class="dmh">значения цели f в вершинах</div>${rows}<div class="pvfm gfm"></div></div><div class="gright gstack">${gSvg(g, G, { pre: true, uid: 'o' })}<svg class="gsvg gov" viewBox="0 0 ${g.W.toFixed(0)} ${g.H.toFixed(0)}" aria-hidden="true"><g clip-path="url(#gclipo)"><g class="glvl dh"></g></g><g class="ggrad dh"></g><g class="gopt dh"></g></svg></div></div>`;
+    const lvlLine = v => { const d = [-cN[1] / cn, cN[0] / cn], p0 = [cN[0] * v / (cn * cn), cN[1] * v / (cn * cn)], Lk = (g.X + g.Y) * 2; return `<line class="glv" x1="${g.sx(p0[0] - d[0] * Lk).toFixed(1)}" y1="${g.sy(p0[1] - d[1] * Lk).toFixed(1)}" x2="${g.sx(p0[0] + d[0] * Lk).toFixed(1)}" y2="${g.sy(p0[1] + d[1] * Lk).toFixed(1)}"/>`; };
+    const script = async A => {
+      const fm = A.q('.gfm'), O = A.q('.gov'), lv = O.querySelector('.glvl'), gr = O.querySelector('.ggrad'), go = O.querySelector('.gopt');
+      A.cls(A.qa('.gsvg .gvx'), 'k-dim');
+      await A.wait(250);
+      for (let k = 0; k < nv; k++) {
+        const w = G.verts[k], row = A.q(`.gvr[data-k="${k}"]`), dotV = A.q(`.gsvg .gvx[data-v="${k}"]`);
+        A.cap(`Подставляем вершину ${VLET(k)} = ${plain(vec(w.p))} в f`);
+        A.cls(row, 'on'); A.cls(dotV, 'k-dim', false); A.cls(dotV, 'k-act');
+        await Promise.all([A.put(row.querySelector('.vx'), row.querySelector('.px'), par(w.p[0]), { d: 600 }), A.put(row.querySelector('.vy'), row.querySelector('.py'), par(w.p[1]), { d: 600 })]);
+        await A.pop(row.querySelector('.fvv'));
+        const bar = row.querySelector('.fvb i'); await A.anim(bar, [{ width: '0%' }, { width: bar.style.width }], { d: 500 });
+        A.cls(row, 'on', false); A.cls(dotV, 'k-act', false); A.cls(dotV, 'k-ok');
+      }
+      if (unb) {
+        A.cap(`Область не ограничена: лучшее из конечных значений ${plain(fq(best))} ещё не оптимум`);
+      } else {
+        A.cap(`${max ? 'Наибольшее' : 'Наименьшее'} значение f = ${plain(fq(best))} в вершине ${bestIdx.map(VLET).join(' и ')}`);
+        G.verts.forEach((_, k) => { const row = A.q(`.gvr[data-k="${k}"]`); if (bestIdx.includes(k)) { A.cls(row, 'done'); row.querySelector('.fvv').insertAdjacentHTML('beforeend', ' ★'); } else A.cls(row, 'k-dim'); });
+      }
+      if (cn < 1e-12) { A.cap('Коэффициенты цели нулевые: f постоянна, подходит любая допустимая точка'); return; }
+      const cx = G.verts.reduce((s, w) => s + g.N(w.p[0]), 0) / nv, cy = G.verts.reduce((s, w) => s + g.N(w.p[1]), 0) / nv;
+      const dirI = max ? 1 : -1, Lg = 0.22 * Math.min(g.X, g.Y) * g.u;
+      const ex = g.sx(cx) + dirI * cN[0] / cn * Lg, ey = g.sy(cy) - dirI * cN[1] / cn * Lg, ang = Math.atan2(ey - g.sy(cy), ex - g.sx(cx));
+      const head = [[0, 0], [-10, -5], [-10, 5]].map(([a, b]) => `${(ex + a * Math.cos(ang) - b * Math.sin(ang)).toFixed(1)},${(ey + a * Math.sin(ang) + b * Math.cos(ang)).toFixed(1)}`).join(' ');
+      gr.innerHTML = `<line x1="${g.sx(cx).toFixed(1)}" y1="${g.sy(cy).toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"/><polygon points="${head}"/><text x="${(ex + 6).toFixed(1)}" y="${(ey - 6).toFixed(1)}">${max ? 'f растёт' : 'f убывает'}</text>`;
+      A.cap(max ? `Вектор (${c.map(ft).join('; ')}) показывает, куда f растёт` : `Для min идём против вектора (${c.map(ft).join('; ')}): туда f убывает`);
+      A.set(fm, `<span class="fmh">направление улучшения: ${max ? 'по' : 'против'} вектора коэффициентов цели</span>`);
+      await A.show(gr);
+      const v0 = worst.sub(f0).toNumber();
+      lv.innerHTML = lvlLine(v0);
+      A.cap(`Линия уровня f = const перпендикулярна вектору; проводим её через вершину с f = ${plain(fq(worst))}`);
+      A.set(fm, `<span class="fmh">линия уровня: f = ${fq(worst)}</span>`);
+      await A.show(lv);
+      const shift = unb ? (g.X + g.Y) * 1.2 * cn * dirI : best.sub(worst).toNumber();
+      const wx = cN[0] * shift / (cn * cn), wy = cN[1] * shift / (cn * cn);
+      A.cap(unb ? 'Сдвигаем линию в сторону улучшения — она никогда не упрётся в область' : 'Сдвигаем линию в сторону улучшения, пока она ещё касается области');
+      await A.anim(lv, [{ transform: 'translate(0px,0px)' }, { transform: `translate(${(g.u * wx).toFixed(1)}px,${(-g.u * wy).toFixed(1)}px)` }], { d: 2600, ease: 'ease-in-out' });
+      if (unb) {
+        A.cap('Линия уходит за пределы области: f не ограничена, оптимума нет');
+        A.set(fm, '<span class="fmh bad">f можно улучшать бесконечно</span>');
+      } else if (bestIdx.length > 1) {
+        const pts = G.opt.slice(0, 2).map(o => o.p);
+        go.innerHTML = `<line x1="${g.sx(g.N(pts[0][0])).toFixed(1)}" y1="${g.sy(g.N(pts[0][1])).toFixed(1)}" x2="${g.sx(g.N(pts[1][0])).toFixed(1)}" y2="${g.sy(g.N(pts[1][1])).toFixed(1)}"/>`;
+        A.cap(`Линия легла на сторону области: f = ${plain(fq(best))} на всём отрезке ${bestIdx.map(VLET).join('–')} — оптимумов много`);
+        A.set(fm, `<span class="fmh ok">оптимум не единственный: весь отрезок ${bestIdx.map(VLET).join('–')}</span>`);
+        await A.show(go);
+      } else {
+        const k = bestIdx[0], w = G.verts[k];
+        A.cap(`Последняя общая точка — вершина ${VLET(k)} = ${plain(vec(w.p))}: f* = ${plain(fq(best))}`);
+        go.innerHTML = `<circle cx="${g.sx(g.N(w.p[0])).toFixed(1)}" cy="${g.sy(g.N(w.p[1])).toFixed(1)}" r="10"/>`;
+        A.set(fm, `<span class="fmh ok">оптимум: ${VLET(k)} = ${vec(w.p)}, f* = ${fq(best)}</span>`);
+        await A.pop(go);
+      }
+    };
+    return demo('значения цели и движение линии уровня', html, script);
+  }
+
+  /* =================== Симплекс-метод и искусственный базис: сцены =================== */
+  const varLegend = '<div class="vleg"><span class="vk-x">● исходные</span><span class="vk-s">■ остаточные (+)</span><span class="vk-e">▲ излишки (−)</span><span class="vk-t">◆ искусственные</span></div>';
+  const objLine2 = (pr, hid) => `<div class="drow cnobj"><i>f</i> = <span class="lhs">${eqTerms(pr.c, xlab, hid)}</span>${pr.c0 && !pr.c0.isZero() ? ` ${pr.c0.s < 0 ? '−' : '+'} ${fq(pr.c0.abs())}` : ''} → <span class="gs">${pr.sense}</span></div>`;
+
+  // --- приведение к равенствам: остаточные, излишки, искусственные переменные, стартовый базис ---
+  function demoCanon(pr, res) {
+    const m = pr.rows.length, vars = res.vars, hasArt = res.artOf.some(x => x !== null);
+    const rowsHtml = pr.rows.map((r, i) => `<div class="drow cnr" data-i="${i}"><span class="kbd">(${i + 1})</span> <span class="lhs">${eqTerms(r.a, xlab)}</span><span class="ex ex-s dh"></span><span class="ex ex-t dh"></span> <span class="rs">${sg(r.s)}</span> <span class="rb">${fq(r.b)}</span><span class="bn dh"></span></div><div class="cnw dh" data-i="${i}"></div>`).join('');
+    const html = `${varLegend}<div class="dmh">ограничения → равенства</div>${rowsHtml}<div class="pvfm cnfm"></div>`;
+    const script = async A => {
+      const row = i => A.q(`.cnr[data-i="${i}"]`), warn = i => A.q(`.cnw[data-i="${i}"]`), fm = A.q('.cnfm');
+      await A.wait(250);
+      for (let i = 0; i < m; i++) {
+        const R = res.rows[i], sl = res.slackOf[i], ar = res.artOf[i], rw = row(i);
+        if (R.flipped) {
+          A.cap(`(${i + 1}): правая часть ${plain(fq(pr.rows[i].b))} < 0 — умножаем ограничение на −1`);
+          A.cls(rw, 'on'); A.set(fm, `<span class="fmh">все коэффициенты, знак неравенства и правая часть меняют знак</span>`);
+          await A.seq([rw.querySelector('.lhs'), rw.querySelector('.rs'), rw.querySelector('.rb')], 140, (el, k) => A.swap(el, k === 0 ? eqTerms(R.a, xlab) : k === 1 ? sg(R.s) : fq(R.b), 520));
+          A.cls(rw, 'on', false);
+        }
+        if (sl !== null) {
+          const plus = R.s === '<=';
+          A.cap(plus ? `(${i + 1}) «≤»: прибавляем остаточную переменную ${plain(vname(vars, sl))} ≥ 0 — получаем равенство` : `(${i + 1}) «≥»: вычитаем переменную излишка ${plain(vname(vars, sl))} ≥ 0 — получаем равенство`);
+          A.cls(rw, 'on', true);
+          const ex = rw.querySelector('.ex-s'); ex.innerHTML = `&nbsp;${plus ? '+' : '−'}&nbsp;${vK(vars, sl)}`; ex.classList.add(plus ? 'vk-s' : 'vk-e');
+          await A.pop(ex); await A.swap(rw.querySelector('.rs'), '=', 520); A.cls(rw, 'on', false);
+        } else {
+          A.cap(`(${i + 1}) уже равенство — дополнительная переменная не нужна`);
+          A.cls(rw, 'on', true); await A.swap(rw.querySelector('.rs'), '=', 300); A.cls(rw, 'on', false);
+        }
+        if (ar !== null) {
+          const w = warn(i);
+          if (sl !== null && R.s === '>=') {
+            A.cap(`При ${xv(1)} = … = 0 излишек ${vK(vars, sl)} = −${plain(fq(R.b))} < 0 — допустимого базиса нет`);
+            w.innerHTML = `<span class="warnchip k-del">${vK(vars, sl)} = −${fq(R.b)} &lt; 0&nbsp;✕ не годится в базис</span>`; await A.pop(w);
+          } else if (sl === null) {
+            A.cap(`В равенстве (${i + 1}) нет переменной с единичным столбцом — нужна искусственная`);
+            w.innerHTML = '<span class="warnchip">нет готовой базисной переменной</span>'; await A.pop(w);
+          }
+          A.cap(sl !== null && R.s === '<=' ? `(${i + 1}): в этом методе искусственную переменную ${plain(vname(vars, ar))} ≥ 0 вводят в каждое уравнение` : `Добавляем искусственную переменную ${plain(vname(vars, ar))} ≥ 0 — она образует единичный столбец`);
+          const ex = rw.querySelector('.ex-t'); ex.innerHTML = `&nbsp;+&nbsp;${vK(vars, ar)}`; ex.classList.add('vk-t');
+          await A.pop(ex);
+        }
+      }
+      A.cap('Стартовый базис: у каждой строки своя переменная с коэффициентом 1 только в этой строке');
+      for (let i = 0; i < m; i++) {
+        const b0 = res.artOf[i] !== null ? res.artOf[i] : res.slackOf[i], rw = row(i);
+        A.cls(rw.querySelector(res.artOf[i] !== null ? '.ex-t' : '.ex-s'), 'k-sel');
+        const bn = rw.querySelector('.bn'); bn.innerHTML = `&nbsp;&nbsp;⇒ ${vK(vars, b0)} = ${fq(res.rows[i].b)}`; await A.pop(bn);
+      }
+      if (hasArt) {
+        const ts = res.artOf.filter(x => x !== null).map(j => vK(vars, j)).join(' + ');
+        A.cap('Цель этапа 1: обнулить искусственные переменные — минимизируем их сумму h');
+        A.set(fm, `<span class="fmh"><i>h</i> = ${ts} → min &nbsp;(если h* = 0 — допустимое решение найдено)</span>`); await A.pop(fm);
+      } else {
+        A.cap('Остатки сразу дают допустимый базис — искусственные переменные не нужны');
+        A.set(fm, '<span class="fmh ok">все b ≥ 0 и в каждой строке есть остаток с коэффициентом 1</span>'); await A.pop(fm);
+      }
+    };
+    return demo('шаг за шагом: неравенства → равенства → стартовый базис', html, script);
+  }
+
+  // --- перенос равенств в начальную симплекс-таблицу ---
+  function demoToTable(pr, res, st0, withObj) {
+    const m = st0.rows.length, vars = st0.vars, cols = st0.cols;
+    const eqs = st0.rows.map((r, i) => `<div class="drow tbr" data-i="${i}"><span class="kbd">(${i + 1})</span> <span class="lhs">${eqTerms(r.a, j => vK(vars, j), false)}</span> = <span class="rb">${fq(r.b)}</span></div>`).join('');
+    const html = `${varLegend}<div class="pvwrap"><div><div class="dmh">равенства</div>${eqs}${withObj ? objLine2(pr) : ''}</div><div><div class="dmh">начальная таблица</div>${dtb(st0, { cls: 'tN', blank: true, blankZ: true })}</div></div><div class="pvfm"></div>`;
+    const script = async A => {
+      const { C, V, H } = sceneTools(A), fm = A.q('.pvfm');
+      A.cls(cols.map(j => H('tN', j)), 'dh');
+      await A.wait(250);
+      A.cap('Столбцы таблицы — переменные; тип переменной подписан и закрашен');
+      await A.seq(cols, 90, j => A.pop(H('tN', j), { d: 300 }));
+      for (let i = 0; i < m; i++) {
+        const row = A.q(`.tbr[data-i="${i}"]`), r = st0.rows[i];
+        A.cap(`Равенство (${i + 1}) → строка таблицы; слева — её базисная переменная ${plain(vname(vars, st0.basis[i]))}`);
+        A.cls(row, 'on');
+        const bt = row.querySelector(`.tw[data-j="${st0.basis[i]}"]`);
+        await A.put(bt || row, V('tN', i, 'bas'), vK(vars, st0.basis[i]));
+        await A.put(row.querySelector('.rb'), V('tN', i, -1), fq(r.b));
+        for (const j of cols) {
+          const tw = row.querySelector(`.tw[data-j="${j}"] .cf`), twAll = row.querySelector(`.tw[data-j="${j}"]`);
+          if (tw) await A.put(twAll, V('tN', i, j), fq(r.a[j]), { d: 500 });
+          else { A.set(V('tN', i, j), '0'); A.cls(C('tN', i, j), 'zc'); await A.pop(V('tN', i, j), { d: 200 }); }
+        }
+        A.cls(row, 'on', false); A.cls(row, 'done');
+      }
+      if (withObj) {
+        const z = st0.z, max = pr.sense === 'max';
+        A.cap(max ? `Строка ${plain(zlab(z.label))}: коэффициенты цели переносим со сменой знака (f − c·x = 0)` : `min f = max(−f): в строку ${plain(zlab(z.label))} коэффициенты цели переносим как есть`);
+        const ob = A.q('.cnobj'); A.cls(ob, 'on');
+        await A.put(A.q('.cnobj .gs'), V('tN', m, 'bas'), zlab(z.label));
+        for (const j of cols) {
+          const cell = V('tN', m, j);
+          if (j < pr.n) {
+            const tw = ob.querySelector(`.tw[data-j="${j}"]`);
+            if (tw) { await A.put(tw, cell, fq(pr.c[j]), { d: 500 }); if (max) { A.cls(C('tN', m, j), 'k-act'); await A.swap(cell, fq(z.a[j]), 520); A.cls(C('tN', m, j), 'k-act', false); } }
+            else { A.set(cell, fq(z.a[j])); await A.pop(cell, { d: 200 }); }
+          } else { A.set(cell, fq(z.a[j])); A.cls(C('tN', m, j), 'zc'); await A.pop(cell, { d: 200 }); }
+        }
+        A.set(V('tN', m, -1), fq(z.b)); await A.pop(V('tN', m, -1), { d: 200 });
+        A.cls(ob, 'on', false);
+        A.cap('Начальная таблица готова: базисное решение — значения b, остальные переменные 0');
+      } else {
+        A.cap('Строки готовы; строку −h составим на следующем шаге');
+      }
+    };
+    return demo('равенства → строки начальной таблицы', html, script);
+  }
+
+  // --- строка −h: минус сумма строк с искусственными переменными ---
+  function demoHRow(pr, res) {
+    const st0 = res.phase1.steps[0], m = st0.rows.length, vars = st0.vars, cols = st0.cols;
+    const artRows = [...Array(m).keys()].filter(i => res.artOf[i] !== null), artCols = cols.filter(j => vars[j].kind === 't'), otherCols = cols.filter(j => vars[j].kind !== 't');
+    const html = `${varLegend}<div class="pvwrap one"><div>${dtb(st0, { cls: 'tN', blankZ: true })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const { C, V } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      await A.wait(250);
+      A.cap(`h = ${artRows.map(i => plain(vname(vars, res.artOf[i]))).join(' + ')}: берём строки, в которых есть искусственные переменные`);
+      for (let i = 0; i < m; i++) A.cls(['bas', -1, ...cols].map(j => C('tN', i, j)), artRows.includes(i) ? 'k-sel' : 'k-dim');
+      await A.pulse(V('tN', artRows[0], 'bas'));
+      const colStep = async j => {
+        const nm = j < 0 ? 'b' : plain(vname(vars, j)), vals = artRows.map(i => j < 0 ? st0.rows[i].b : st0.rows[i].a[j]), tot = vals.reduce((s, v) => s.add(v), new Q(0n)), res0 = tot.neg();
+        A.cap(`Столбец ${nm}: складываем числа строк с t и меняем знак`);
+        A.cls(['bas', -1, ...cols].map(jj => artRows.concat([m]).map(i => C('tN', i, jj))).flat(), 'k-act', false);
+        A.cls(artRows.map(i => C('tN', i, j)), 'k-act');
+        A.set(fm, `<span class="fmh">−( ${artRows.map((_, k) => `<span class="fo h${k}">□</span>`).join(' + ')} ) = <b class="fr">□</b></span>`);
+        for (let k = 0; k < artRows.length; k++) await A.put(V('tN', artRows[k], j), A.q(`.pvfm .h${k}`), par(vals[k]), { d: 500 });
+        await A.swap(A.q('.pvfm .fr'), fq(res0), 420);
+        await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 600 });
+        A.set(V('tN', m, j), fq(res0)); await A.pop(V('tN', m, j), { d: 260 });
+        A.cls(artRows.map(i => C('tN', i, j)), 'k-act', false); A.cls(C('tN', m, j), 'k-ok');
+      };
+      await colStep(-1);
+      for (const j of otherCols) await colStep(j);
+      if (artCols.length) {
+        A.cap('В столбцах искусственных переменных строки −h стоят нули: они уже в базисе');
+        await A.seq(artCols, 120, j => { A.set(V('tN', m, j), '0'); A.cls(C('tN', m, j), 'zc'); return A.pop(V('tN', m, j), { d: 250 }); });
+      }
+      A.cap(`Строка −h готова: в b стоит −h = ${plain(fq(st0.z.b))}`);
+      A.set(fm, '');
+      sum.innerHTML = `Сейчас <i>h</i> = ${fq(st0.z.b.neg())}: столько «не хватает» до допустимого решения. Задача этапа 1 — довести ее до 0.`; await A.show(sum);
+    };
+    return demo('строка −h: складываем строки с искусственными', html, script);
+  }
+
+  // --- итог этапа 1: проверка h = 0 (или h > 0), удаление столбцов t ---
+  function demoPhase1End(pr, res) {
+    const p1 = res.phase1.steps, last = p1[p1.length - 1], m = last.rows.length, vars = last.vars, cols = last.cols, infeasible = res.status === 'infeasible';
+    const tc = cols.filter(j => vars[j].kind === 't'), inBasis = last.basis.filter(bj => vars[bj].kind === 't');
+    const html = `<div class="pvwrap one"><div>${dtb(last, { cls: 'tO' })}</div></div><div class="pvfm"></div>`;
+    const script = async A => {
+      const { C, V, H } = sceneTools(A), fm = A.q('.pvfm');
+      await A.wait(250);
+      A.cap('Этап 1 закончен: в строке −h нет отрицательных чисел');
+      await A.each(cols, async j => { A.cls(C('tO', m, j), 'k-ok'); await A.wait(40); });
+      if (infeasible) {
+        A.cap(`Но b = ${plain(fq(last.z.b))} ≠ 0, то есть h* = ${plain(fq(last.z.b.neg()))} > 0`);
+        A.cls(C('tO', m, -1), 'k-del'); await A.pulse(V('tO', m, -1));
+        A.set(fm, `<span class="fmh bad">h* = ${fq(last.z.b.neg())} &gt; 0: искусственные переменные нельзя обнулить</span>`);
+        A.cap('Допустимого решения нет: система ограничений несовместна, этап 2 не выполняется');
+        A.cls(inBasis.map(bj => C('tO', last.basis.indexOf(bj), 'bas')), 'k-del');
+        A.set(fm, `<span class="fmh bad">✕ допустимая область пуста — задача не имеет решения</span>`); await A.pulse(fm);
+        return;
+      }
+      A.cap('b = 0, значит h* = 0: все искусственные переменные равны 0 — допустимое решение найдено');
+      A.cls(C('tO', m, -1), 'k-ok'); await A.pulse(V('tO', m, -1));
+      A.set(fm, '<span class="fmh ok">✓ h* = 0 — допустимое базисное решение найдено</span>');
+      if (inBasis.length) {
+        A.cap(`${inBasis.map(bj => plain(vname(vars, bj))).join(', ')} осталась в базисе со значением 0 — её нужно вывести (см. ниже)`);
+        A.cls(inBasis.map(bj => C('tO', last.basis.indexOf(bj), 'bas')), 'k-act');
+      }
+      if (tc.length) {
+        A.cap(`Искусственные переменные свою роль сыграли — вычёркиваем столбцы ${tc.map(j => plain(vname(vars, j))).join(', ')}`);
+        const cells = tc.map(j => [H('tO', j), ...[...Array(m + 1).keys()].map(i => C('tO', i, j))]).flat();
+        A.cls(cells, 'k-del'); await A.wait(500);
+        await A.anim(A.q('.tO table'), [{ opacity: 1 }, { opacity: .85 }, { opacity: 1 }], { d: 300 });
+        cells.forEach(c => c && c.classList.add('dh'));
+      }
+    };
+    return demo('конец этапа 1: проверяем h и убираем искусственные переменные', html, script);
+  }
+
+  // --- переход к этапу 2: исходная цель и приведение её строки к базису ---
+  function demoPhase2Start(pr, res) {
+    const start2 = res.phase2.steps[0], raw = res.raw, m = start2.rows.length, vars = start2.vars, cols = start2.cols;
+    const base = { ...start2, z: raw.z, q: null };
+    const html = `<div class="pvwrap one"><div class="dmh">таблица этапа 2</div><div>${dtb(base, { cls: 'tN', blankZ: true })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const { C, V } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum'), zl = plain(zlab(raw.z.label)), max = pr.sense === 'max';
+      A.cls(cols.map(j => C('tN', m, j)), 'dh');
+      await A.wait(250);
+      A.cap(max ? `Возвращаем исходную цель: строка ${zl} — коэффициенты f с обратным знаком` : `Возвращаем исходную цель: min f = max(−f), строка ${zl} — коэффициенты f как есть`);
+      await A.seq(cols, 80, j => { A.set(V('tN', m, j), fq(raw.z.a[j])); return A.pop(C('tN', m, j), { d: 300 }); });
+      A.set(V('tN', m, -1), fq(raw.z.b));
+      let zc = { b: raw.z.b, a: raw.z.a.slice() };
+      if (!res.elim.length) {
+        A.cap('Под базисными переменными в строке цели уже нули — приводить её к базису не нужно');
+        A.cls(start2.basis.map(bj => C('tN', m, bj)), 'k-ok');
+      }
+      for (const e of res.elim) {
+        const kk = zc.a[e.bj], row = start2.rows[e.i], nb = { b: zc.b.sub(kk.mul(row.b)), a: zc.a.map((v, j) => v.sub(kk.mul(row.a[j]))) };
+        A.cap(`Под базисной ${plain(vname(vars, e.bj))} в строке ${zl} стоит ${plain(fq(kk))}, а должен быть 0`);
+        A.cls(C('tN', m, e.bj), 'k-del'); A.cls(['bas', -1, ...cols].map(j => C('tN', e.i, j)), 'k-sel'); await A.pulse(V('tN', m, e.bj));
+        A.cap(`Вычитаем из строки ${zl} строку ${plain(vname(vars, e.bj))}, умноженную на ${plain(fq(kk))}`);
+        for (const j of [-1, ...cols]) {
+          const old = j < 0 ? zc.b : zc.a[j], nw = j < 0 ? nb.b : nb.a[j], cell = row2 => j < 0 ? row2.b : row2.a[j];
+          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="fr">□</b></span>`);
+          A.cls(C('tN', m, j), 'k-act');
+          await A.put(V('tN', m, j), A.q('.pvfm .fo'), fq(old), { d: 420 });
+          await A.put(V('tN', m, e.bj), A.q('.pvfm .fk'), par(kk), { d: 420 });
+          await A.put(V('tN', e.i, j), A.q('.pvfm .fn'), par(cell(row)), { d: 420 });
+          await A.swap(A.q('.pvfm .fr'), fq(nw), 360);
+          await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 450 });
+          A.set(V('tN', m, j), fq(nw)); await A.pop(V('tN', m, j), { d: 220 });
+          A.cls(C('tN', m, j), 'k-act', false);
+        }
+        zc = nb; A.cls(['bas', -1, ...cols].map(j => C('tN', e.i, j)), 'k-sel', false); A.cls(C('tN', m, e.bj), 'k-del', false); A.cls(C('tN', m, e.bj), 'k-ok');
+      }
+      A.cap(`Строка ${zl} готова: под базисными переменными нули — можно запускать симплекс-метод`);
+      A.set(fm, '');
+      A.cls(start2.basis.map(bj => C('tN', m, bj)), 'k-ok');
+      sum.innerHTML = `Базис: ${start2.basis.map((bj, i) => `${vK(vars, bj)} = ${fq(start2.rows[i].b)}`).join(', ')}; ${plain(zlab(start2.z.label))}: b = ${fq(start2.z.b)}`; await A.show(sum);
+    };
+    return demo('этап 2: исходная цель → строка, приведённая к базису', html, script);
+  }
+
+  // --- подстановка точки в ограничения и цель (проверка ответа) ---
+  // st — итоговая таблица (если есть), по ней показывается чтение значений из базиса
+  function demoAnswer(pr, x, fv, st, extra = {}) {
+    const n = pr.n, m = pr.rows.length;
+    const vN = j => xv(j + 1);
+    let top = '';
+    if (st) top = `<div class="pvwrap one"><div>${dtb(st, { cls: 'tO' })}</div></div>`;
+    const chips = `<div class="dmbig anschips"><i>x</i>* = (${x.map((_, j) => `<span class="ch v" data-j="${j}">${vN(j)} = ?</span>`).join('; ')}), &nbsp;<i>f</i>* = <span class="ch fv">?</span></div>`;
+    const rows = pr.rows.map((r, i) => `<div class="drow ansr" data-i="${i}"><span class="kbd">(${i + 1})</span> <span class="lhs">${TM(r.a, xlab)}</span> <span class="ch rs">${sg(r.s)}</span> ${fq(r.b)} <span class="ch okc dh"></span></div>`).join('');
+    const objr = `<div class="drow ansr" data-obj="1"><i>f</i> = <span class="lhs">${TM(pr.c, xlab)}</span>${pr.c0 && !pr.c0.isZero() ? ` ${pr.c0.s < 0 ? '−' : '+'} ${fq(pr.c0.abs())}` : ''} <span class="ch okc dh"></span></div>`;
+    const html = `${top}${chips}<div class="dmh" style="margin-top:6px">подстановка в исходные ограничения</div>${rows}${objr}`;
+    const script = async A => {
+      const { C, V } = sceneTools(A);
+      await A.wait(250);
+      if (st) {
+        const m2 = st.rows.length, vars = st.vars;
+        A.cap('Читаем итоговую таблицу: базисная переменная равна своему b, небазисные равны 0');
+        for (let j = 0; j < n; j++) {
+          const chip = A.q(`.ch.v[data-j="${j}"]`), i = st.basis.indexOf(j);
+          if (i >= 0) {
+            A.cls([C('tO', i, 'bas'), C('tO', i, -1)], 'k-sel');
+            await A.fly(V('tO', i, -1), chip); await A.swap(chip, `${vN(j)} = <b>${fq(x[j])}</b>`, 360); A.cls(chip, 'pos');
+          } else { await A.swap(chip, `${vN(j)} = <b>0</b>`, 300); A.cls(chip, 'zero'); }
+        }
+        const hid = st.vars.map((v, j) => ({ v, j })).filter(o => o.v.kind !== 'x' && st.basis.indexOf(o.j) >= 0).map(o => plain(vname(vars, o.j)));
+        if (hid.length) { A.cap(`Дополнительные переменные (${st.vars.filter(v => v.kind !== 'x').map(v => plain(vname(vars, st.vars.indexOf(v)))).join(', ')}) в ответ не входят`); }
+        A.cap(`Значение цели читаем из b строки ${plain(zlab(st.z.label))}`);
+        A.cls(C('tO', m2, -1), 'k-sel');
+        await A.fly(V('tO', m2, -1), A.q('.ch.fv'));
+        await A.swap(A.q('.ch.fv'), `<b>${fq(fv)}</b>`, 420); A.cls(A.q('.ch.fv'), 'pos');
+        if (extra.alt && extra.alt.length) { A.cap(`Под ${extra.alt.map(j => plain(vname(vars, j))).join(', ')} в строке цели стоит 0 — есть и другие оптимальные решения`); A.cls(extra.alt.map(j => C('tO', m2, j)), 'k-act'); }
+        if (extra.degenerate) { A.cap('Одна из базисных переменных равна 0 — решение вырожденное'); st.rows.forEach((r, i) => { if (r.b.isZero()) A.cls(C('tO', i, -1), 'k-act'); }); }
+      } else {
+        A.cap('Записываем найденную точку x* и значение f*');
+        await A.seq(x.map((_, j) => j), 150, j => { const chip = A.q(`.ch.v[data-j="${j}"]`); return A.swap(chip, `${vN(j)} = <b>${fq(x[j])}</b>`, 360).then(() => A.cls(chip, x[j].isZero() ? 'zero' : 'pos')); });
+        await A.swap(A.q('.ch.fv'), `<b>${fq(fv)}</b>`, 420); A.cls(A.q('.ch.fv'), 'pos');
+      }
+      A.cap('Подставляем x* в исходные ограничения');
+      for (let i = 0; i < m; i++) {
+        const row = A.q(`.ansr[data-i="${i}"]`), r = pr.rows[i], stt = termIn(r.a, (j, one) => (one ? '' : '·') + par(x[j]));
+        const lhs = r.a.reduce((s, v, j) => s.add(v.mul(x[j])), new Q(0n)), ok = r.s === '<=' ? lhs.le(r.b) : r.s === '>=' ? lhs.ge(r.b) : lhs.eq(r.b), tight = lhs.eq(r.b);
+        A.cap(`Ограничение (${i + 1}): ${plain(fq(lhs))} ${sg(r.s)} ${plain(fq(r.b))} — ${ok ? (tight ? 'выполнено как равенство (активное)' : 'выполнено с запасом') : 'НЕ выполнено'}`);
+        A.cls(row, 'on');
+        await A.seq([...row.querySelectorAll('.tm')], 90, (el, k) => A.swap(el, stt[k] ? stt[k].h : el.innerHTML, 380));
+        await A.wait(200);
+        await A.swap(row.querySelector('.lhs'), `<b>${fq(lhs)}</b>`, 420);
+        const mark = row.querySelector('.okc'); mark.innerHTML = ok ? '✓' : '✕ не выполнено'; mark.style.color = ok ? '' : '#c0284f';
+        await A.pop(mark); A.cls(row, 'on', false); A.cls(row, ok ? 'done' : 'bad');
+      }
+      const ro = A.q('.ansr[data-obj="1"]'), stt = termIn(pr.c, (j, one) => (one ? '' : '·') + par(x[j])), val = ALG.value(pr.c, x).add(pr.c0 || new Q(0n));
+      A.cap(`Цель: f = ${plain(fq(val))}${val.eq(fv) ? ' — совпадает с f*' : ' — не совпадает с f*'}`);
+      A.cls(ro, 'on');
+      await A.seq([...ro.querySelectorAll('.tm')], 90, (el, k) => A.swap(el, stt[k] ? stt[k].h : el.innerHTML, 380));
+      await A.swap(ro.querySelector('.lhs'), `<b>${fq(ALG.value(pr.c, x))}</b>`, 420);
+      const mk = ro.querySelector('.okc'); mk.innerHTML = `= ${fq(val)} ✓`; await A.pop(mk); A.cls(ro, 'on', false); A.cls(ro, 'done');
+      A.cap('Все ограничения выполнены, значение цели подтверждено — ответ верен');
+    };
+    return demo('ответ: чтение таблицы и обратная проверка', html, script);
+  }
+
+  /* =================== Двойственная задача, Гаусс, сведение к плоскости: дополнительные сцены =================== */
+  // --- соответствие «ограничение ↔ переменная y», «переменная x ↔ ограничение Д» ---
+  // P: { sense, rows:[{a,s,b}], signs? }, D: { sense, rows:[{s}], signs? }
+  function demoDualMap(P, D) {
+    const n = P.rows[0].a.length, m = P.rows.length, xs = P.signs || new Array(n).fill('>='), ys = D.signs || new Array(m).fill('>=');
+    const rI = P.rows.map((r, i) => `<div class="mprow" data-i="${i}"><span class="mpl">(${i + 1}) &nbsp;${lin(r.a, j => xv(j + 1))} ${sg(r.s)} ${fq(r.b)}</span><span class="mpa dh">⟷</span><span class="mpr">${yv(i + 1)} <span class="dh mpv">${signTxt(ys[i], '').trim()}</span></span><span class="mpw dh">«${sg(r.s)}» ⇒ ${signTxt(ys[i], yv(i + 1))}</span></div>`).join('');
+    const rJ = [...Array(n)].map((_, j) => `<div class="mprow" data-j="${j}"><span class="mpl">${signTxt(xs[j], xv(j + 1))} &nbsp;(столбец ${j + 1})</span><span class="mpa dh">⟷</span><span class="mpr dh">Д${j + 1}: Σ aᵢ${j + 1}·yᵢ ${sg(D.rows[j].s)} c${j + 1}</span><span class="mpw dh">${signTxt(xs[j], xv(j + 1))} ⇒ «${sg(D.rows[j].s)}»</span></div>`).join('');
+    const html = `<div class="dmh">каждому ограничению прямой — переменная двойственной</div>${rI}<div class="dmh" style="margin-top:8px">каждой переменной прямой — ограничение двойственной</div>${rJ}<div class="mprow mpgoal"><span class="mpl"><i>L</i> → ${P.sense}</span><span class="mpa dh">⟷</span><span class="mpr dh"><i>g</i> → ${D.sense}</span></div>`;
+    const script = async A => {
+      await A.wait(250);
+      for (let i = 0; i < m; i++) {
+        const row = A.q(`.mprow[data-i="${i}"]`);
+        A.cap(`Ограничение (${i + 1}) получает свою переменную ${plain(yv(i + 1))}`);
+        A.cls(row, 'on'); await A.pop(row.querySelector('.mpa'), { d: 300 });
+        A.cap(`Знак ограничения «${sg(P.rows[i].s)}» ⇒ условие на ${plain(yv(i + 1))}: ${signTxt(ys[i], '').trim()}`);
+        await A.pop(row.querySelector('.mpv')); await A.pop(row.querySelector('.mpw'), { d: 300 });
+        A.cls(row, 'on', false); A.cls(row, 'done');
+      }
+      for (let j = 0; j < n; j++) {
+        const row = A.q(`.mprow[data-j="${j}"]`);
+        A.cap(`Столбец при ${plain(xv(j + 1))} задаёт ограничение Д${j + 1} двойственной`);
+        A.cls(row, 'on'); await A.pop(row.querySelector('.mpa'), { d: 300 }); await A.pop(row.querySelector('.mpr'));
+        A.cap(`Знак условия на ${plain(xv(j + 1))} ⇒ знак в Д${j + 1}: «${sg(D.rows[j].s)}»`);
+        await A.pop(row.querySelector('.mpw'), { d: 300 });
+        A.cls(row, 'on', false); A.cls(row, 'done');
+      }
+      A.cap(`Цель меняет направление: ${P.sense} → ${D.sense}`);
+      const gl = A.q('.mpgoal'); A.cls(gl, 'on'); await A.pop(gl.querySelector('.mpa'), { d: 300 }); await A.pop(gl.querySelector('.mpr')); A.cls(gl, 'on', false); A.cls(gl, 'done');
+    };
+    return demo('соответствие: ограничения ↔ y, переменные ↔ ограничения Д, знаки', html, script);
+  }
+
+  // --- подстановка x* в ограничения прямой: равенство или запас ⇒ y = 0 ---
+  function demoCSsub(norm, x) {
+    const m = norm.length;
+    const rows = norm.map((r, i) => `<div class="drow csr" data-i="${i}"><span class="kbd">(${i + 1})</span> <span class="lhs">${TM(r.a, xlab)}</span> <span class="ch rs">≤</span> ${fq(r.b)} <span class="ch dh csv"></span></div>`).join('');
+    const xs = `<div class="dmbig"><i>x</i>* = (${x.map((v, j) => `<span class="ch xs" data-j="${j}">${xv(j + 1)} = ${fq(v)}</span>`).join('; ')})</div>`;
+    const script = async A => {
+      await A.wait(250);
+      for (let i = 0; i < m; i++) {
+        const row = A.q(`.csr[data-i="${i}"]`), r = norm[i], stt = termIn(r.a, (j, one) => (one ? '' : '·') + par(x[j]));
+        const lhs = r.a.reduce((s, v, j) => s.add(v.mul(x[j])), new Q(0n)), slack = r.b.sub(lhs), tight = slack.isZero();
+        A.cap(`Ограничение (${i + 1}): подставляем x* — левая часть ${plain(fq(lhs))}`);
+        A.cls(row, 'on');
+        await A.seq([...row.querySelectorAll('.tm')], 90, (el, k) => { const jj = +el.dataset.j; return A.fly(A.q(`.xs[data-j="${jj}"]`), el, plain(fq(x[jj])), { d: 600 }).then(() => A.swap(el, stt[k] ? stt[k].h : el.innerHTML, 300)); });
+        await A.swap(row.querySelector('.lhs'), `<b>${fq(lhs)}</b>`, 420);
+        const csv = row.querySelector('.csv');
+        if (tight) { A.cap(`${plain(fq(lhs))} = ${plain(fq(r.b))}: ресурс израсходован полностью — ${plain(yv(i + 1))} пока неизвестна`); await A.swap(row.querySelector('.rs'), '=', 400); csv.innerHTML = `${yv(i + 1)} ≥ 0`; csv.classList.add('dim'); }
+        else { A.cap(`${plain(fq(lhs))} < ${plain(fq(r.b))}: остался запас ${plain(fq(slack))} ⇒ ${plain(yv(i + 1))} = 0`); await A.swap(row.querySelector('.rs'), '&lt;', 400); csv.innerHTML = `${yv(i + 1)} = 0`; csv.classList.add('zero'); }
+        await A.pop(csv); A.cls(row, 'on', false);
+      }
+    };
+    return demo('подставляем x* в ограничения: запас ⇒ y = 0', xs + rows, script);
+  }
+
+  // --- метод Гаусса — Жордана по шагам (расширенная матрица) ---
+  function demoGauss(eqs, names, title) {
+    const k = names.length, rowsN = eqs.length;
+    const M0 = eqs.map(e => [...e.a, e.b]);
+    // моделируем решение, запоминая шаги
+    const snaps = [M0.map(r => r.slice())], ops = [];
+    let M = M0.map(r => r.slice()), r = 0; const piv = [];
+    for (let c = 0; c < k && r < rowsN; c++) {
+      let p = r; while (p < rowsN && M[p][c].isZero()) p++;
+      if (p === rowsN) continue;
+      if (p !== r) { [M[r], M[p]] = [M[p], M[r]]; ops.push({ t: 'swap', r, p, c }); snaps.push(M.map(x => x.slice())); }
+      const pv = M[r][c];
+      if (!pv.eq(new Q(1n))) { M[r] = M[r].map(v => v.div(pv)); ops.push({ t: 'div', r, c, pv }); snaps.push(M.map(x => x.slice())); }
+      for (let i = 0; i < rowsN; i++) if (i !== r && !M[i][c].isZero()) { const f = M[i][c]; M[i] = M[i].map((v, j) => v.sub(f.mul(M[r][j]))); ops.push({ t: 'sub', r, i, c, f }); snaps.push(M.map(x => x.slice())); }
+      piv.push(c); r++;
+    }
+    const incons = M.slice(r).some(row => !row[k].isZero()), free = [...Array(k).keys()].filter(c => !piv.includes(c));
+    const tbl = (S, tag) => `<table class="sx dmsx gm"><thead><tr><th></th>${names.map(n => `<th>${n}</th>`).join('')}<th>b</th></tr></thead><tbody>${S.map((row, i) => `<tr data-r="${i}"><td class="bas">(${i + 1})</td>${row.map((v, j) => `<td data-r="${i}" data-c="${j}"><span class="cv">${fq(v)}</span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    const html = `<div class="tblwrap">${tbl(M0)}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const T = A.q('table.gm'), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      const cellAt = (i, j) => T.querySelector(`td[data-r="${i}"][data-c="${j}"]`);
+      const rowCells = i => [...T.querySelectorAll(`td[data-r="${i}"]`)];
+      const setRow = async (i, S, d) => { await A.seq([...Array(k + 1).keys()], 60, j => A.swap(cellAt(i, j).querySelector('.cv'), fq(S[i][j]), d || 420)); };
+      await A.wait(250);
+      A.cap('Записываем систему в виде таблицы: строки — уравнения, столбцы — неизвестные');
+      A.cls(rowCells(0), 'k-sel'); await A.wait(200); A.cls(rowCells(0), 'k-sel', false);
+      let prev = snaps[0];
+      for (let s = 0; s < ops.length; s++) {
+        const o = ops[s], S = snaps[s + 1];
+        if (o.t === 'swap') {
+          A.cap(`В столбце ${plain(names[o.c])} на месте ведущего 0 — меняем строки (${o.r + 1}) и (${o.p + 1})`);
+          A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act'); await Promise.all([setRow(o.r, S), setRow(o.p, S)]); A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act', false);
+        } else if (o.t === 'div') {
+          A.cap(`Делим строку (${o.r + 1}) на ведущий элемент ${plain(fq(o.pv))}`);
+          A.cls(cellAt(o.r, o.c), 'k-pe'); A.cls(rowCells(o.r), 'k-sel');
+          await setRow(o.r, S); A.cls(cellAt(o.r, o.c), 'k-pe', false); A.cls(rowCells(o.r), 'k-sel', false); A.cls(rowCells(o.r), 'k-ok');
+        } else {
+          A.cap(`Из строки (${o.i + 1}) вычитаем ${plain(fq(o.f))} × строку (${o.r + 1}) — обнуляем столбец ${plain(names[o.c])}`);
+          A.cls(rowCells(o.r), 'k-sel'); A.cls(rowCells(o.i), 'k-act'); A.cls(cellAt(o.i, o.c), 'k-del');
+          A.set(fm, `<span class="fmh">строка (${o.i + 1}) − ${par(o.f)} × строка (${o.r + 1})</span>`);
+          await setRow(o.i, S);
+          A.cls(rowCells(o.r), 'k-sel', false); A.cls(rowCells(o.i), 'k-act', false); A.cls(cellAt(o.i, o.c), 'k-del', false);
+        }
+        prev = S;
+      }
+      A.set(fm, '');
+      if (incons) { A.cap('Получилось 0 = число ≠ 0: система несовместна'); sum.innerHTML = '<b class="bad">система несовместна</b>'; await A.show(sum); return; }
+      A.cap('Читаем решение: в каждом ведущем столбце единица — неизвестная равна b своей строки');
+      const parts = piv.map((c, i) => `${names[c]} = <b>${fq(M[i][k])}</b>`);
+      sum.innerHTML = parts.join(', ') + (free.length ? `; ${free.map(c => names[c]).join(', ')} — свободные` : '');
+      piv.forEach((c, i) => A.cls(cellAt(i, k), 'k-ok'));
+      await A.show(sum);
+    };
+    return demo(title || 'решаем систему методом Гаусса', html, script);
+  }
+
+  // --- сведение к двум переменным (сборник, 2.2) ---
+  function demoReduce(pr, Rd, P2) {
+    const lines = pr.rows.map((r, i) => `<div class="drow rdr" data-src="e${i}"><span class="kbd">(${i + 1})</span> ${rowLine(r)}</div>`).join('');
+    const exprs = Rd.basic.map((B, t) => `<div class="drow rdx dh" data-b="${t}">${xv(B.j + 1)} = ${fq(B.b)}${[0, 1].map(tt => B.a[tt].isZero() ? '' : (B.a[tt].s > 0 ? ' − ' : ' + ') + (B.a[tt].abs().eq(new Q(1n)) ? '' : fq(B.a[tt].abs())) + xv(tt + 1)).join('')} <span class="kbd">(из уравнения ${B.from + 1})</span></div>`).join('');
+    const news = P2.rows.map((r, k) => { const o = Rd.origin[k] || {}; return `<div class="drow rdn dh" data-k="${k}">${rowLine(r)} <span class="kbd">${o.kind === 'basic' ? `из ${plain(xv(o.j + 1))} ≥ 0` : o.kind === 'eq' ? `из уравнения ${o.i + 1}` : o.kind === 'contra' ? 'условие вместо числового противоречия' : `из ограничения ${o.i + 1}`}</span></div>`; }).join('');
+    const html = `<div class="pvwrap"><div><div class="dmh">условие</div>${lines}</div><div><div class="dmh">выражаем лишние переменные</div>${exprs}<div class="dmh" style="margin-top:6px">неравенства на плоскости (x₁; x₂)</div>${news}<div class="drow rdo dh">${objLine(P2)}</div></div></div>`;
+    const script = async A => {
+      await A.wait(250);
+      for (let t = 0; t < Rd.basic.length; t++) {
+        const B = Rd.basic[t], src = A.q(`.rdr[data-src="e${B.from}"]`);
+        A.cap(`Из уравнения (${B.from + 1}) выражаем ${plain(xv(B.j + 1))} через ${plain(xv(1))} и ${plain(xv(2))}`);
+        A.cls(src, 'on'); await A.pop(A.q(`.rdx[data-b="${t}"]`)); A.cls(src, 'on', false); A.cls(src, 'done');
+      }
+      for (let k = 0; k < P2.rows.length; k++) {
+        const o = Rd.origin[k] || {}, srcs = o.kind === 'basic' ? A.qa('.rdx') : (o.i != null ? [A.q(`.rdr[data-src="e${o.i}"]`)] : []);
+        A.cap(o.kind === 'basic' ? `Условие ${plain(xv(o.j + 1))} ≥ 0 с подстановкой даёт неравенство на плоскости` : `Подставляем выражения в ограничение ${o.i != null ? o.i + 1 : ''} — остаются только ${plain(xv(1))}, ${plain(xv(2))}`);
+        A.cls(srcs.filter(Boolean), 'on'); await A.pop(A.q(`.rdn[data-k="${k}"]`)); A.cls(srcs.filter(Boolean), 'on', false);
+      }
+      A.cap('Цель тоже выражается через x₁ и x₂ — получена задача с двумя переменными');
+      await A.pop(A.q('.rdo'));
+    };
+    return demo('сведение к двум переменным: подстановка выражений', html, script);
   }
   const more = h => `<details class="dmmore"><summary>Подробно (текст и таблицы)</summary>${h}</details>`;
   // слагаемые Σ aⱼ·lab(j) по отдельности: [{ j, h }]; lab(j, единичный_коэффициент)
@@ -2445,9 +3661,12 @@ const VIEWS = (() => {
   function demoCheck(res) {
     const D = res.D, y = res.y;
     const rows = D.rows.map((r, j) => `<div class="drow" data-j="${j}"><span class="lhs">${TM(r.a, ylab)}</span> <span class="ch">≥</span> ${fq(r.b)} <span class="ch okc dh">✓</span></div>`).join('');
-    const html = `<div>${rows}${bars(['g*', res.g], ['f*', res.primal.f])}</div>`;
+    const ysg = `<div class="drow" data-ys="1">${y.map((v, i) => `<span class="ch ysc" data-i="${i}">${yv(i + 1)} = ${fq(v)} ${v.s >= 0 ? '≥ 0' : '&lt; 0'}<span class="okc dh"> ${v.s >= 0 ? '✓' : '✕'}</span></span>`).join('; ')}</div>`;
+    const html = `<div>${ysg}${rows}${bars(['g*', res.g], ['f*', res.primal.f])}</div>`;
     return demo('подставляем y* — ограничения выполнены, g* = f*', html, async A => {
-      await A.wait(400); A.cap(`подставляем y* = ${vec(y)}`);
+      await A.wait(400); A.cap('сначала проверяем знаки: все yᵢ ≥ 0');
+      await A.seq(A.qa('.ysc'), 150, el => A.pop(el.querySelector('.okc')));
+      A.cap(`подставляем y* = ${vec(y)}`);
       for (let j = 0; j < D.rows.length; j++) {
         const row = A.q(`.drow[data-j="${j}"]`), r = D.rows[j], st = termIn(r.a, (i, one) => (one ? '' : '·') + par(y[i]));
         A.cls(row, 'on');
@@ -2465,14 +3684,20 @@ const VIEWS = (() => {
   }
 
   /* =================== Этапы решения: номер, цель, методы =================== */
-  // st(id, заголовок, цель, методы, тело) — раздел «Этап k»; plan() — сводная таблица всех этапов.
+  // st(id, заголовок, цель, методы, тело) — раздел «Этап k»; plan() — схема этапов: номер, короткое название, результат.
+  // Цель и методы подробно — в начале каждого раздела, в схеме только короткие подписи.
+  const STAGE_SHORT = {
+    norm: ['Приведение', '«≥» × (−1)'], build: ['Построение', 'двойственная задача'], primal: ['Прямая задача', 'x*, f*'],
+    cs: ['УДН', 'равенства и нули y'], sys: ['Система', 'y* методом Гаусса'], check: ['Проверка', 'допустимость, оптимумы равны'],
+    prep: ['Знаки', 'условия на x и y'], solve: ['Решение', 'x* и y*']
+  };
   function stager() {
     const list = [];
     const st = (id, title, goal, methods, body) => {
       list.push({ id, title, goal, methods });
       return sec(id, `Этап ${list.length}. ${title}`, `<div class="stage"><div><span class="stk">Цель</span>${goal}</div><div><span class="stk">Методы</span>${methods}</div></div>` + body);
     };
-    const plan = intro => sec('plan', 'Этапы решения', `${intro ? `<p>${intro}</p>` : ''}<div class="tblwrap"><table class="plain stplan"><tr><th>№</th><th>Этап</th><th>Цель</th><th>Методы</th></tr>${list.map((s, k) => `<tr><td>${k + 1}</td><td><a href="#${s.id}" data-jump="1">${s.title}</a></td><td>${s.goal}</td><td>${s.methods}</td></tr>`).join('')}</table></div>`);
+    const plan = () => sec('plan', 'Этапы решения', `<div class="stflow">${list.map((s, k) => { const [t, r] = STAGE_SHORT[s.id] || [s.title, '']; return `<a class="stc" href="#${s.id}" data-jump="1" title="${s.title}"><span class="stn">${k + 1}</span><span class="stt">${t}</span><span class="str">${r}</span></a>`; }).join('')}</div>`);
     return { st, plan };
   }
   /* =================== Задание 4: двойственная задача =================== */
@@ -2486,7 +3711,7 @@ const VIEWS = (() => {
       links: [['plan', 'Этапы'], ['build', 'Построение'], ['cs', 'УДН'], ['check', 'Проверка']] }));
     // сводная таблица этапов вставляется сюда, когда известны все этапы
     const planAt = S.length;
-    const done = () => { S.splice(planAt, 0, plan('Решение по методичке: построить двойственную задачу, найти y* из условий дополняющей нежёсткости по известному решению прямой задачи и проверить допустимость и равенство g* = f*. Названия этапов — ссылки на разделы.')); return S; };
+    const done = () => { S.splice(planAt, 0, plan()); return S; };
     // приведение к «≤» — только если в прямой задаче есть «≥»
     const flips = res.norm.filter(r => r.flipped);
     if (flips.length) S.push(st('norm', 'Приведение прямой задачи к виду «≤»',
@@ -2498,7 +3723,7 @@ const VIEWS = (() => {
     S.push(st('build', 'Построение двойственной задачи',
       'записать задачу, двойственную к прямой: её переменные, целевую функцию и ограничения.',
       'правила построения из методички: m переменных yᵢ, цель Σ bᵢyᵢ → min; ограничению Σ aᵢⱼxⱼ ≤ bᵢ соответствует yᵢ ≥ 0; условию xⱼ ≥ 0 — ограничение Σ aᵢⱼyᵢ ≥ cⱼ (столбец коэффициентов при xⱼ).',
-      demoBuild({ rows: res.norm, c: pr.c, sense: 'max' }, D) + more(dl)));
+      demoDualMap({ sense: 'max', rows: res.norm }, { sense: 'min', rows: D.rows }) + demoBuild({ rows: res.norm, c: pr.c, sense: 'max' }, D) + more(dl)));
     // решение прямой
     const P = res.primal, bid = 'bd' + Math.random().toString(36).slice(2, 8);
     let ph = P.status === 'optimal' ? demoReveal(`решение задания ${baseKey === 'graph' ? '1' : '2'}`, [{ name: '<i>x</i>', lab: xlab, vals: P.x, fname: 'f', f: P.f }], 'оптимальный план прямой задачи известен') : `<div class="note bad">Прямая задача: ${statusText(P.status)}. По теореме двойственности у двойственной задачи тогда тоже нет оптимального решения — УДН применять не к чему.</div>`;
@@ -2518,7 +3743,7 @@ const VIEWS = (() => {
     S.push(st('cs', 'Условия дополняющей нежёсткости (УДН)',
       'по известному x* определить, какие ограничения двойственной задачи выполняются как равенства и какие yᵢ равны нулю.',
       'УДН: в каждой паре сопряжённых ограничений хотя бы одно выполняется как равенство — xⱼ* > 0 ⇒ Дj равенство; ограничение (i) выполнено строго ⇒ yᵢ = 0.',
-      demoCS(pr, res) + more(`<p>Подставляем x* = ${vec(P.x)} и проверяем все ${n + m} пар:</p>` + cards)));
+      demoCSsub(res.norm, P.x) + demoCS(pr, res) + more(`<p>Подставляем x* = ${vec(P.x)} и проверяем все ${n + m} пар:</p>` + cards)));
     // система
     const sol = cs.sol, U = cs.U;
     let sh = `<p>Обнуляются: ${cs.zeroY.map((z, i) => z ? yv(i + 1) : null).filter(Boolean).join(', ') || 'ни одна переменная'}. Неизвестные: ${U.map(i => yv(i + 1)).join(', ') || '—'}.</p>`;
@@ -2541,7 +3766,7 @@ const VIEWS = (() => {
     S.push(st('sys', 'Составление и решение системы уравнений',
       'найти оптимальный план двойственной задачи y* из равенств, выписанных по УДН.',
       `система линейных уравнений относительно y₁…yₘ (yᵢ = 0 подставлены); метод Гаусса${sol.free && sol.free.length ? '; решение системы не единственно — минимум g ищется на множестве, заданном УДН и оставшимися неравенствами' : ''}.`,
-      (res.y ? demoSys(res) : '') + more(sh)));
+      (res.y ? demoSys(res) : '') + (res.y && cs.eqs.length ? demoGauss(cs.eqs, cs.U.map(i => yv(i + 1)), 'решаем систему уравнений по шагам') : '') + more(sh)));
     // проверка
     let kh = '';
     if (res.status === 'optimal') {
@@ -2606,7 +3831,7 @@ const VIEWS = (() => {
       const res = { status: full.status, x: full.status === 'optimal' ? x : null, f: full.status === 'optimal' ? ALGZ.fv(pr, x) : null };
       let h = note2 || '';
       if (full.status !== res2.status) h += `<div class="note">Проверка двухэтапным симплекс-методом исходной задачи: ${statusText(full.status)}.</div>`;
-      if (res.x) h += `<p>Решение исходной задачи: <span class="m">${vec(res.x)}</span>.</p>` + checkTable(pr, res.x) + valueLine(pr, res.x);
+      if (res.x) h += `<p>Решение исходной задачи: <span class="m">${vec(res.x)}</span>.</p>` + demoAnswer(pr, res.x, res.f, null) + checkTable(pr, res.x) + valueLine(pr, res.x);
       else h += noCheck(res);
       if (full.status === 'optimal' && !ALGZ.fv(pr, full.x).eq(res.f)) h += `<div class="note bad">Графическое решение и симплекс-метод дали разные значения цели.</div>`;
       return [sec('check', checkTitle(meta), h + compare(pr, res, meta))];
@@ -2632,7 +3857,8 @@ const VIEWS = (() => {
     if (Rd.dropped.length) rh += `<p class="kbd">Обратились в верное числовое неравенство и отброшены: ${Rd.dropped.map(o => o.kind === 'basic' ? `${xv(o.j + 1)} ≥ 0` : `ограничение ${o.i + 1}`).join(', ')}.</p>`;
     if (Rd.contra.length) rh += `<div class="note bad">Противоречие: ${Rd.contra.map(o => (o.kind === 'basic' ? `${xv(o.j + 1)} ≥ 0` : `ограничение ${o.i + 1}`) + ` даёт 0 ${sg(o.s)} ${fq(o.b)}`).join('; ')} — допустимых решений нет.</div>`;
     if (Rd.objOnly.length) rh += `<div class="note">${Rd.objOnly.map(j => xv(j + 1)).join(', ')} входят только в цель, ограничений на них, кроме ≥ 0, нет: при допустимой области ${pr.sense === 'max' ? 'положительный' : 'отрицательный'} коэффициент сделал бы цель неограниченной.</div>`;
-    const reduce = sec('reduce', 'Сведение к двум переменным', rh);
+    const eqRows = pr.rows.filter(r => r.s === '=');
+    const reduce = sec('reduce', 'Сведение к двум переменным', (eqRows.length ? demoGauss(eqRows.map(r => ({ a: r.a, b: r.b })), pr.c.map((_, j) => xv(j + 1)), 'уравнения: метод Гаусса — выражаем лишние переменные') : '') + (Rd.basic.length ? demoReduce(pr, Rd, P2) : '') + rh);
     const lift = Rd.lift;
     const note2 = `<p class="kbd">Остальные переменные восстанавливаются по выражениям из раздела «Сведение к двум переменным».</p>`;
     const S = graph(P2, meta, { pre: [cond, sumc, reduce], finish: finish(lift, note2), noSummary: true });
@@ -2706,7 +3932,7 @@ const VIEWS = (() => {
     S.push(st('build', 'Построение двойственной задачи',
       'записать двойственную задачу: направление цели, знаки ограничений Дj и условия на знак yᵢ.',
       `транспонирование матрицы A; правила соответствия для задачи на ${P.sense} (знак ограничения (i) → знак yᵢ, знак xⱼ → вид ограничения Дj, b → коэффициенты g, ${P.sense} → ${D.sense}).`,
-      demoBuild(P, D) + (R.TR.on ? bodyB : more(bodyB))));
+      demoDualMap(P, D) + demoBuild(P, D) + (R.TR.on ? bodyB : more(bodyB))));
     // решение обеих задач
     const stl = (s, nm, v2, val) => s.status === 'optimal' ? `<span class="m">${nm}* = ${vec(s.x)}, ${val}* = ${fq(s.f)}${approx(s.f)}</span>` : statusText(s.status);
     let sh = `<p class="kbd">Для решения переменные ≤ 0 заменяются на −x′, переменные любого знака — на разность x′ − x″ (обе ≥ 0); полученные задачи решаются двухэтапным симплекс-методом.</p>`;
@@ -2740,7 +3966,7 @@ const VIEWS = (() => {
       'подтвердить, что двойственная задача построена верно.',
       'первая теорема двойственности (L* = g* или согласованные исходы «несовместна / не ограничена»); вторая теорема — условия дополняющей нежёсткости (произведение переменной на невязку сопряжённого ограничения равно 0).',
       (sp.status === 'optimal' && sd.status === 'optimal' && sp.f.eq(sd.f) ? demo('оптимальные значения сравниваются', bars(['L*', sp.f], ['g*', sd.f]), async A => { await A.wait(300); await growBars(A, sp.f, sd.f); A.cap('L* = g* — двойственная построена верно'); }) : '') + more(kh)));
-    S.splice(planAt, 0, plan('Задача сборника решается в четыре этапа: у каждого указаны цель и методы. Названия этапов — ссылки на разделы.'));
+    S.splice(planAt, 0, plan());
     S.consistent = ok;
     return S;
   }
@@ -3397,7 +4623,11 @@ const VIEWS = (() => {
     requestAnimationFrame(tick);
   }
 
-  return { graph, simplex, artificial, dual, statusText, graphZ, dualZ, verdictZ, quiz, trainerFlow };
+  R.bridge.pivot = (box, steps, k, auto) => {
+    const s = steps[k], sp = s.q == null ? optSpec(s) : pivotSpec(s, s.unbounded ? null : steps[k + 1]);
+    return mountInto(box, s.q == null ? `Таблица ${k}: проверка оптимальности` : s.unbounded ? `Таблица ${k}: неограниченность` : `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, sp.html, sp.script, { ...sp.opts, autoplay: auto });
+  };
+  return { graph, simplex, artificial, dual, statusText, graphZ, dualZ, verdictZ, quiz, trainerFlow, stopAllDemos };
 })();
 
 </script>
@@ -3559,7 +4789,7 @@ const APP = (() => {
     return h;
   }
   function solve() {
-    R.hooks.length = 0; R.offAll(); R.TR.on = false;
+    VIEWS.stopAllDemos(); R.hooks.length = 0; R.offAll(); R.TR.on = false;
     const t = structOf(), key = ckey();
     let pr, meta;
     if (state.mode === 'db' && isZ()) {
