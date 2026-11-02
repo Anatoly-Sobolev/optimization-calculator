@@ -19,7 +19,7 @@ header p{margin:6px 0 0;color:#b9bfdc;font-size:14.5px}
 .people>div:first-child{margin-left:0;padding-left:0;border-left:0}
 .people dt{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9aa3d6;margin-bottom:4px}
 .people dd{margin:0;font-size:15.5px;font-weight:600;white-space:nowrap}.people dd.sub{font-weight:400;font-size:13px;color:#c9cdea;margin-top:2px}
-@media(max-width:900px){header{padding:16px 14px}header h1{font-size:22px}.hdr{grid-template-columns:minmax(0,1fr);align-items:start}.people{flex-direction:column;gap:12px}.people>div{margin-left:0;padding-left:0;border-left:0}.people dd{white-space:normal}#controls .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}#controls .tab{flex:none}.srcsw .seg2 .btn{padding:5px 10px}}
+@media(max-width:900px){header{padding:16px 14px}header h1{font-size:22px}.hdr{grid-template-columns:minmax(0,1fr);align-items:start}.people{flex-direction:column;gap:12px}.people>div{margin-left:0;padding-left:0;border-left:0}.people dd{white-space:normal}.srcsw .seg2 .btn{padding:5px 10px}}
 section.sol{scroll-margin-top:14px}@media(max-width:900px){section.sol{scroll-margin-top:72px}}
 .wrap{max-width:1240px;margin:0 auto;padding:18px 16px 60px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px}
 main{min-width:0}
@@ -28,14 +28,12 @@ main{min-width:0}
 #secnav a:hover{background:var(--accent-soft)}
 .navh{margin-bottom:6px}
 @media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);padding:10px 8px 40px}.card{padding:12px 12px}input.num{width:64px}#secnav{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-radius:0 0 12px 12px}#secnav .navh{display:none}#secnav a{flex:none}}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs{display:flex;align-items:center;gap:10px;margin-bottom:10px}.tabs label{font-weight:600}.tabs select{min-width:min(420px,100%);max-width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:9px 36px 9px 12px;background:#fff;color:var(--ink)}
 .srcsw{margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .srcsw .seg2{display:inline-flex;background:#e9e6dd;border-radius:999px;padding:3px}
 .srcsw .seg2 .btn{border:0;background:transparent;border-radius:999px;padding:5px 14px;font-size:13.5px;color:#4a4e5c}
 .srcsw .seg2 .btn.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
-.tab{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 14px;font:inherit;font-size:15px;cursor:pointer}
-.tab .n{display:inline-block;min-width:22px;padding:0 4px;height:22px;line-height:22px;border-radius:11px;background:#e8e5dc;text-align:center;font-size:12px;margin-right:6px;font-weight:700}
-.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.tab.on .n{background:#fff;color:var(--accent)}
+@media(max-width:600px){.tabs{align-items:stretch;flex-direction:column;gap:4px}.tabs select{width:100%;min-width:0}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:0 0 14px}
 .ctlrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}
 select,input.num{font:inherit;font-size:15px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff}
@@ -320,7 +318,11 @@ footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--muted);fon
 .demo .cv:empty::before{content:"·";color:#c7cbe0}
 .demo .cv{display:inline-block;min-width:1ch}
 /* типы переменных */
-.vk-x{color:#2b3fb8}.vk-s{color:#12805a}.vk-e{color:#b86a00}.vk-t{color:#c2185b}
+.vk-x{color:#2b3fb8}.vk-s{color:#12805a}.vk-e{color:#b86a00}.vk-t{color:#c2185b}.vk-b{color:#7b3fc4}
+table.sx th.vk-b{background:#efe6fb}.bm{font-style:italic;font-weight:700;color:#7b3fc4}
+.demo td.rr{font-size:13px;white-space:nowrap}.demo tr.rrow td{border-top:1px dashed var(--line)}
+.dsteps .btnrow{margin-bottom:6px}
+@media print{.dsteps .btnrow{display:none}}
 table.sx th.vk-s{background:#e3f6ec}table.sx th.vk-e{background:#fdeccf}table.sx th.vk-t{background:#fde4ee}
 table.sx th .vtag{display:block;font:600 10px/1.1 "Segoe UI",sans-serif;color:#6b6f7c;letter-spacing:.02em}
 .vleg{display:flex;flex-wrap:wrap;gap:3px 16px;font:13px "Segoe UI",sans-serif;margin-bottom:6px}
@@ -626,6 +628,40 @@ const DB_ZYK = {
     {"v": 28, "n": 5, "sense": "min", "c": [6, -2, 3, 0, 0], "rows": [{"a": [-1, 2, 0, 1, 1], "s": "=", "b": 3}, {"a": [2, -1, 1, -3, 0], "s": "=", "b": 4}, {"a": [1, 0, 0, 2, 1], "s": "=", "b": 5}], "answer": null, "note": ""},
     {"v": 29, "n": 4, "sense": "min", "c": [5, 1, -2, 1], "rows": [{"a": [1, 5, 1, 1], "s": "=", "b": 4}, {"a": [-3, 1, 1, 1], "s": "=", "b": 5}], "answer": null, "note": ""},
     {"v": 30, "n": 3, "sense": "max", "c": [1, -1, 3], "rows": [{"a": [-1, 2, 5], "s": "=", "b": 1}, {"a": [2, -1, 1], "s": "=", "b": 3}], "answer": null, "note": ""}
+  ] },
+    dsimplex: { id: '2.5', title: 'Раздел 2.5. Двойственный симплекс-метод', short: 'Двойственный симплекс', pages: '30–33',
+      task: 'Решить задачу ЛП двойственным симплекс-методом (во всех заданиях xᵢ ≥ 0, i = 1, …, n).',
+      variants: [
+    {"v": 1, "page": 30, "n": 5, "sense": "min", "c": [1, 2, 3, 0, 0], "rows": [{"a": [1, 2, 1, -1, 0], "s": "=", "b": 3}, {"a": [-1, 1, -2, 0, -1], "s": "=", "b": 2}], "answer": {"x": ["0", "2", "0", "1", "0"], "f": "4"}, "note": "Страница 30. Переменные x₄, x₅ входят только в уравнения (коэффициент −1) и не входят в цель, поэтому n = 5 (в ответе пять координат)."},
+    {"v": 2, "page": 30, "n": 3, "sense": "min", "c": [1, 1, 0], "rows": [{"a": [1, -1, 1], "s": ">=", "b": 2}, {"a": [2, 1, -1], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "1"], "f": "1"}, "note": "Страница 30. В ответе три координаты: x₃ входит только в ограничения, в цель — с коэффициентом 0."},
+    {"v": 3, "page": 31, "n": 3, "sense": "min", "c": [2, 3, 2], "rows": [{"a": [1, 1, -1], "s": ">=", "b": 8}, {"a": [1, -1, 2], "s": ">=", "b": 2}, {"a": [-2, -8, 3], "s": ">=", "b": 1}], "answer": {"x": ["25", "0", "17"], "f": "84"}, "note": "Страница 31."},
+    {"v": 4, "page": 31, "n": 3, "sense": "min", "c": [1, 3, "2/3"], "rows": [{"a": [1, -2, 1], "s": ">=", "b": 2}, {"a": [3, 1, 1], "s": ">=", "b": 3}, {"a": [2, 3, -1], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "1"], "f": "5/3"}, "note": "Страница 31. Коэффициент при x₃ в цели напечатан как 2/3."},
+    {"v": 5, "page": 31, "n": 3, "sense": "min", "c": [2, 0, 1], "rows": [{"a": [1, -4, 0], "s": ">=", "b": 1}, {"a": [2, -1, 1], "s": ">=", "b": 4}], "answer": {"x": ["1", "0", "2"], "f": "4"}, "note": "Страница 31. В ответе три координаты: x₃ входит и в цель, и во второе ограничение. Оптимум не единственный: точка из ответа (1; 0; 2) и точка расчёта (2; 0; 0) дают L = 4."},
+    {"v": 6, "page": 31, "n": 4, "sense": "min", "c": [1, 1, 0, 0], "rows": [{"a": [1, -2, 1, 1], "s": ">=", "b": 2}, {"a": [-1, -1, 3, 2], "s": ">=", "b": 1}], "answer": {"x": ["0", "0", "0", "2"], "f": "0"}, "note": "Страница 31. Условие совпадает с задачей 24, но там напечатан другой ответ."},
+    {"v": 7, "page": 31, "n": 3, "sense": "min", "c": [1, 2, 0], "rows": [{"a": [1, -1, 2], "s": ">=", "b": 1}, {"a": [0, 1, -1], "s": ">=", "b": 1}, {"a": [2, 1, 1], "s": ">=", "b": 1}], "answer": {"x": ["2", "1", "0"], "f": "4"}, "note": "Страница 31."},
+    {"v": 8, "page": 31, "n": 4, "sense": "min", "c": [1, 1, 1, 1], "rows": [{"a": [2, 1, -1, 1], "s": ">=", "b": 3}, {"a": [-2, 1, 1, -1], "s": ">=", "b": -1}], "answer": {"x": ["1", "1", "0", "0"], "f": "2"}, "note": "Страница 31."},
+    {"v": 9, "page": 31, "n": 4, "sense": "min", "c": [1, 2, 3, 4], "rows": [{"a": [1, 1, 1, 1], "s": ">=", "b": 2}, {"a": [-1, -2, 1, -2], "s": ">=", "b": 1}], "answer": {"x": ["1/2", "0", "3/2", "0"], "f": "5"}, "note": "Страница 31."},
+    {"v": 10, "page": 31, "n": 5, "sense": "min", "c": [3, 1, 2, 0, 0], "rows": [{"a": [2, 4, 0, -1, 0], "s": "=", "b": 5}, {"a": [-3, -1, 3, 0, -1], "s": "=", "b": 4}], "answer": {"x": ["0", "5/4", "7/4", "0", "0"], "f": "19/4"}, "note": "Страница 31. Переменные x₄, x₅ входят только в уравнения (коэффициент −1) и не входят в цель, поэтому n = 5."},
+    {"v": 11, "page": 31, "n": 4, "sense": "min", "c": [1, 1, 1, 1], "rows": [{"a": [1, 2, 1, -1], "s": ">=", "b": 3}, {"a": [1, -2, -1, 1], "s": ">=", "b": 1}], "answer": {"x": ["2", "1/2", "0", "0"], "f": "5/2"}, "note": "Страница 31. Условие и ответ совпадают с задачей 29."},
+    {"v": 12, "page": 31, "n": 4, "sense": "min", "c": [3, 1, 0, 0], "rows": [{"a": [-1, 2, -1, 0], "s": "=", "b": 4}, {"a": [1, -1, 0, -1], "s": "=", "b": 3}], "answer": {"x": ["10", "7", "0", "0"], "f": "37"}, "note": "Страница 31. Переменные x₃, x₄ входят только в уравнения (коэффициент −1) и не входят в цель, поэтому n = 4. Условие и ответ совпадают с задачей 30."},
+    {"v": 13, "page": 32, "n": 3, "sense": "min", "c0": 2, "c": [2, 8, 3], "rows": [{"a": [10, -2, 4], "s": ">=", "b": 6}, {"a": [1, 2, -2], "s": ">=", "b": 3}, {"a": [2, -5, 1], "s": ">=", "b": 4}], "answer": {"x": ["3", "0", "0"], "f": "8"}, "note": "Страница 32. Цель L = 2 + 2x₁ + 8x₂ + 3x₃: свободный член 2 вынесен отдельно (в таблицу не входит, прибавляется к ответу)."},
+    {"v": 14, "page": 32, "n": 2, "sense": "max", "c": [2, 4], "rows": [{"a": [-1, 5], "s": ">=", "b": 2}, {"a": [-2, 2], "s": ">=", "b": 4}, {"a": [2, 2], "s": ">=", "b": 6}], "answer": {"x": ["1/2", "5/12"], "f": "11"}, "note": "Страница 32. Условие перенесено верно (все три неравенства «≥», цель на max). Напечатанный ответ L* = 11, x* = (1/2; 5/12) недопустим: нарушены все три ограничения (−x₁ + 5x₂ = 19/12 < 2, −2x₁ + 2x₂ = −1/6 < 4, 2x₁ + 2x₂ = 11/6 < 6), а L в этой точке равна 8/3, не 11. Расчёт: из неравенства (2) x₂ ≥ x₁ + 2, область не ограничена, L неограничена сверху."},
+    {"v": 15, "page": 32, "n": 5, "sense": "min", "c": [2, 1, 1, 0, 0], "rows": [{"a": [1, 1, 2, -1, 0], "s": "=", "b": 3}, {"a": [-1, 2, -2, 0, -1], "s": "=", "b": 2}], "answer": {"x": ["0", "5/3", "2/3", "0", "0"], "f": "7/3"}, "note": "Страница 32. Переменные x₄, x₅ входят только в уравнения (коэффициент −1), n = 5."},
+    {"v": 16, "page": 32, "n": 3, "sense": "min", "c": [1, 2, 1], "rows": [{"a": [-1, -1, -1], "s": "<=", "b": -2}, {"a": [2, -1, -1], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "1"], "f": "2"}, "note": "Страница 32."},
+    {"v": 17, "page": 32, "n": 3, "sense": "min", "c": [1, 1, 1], "rows": [{"a": [1, 1, 0], "s": ">=", "b": 1}, {"a": [1, -2, 1], "s": "<=", "b": 2}, {"a": [2, 0, -1], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "0"], "f": "1"}, "note": "Страница 32."},
+    {"v": 18, "page": 32, "n": 2, "sense": "max", "c": [2, 0], "rows": [{"a": [1, -1], "s": "<=", "b": 2}, {"a": [-1, 1], "s": "<=", "b": 1}, {"a": [1, -1], "s": ">=", "b": 3}], "answer": {"x": ["1", "4"], "f": "-8"}, "note": "Страница 32. Условие перенесено верно: (1) x₁ − x₂ ≤ 2 и (3) x₁ − x₂ ≥ 3 несовместны, допустимой области нет. Напечатанный ответ L* = −8, x* = (1; 4) нарушает ограничения (2) и (3); к тому же при x₁ = 1 цель 2x₁ равна 2, а не −8. Переменная x₂ в цели отсутствует (коэффициент 0)."},
+    {"v": 19, "page": 32, "n": 4, "sense": "min", "c": [1, 1, 2, -1], "rows": [{"a": [1, -1, 3, -1], "s": ">=", "b": 0}, {"a": [-1, 2, -1, 2], "s": ">=", "b": 2}], "answer": {"x": ["0", "0", "2/5", "6/5"], "f": "2/5"}, "note": "Страница 32. Напечатанный ответ L* = 2/5, x* = (0; 0; 2/5; 6/5): точка допустима, но L в ней равна 2·(2/5) − 6/5 = −2/5, а не 2/5. Расчёт: L неограничена снизу — лучи x = (0; 0; s; 3s), s ≥ 2/5, допустимы, и L = −s."},
+    {"v": 20, "page": 32, "n": 3, "sense": "min", "c": [1, 1, 1], "rows": [{"a": [1, -1, 1], "s": ">=", "b": 2}, {"a": [2, 1, -1], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "1"], "f": "2"}, "note": "Страница 32. Оптимум не единственный: точка из ответа (1; 0; 1) и точка расчёта (2; 0; 0) дают L = 2."},
+    {"v": 21, "page": 32, "n": 5, "sense": "min", "c": [6, 0, 0, 1, 2], "rows": [{"a": [4, 1, 1, -2, 1], "s": "=", "b": 8}, {"a": [2, -1, 0, -1, 0], "s": ">=", "b": 2}, {"a": [1, 1, 0, 0, 1], "s": ">=", "b": 0}], "answer": {"x": ["0", "2", "14", "4", "0"], "f": "4"}, "note": "Страница 32. Переменные x₄, x₅ в первом уравнении входят с коэффициентами −2 и 1; n = 5. Напечатанный ответ x* = (0; 2; 14; 4; 0) удовлетворяет (1), но нарушает (2): 2·0 − 2 − 4 = −6 < 2; значение L = 4 для этой точки совпадает с печатным. Расчёт: L* = 6 в точке (1; 0; 4; 0; 0)."},
+    {"v": 22, "page": 32, "n": 3, "sense": "min", "c": [1, 1, 0], "rows": [{"a": [2, -1, 2], "s": ">=", "b": 1}, {"a": [1, 2, 1], "s": ">=", "b": 2}, {"a": [2, 1, -2], "s": ">=", "b": 3}], "answer": {"x": ["4/3", "1/3", "0"], "f": "5/3"}, "note": "Страница 32."},
+    {"v": 23, "page": 32, "n": 3, "sense": "min", "c": [2, 0, 1], "rows": [{"a": [1, -4, 0], "s": ">=", "b": 1}, {"a": [2, -1, 1], "s": ">=", "b": 4}], "answer": {"x": ["1", "0", "2"], "f": "4"}, "note": "Страница 32. Условие и ответ совпадают с задачей 5."},
+    {"v": 24, "page": 32, "n": 4, "sense": "min", "c": [1, 1, 0, 0], "rows": [{"a": [1, -2, 1, 1], "s": ">=", "b": 2}, {"a": [-1, -1, 3, 2], "s": ">=", "b": 1}], "answer": {"x": ["1", "0", "0", "1"], "f": "1"}, "note": "Страница 32. Условие совпадает с задачей 6, но ответ напечатан другой: точка (1; 0; 0; 1) допустима (L = 1), но не оптимальна — в задаче 6 L* = 0. Расчёт: L* = 0."},
+    {"v": 25, "page": 33, "n": 3, "sense": "min", "c": [1, 1, 0], "rows": [{"a": [1, -1, 2], "s": ">=", "b": 1}, {"a": [0, 1, -1], "s": ">=", "b": 1}, {"a": [2, 2, 1], "s": ">=", "b": 1}], "answer": {"x": ["0", "17/3", "14/3"], "f": "17/3"}, "note": "Страница 33. Напечатанный ответ L* = 17/3, x* = (0; 17/3; 14/3): точка допустима, но не оптимальна. Расчёт: L* = 3, например в точке (2; 1; 0) или (0; 3; 2)."},
+    {"v": 26, "page": 33, "n": 3, "sense": "min", "c": [3, 2, 0], "rows": [{"a": [1, -1, 0], "s": "<=", "b": 3}, {"a": [1, 2, -1], "s": ">=", "b": 2}, {"a": [1, 0, 1], "s": ">=", "b": 4}], "answer": {"x": ["0", "3", "4"], "f": "6"}, "note": "Страница 33."},
+    {"v": 27, "page": 33, "n": 3, "sense": "min", "c": [1, 3, 2], "rows": [{"a": [1, -1, 0], "s": ">=", "b": 2}, {"a": [0, 3, 1], "s": ">=", "b": 3}, {"a": [1, 1, -1], "s": ">=", "b": 1}], "answer": {"x": ["3", "1", "0"], "f": "6"}, "note": "Страница 33."},
+    {"v": 28, "page": 33, "n": 3, "sense": "min", "c": [1, 1, 0], "rows": [{"a": [1, -1, 2], "s": ">=", "b": 1}, {"a": [0, 1, -3], "s": ">=", "b": 1}, {"a": [2, 2, 1], "s": ">=", "b": 1}], "answer": {"x": ["2", "1", "0"], "f": "3"}, "note": "Страница 33."},
+    {"v": 29, "page": 33, "n": 4, "sense": "min", "c": [1, 1, 1, 1], "rows": [{"a": [1, 2, 1, -1], "s": ">=", "b": 3}, {"a": [1, -2, -1, 1], "s": ">=", "b": 1}], "answer": {"x": ["2", "1/2", "0", "0"], "f": "5/2"}, "note": "Страница 33. Условие и ответ совпадают с задачей 11."},
+    {"v": 30, "page": 33, "n": 4, "sense": "min", "c": [3, 1, 0, 0], "rows": [{"a": [-1, 2, -1, 0], "s": "=", "b": 4}, {"a": [1, -1, 0, -1], "s": "=", "b": 3}], "answer": {"x": ["10", "7", "0", "0"], "f": "37"}, "note": "Страница 33. Условие и ответ совпадают с задачей 12."}
   ] },
     dual: { id: '2.6', title: 'Раздел 2.6. Двойственная задача', short: 'Двойственная задача', pages: '33–36',
       task: 'Определить задачу, двойственную к исходной. Ответов в сборнике нет.',
@@ -1108,6 +1144,196 @@ const ALGZ = (() => {
   }
 
   return { normalize, solve, dualOf, reduce2, fv };
+})();
+
+/* =====================================================================
+   3б. ДВОЙСТВЕННЫЙ СИМПЛЕКС-МЕТОД (сборник ПЗ, раздел 2.5)
+   Таблицы те же, что в симплекс-методе проекта: строки x_Б + Σ a·x = b, строка цели хранит d_j
+   (для задачи min g; для max берётся g = −f). Признак «оптимально» в обычном симплексе — все d_j ≥ 0;
+   в двойственном методе это двойственная допустимость, которую сохраняют, пока не исчезнут b < 0.
+   Правую часть и значение цели храним как a + m·M: M — «большое» число искусственного ограничения.
+   ===================================================================== */
+class QM {
+  constructor(a, m) { this.a = a instanceof Q ? a : Q.of(a); this.m = m === undefined ? new Q(0n) : (m instanceof Q ? m : Q.of(m)); }
+  static of(v) { return v instanceof QM ? v : new QM(Q.of(v)); }
+  get s() { return this.m.s !== 0 ? this.m.s : this.a.s; }
+  hasM() { return !this.m.isZero(); }
+  isZero() { return this.m.isZero() && this.a.isZero(); }
+  neg() { return new QM(this.a.neg(), this.m.neg()); }
+  add(o) { o = QM.of(o); return new QM(this.a.add(o.a), this.m.add(o.m)); }
+  sub(o) { o = QM.of(o); return new QM(this.a.sub(o.a), this.m.sub(o.m)); }
+  scale(k) { return new QM(this.a.mul(k), this.m.mul(k)); }
+  div(k) { return new QM(this.a.div(k), this.m.div(k)); }
+  cmp(o) { return this.sub(o).s; }
+  eq(o) { return this.cmp(o) === 0; }
+  lt(o) { return this.cmp(o) < 0; }
+  gt(o) { return this.cmp(o) > 0; }
+  at(M0) { return this.a.add(this.m.mul(M0)); }
+  toText() {
+    if (!this.hasM()) return this.a.toText();
+    const mt = this.m.eq(ONE()) ? 'M' : this.m.eq(ONE().neg()) ? '−M' : this.m.toText() + 'M';
+    return this.a.isZero() ? mt : mt + (this.a.s < 0 ? ' − ' : ' + ') + this.a.abs().toText();
+  }
+}
+
+const ALGD = (() => {
+  const { check, value } = ALG;
+  const idx = n => [...Array(n).keys()];
+  const MAXIT = 400;
+
+  function clone(st) {
+    return { rows: st.rows.map(r => ({ b: r.b, a: r.a.slice() })), z: { b: st.z.b, a: st.z.a.slice(), label: st.z.label },
+      basis: st.basis.slice(), cols: st.cols.slice(), vars: st.vars.slice(), phase: st.phase };
+  }
+  /* Поворот по ведущему элементу (p, q): ведущую строку делим на элемент, из остальных вычитаем её × их число в столбце q. */
+  function pivot(st, p, q) {
+    const s = clone(st), piv = st.rows[p].a[q];
+    const np = { b: st.rows[p].b.div(piv), a: st.rows[p].a.map(v => v.div(piv)) };
+    const red = r => { const k = r.a[q]; return { b: r.b.sub(np.b.scale(k)), a: r.a.map((v, j) => v.sub(k.mul(np.a[j]))) }; };
+    s.rows = st.rows.map((r, i) => i === p ? np : red(r));
+    const zr = red(st.z); s.z = { b: zr.b, a: zr.a, label: st.z.label };
+    s.basis[p] = q;
+    return s;
+  }
+
+  /* Рабочая форма: min g, равенства в строках, стартовый базис, строка d.
+     «≤» → +остаток; «≥» → ×(−1) и +остаток; «=» → базисной делаем переменную, входящую только в эту строку
+     (если такой нет — равенство заменяем парой «≤» и «≥»). Базис из равенств выбираем так, чтобы все d ≥ 0. */
+  function prepare(pr) {
+    const n = pr.n, max = pr.sense === 'max';
+    const cc = pr.c.map(v => max ? v.neg() : v);
+    const single = pr.rows.map((r, i) => r.s !== '=' ? null : idx(n)
+      .filter(j => !r.a[j].isZero() && pr.rows.every((q, k) => k === i || q.a[j].isZero()))
+      .sort((x, y) => (cc[x].isZero() ? 0 : 1) - (cc[y].isZero() ? 0 : 1) || x - y));
+    const eqRows = idx(pr.rows.length).filter(i => single[i] && single[i].length);
+    const feasible = pick => {
+      const bs = new Set(pick.values());
+      return idx(n).every(k => { if (bs.has(k)) return true; let d = cc[k]; pick.forEach((j, i) => { d = d.sub(cc[j].mul(pr.rows[i].a[k].div(pr.rows[i].a[j]))); }); return d.s >= 0; });
+    };
+    let pick = null, tries = 0;
+    const dfs = (k, cur) => {
+      if (k === eqRows.length) { tries++; if (feasible(cur)) { pick = new Map(cur); return true; } return false; }
+      for (const j of single[eqRows[k]]) { cur.set(eqRows[k], j); if (dfs(k + 1, cur)) return true; if (tries > 3000) break; }
+      cur.delete(eqRows[k]); return false;
+    };
+    if (!dfs(0, new Map())) pick = new Map(eqRows.map(i => [i, single[i][0]]));
+
+    const work = [];
+    pr.rows.forEach((r, i) => {
+      if (r.s === '<=') work.push({ src: i, kind: 'le', mult: ONE(), slack: true });
+      else if (r.s === '>=') work.push({ src: i, kind: 'ge', mult: ONE().neg(), slack: true });
+      else if (pick.has(i)) { const j = pick.get(i); work.push({ src: i, kind: 'eq', mult: ONE().div(r.a[j]), slack: false, basic: j, cands: single[i] }); }
+      else { work.push({ src: i, kind: 'eq-le', mult: ONE(), slack: true, part: 0 }); work.push({ src: i, kind: 'eq-ge', mult: ONE().neg(), slack: true, part: 1 }); }
+    });
+    const vars = idx(n).map(j => ({ kind: 'x', k: j + 1 }));
+    work.forEach((w, t) => { if (w.slack) { w.slackVar = vars.length; vars.push({ kind: 's', k: vars.length + 1, row: t, sign: 1 }); } });
+    const N = vars.length;
+    const rows = work.map(w => {
+      const r = pr.rows[w.src], a = idx(N).map(Z);
+      r.a.forEach((v, j) => { a[j] = v.mul(w.mult); });
+      if (w.slack) a[w.slackVar] = ONE();
+      return { b: new QM(r.b.mul(w.mult)), a };
+    });
+    const basis = work.map(w => w.slack ? w.slackVar : w.basic);
+    const label = max ? 'f' : '−f';
+    let z = { b: new QM(Z()), a: idx(N).map(j => j < n ? cc[j] : Z()), label };
+    const raw = { b: z.b, a: z.a.slice(), label };
+    const elim = [];
+    basis.forEach((bj, i) => {
+      const k = z.a[bj];
+      if (!k.isZero()) { elim.push({ i, bj, k, before: z }); z = { b: z.b.sub(rows[i].b.scale(k)), a: z.a.map((v, j) => v.sub(k.mul(rows[i].a[j]))), label }; }
+    });
+    const base = { rows, z, basis, cols: idx(N), vars, phase: 'D' };
+    return { n, max, cc, c0: pr.c0 || null, work, vars, base, raw, elim, single, pick, split: work.filter(w => w.kind === 'eq-le').map(w => w.src) };
+  }
+
+  /* Значение таблицы при M = M0 (для чтения ответа). */
+  const atM = (st, M0) => ({ ...st, rows: st.rows.map(r => ({ b: r.b.at(M0), a: r.a })), z: { ...st.z, b: st.z.b.at(M0) } });
+
+  function solve(pr) {
+    const prep = prepare(pr), base = prep.base, n = pr.n;
+    const res = { prep, base, steps: [], status: null, bound: null, last: null };
+    res.negD = base.cols.filter(j => base.z.a[j].s < 0);
+    res.dualFeasible = !res.negD.length;
+    let st = base;
+    if (!res.dualFeasible) {
+      // искусственное ограничение Σ(небазисных) + s = M возвращает двойственную допустимость
+      const nonb = base.cols.filter(j => base.basis.indexOf(j) < 0), sv = base.vars.length;
+      const vars = base.vars.concat([{ kind: 's', k: sv + 1, row: base.rows.length, sign: 1, bound: true }]);
+      const ext = a => a.concat([Z()]);
+      const mrow = { b: new QM(Z(), ONE()), a: base.cols.map(j => nonb.includes(j) ? ONE() : Z()).concat([ONE()]) };
+      const tb = { rows: base.rows.map(r => ({ b: r.b, a: ext(r.a) })).concat([mrow]), z: { b: base.z.b, a: ext(base.z.a), label: base.z.label },
+        basis: base.basis.concat([sv]), cols: base.cols.concat([sv]), vars, phase: 'D' };
+      let q = res.negD[0]; res.negD.forEach(j => { if (tb.z.a[j].lt(tb.z.a[q])) q = j; });
+      const p = tb.rows.length - 1;
+      res.bound = { nonb, slackVar: sv, row: p, q, table: tb };
+      res.steps.push({ ...tb, kind: 'M', p, q, ratios: null, cand: res.negD });
+      st = pivot(tb, p, q);
+    }
+    const seen = new Set(); let bland = false; res.bland = false;
+    for (let it = 0; it <= MAXIT; it++) {
+      if (it === MAXIT) { res.status = 'cycle'; res.steps.push({ ...st, kind: 'end', p: null, q: null, terminal: 'cycle' }); break; }
+      const key = st.basis.join(',');
+      if (seen.has(key) && !bland) { bland = true; res.bland = true; }
+      seen.add(key);
+      const inf = st.rows.map((r, i) => r.b.s < 0 ? i : -1).filter(i => i >= 0);
+      if (!inf.length) { res.steps.push({ ...st, kind: 'end', p: null, q: null, terminal: 'optimal' }); res.status = 'optimal'; break; }
+      let p = inf[0];
+      inf.forEach(i => {
+        if (bland) { if (st.basis[i] < st.basis[p]) p = i; }
+        else if (st.rows[i].b.lt(st.rows[p].b) || (st.rows[i].b.eq(st.rows[p].b) && st.basis[i] < st.basis[p])) p = i;
+      });
+      const tieRows = inf.filter(i => i !== p && st.rows[i].b.eq(st.rows[p].b));
+      const negs = st.cols.filter(j => st.rows[p].a[j].s < 0);
+      if (!negs.length) { res.steps.push({ ...st, kind: 'end', p, q: null, inf, terminal: 'infeasible' }); res.status = 'infeasible'; break; }
+      const ratios = st.cols.map(j => st.rows[p].a[j].s < 0 ? st.z.a[j].div(st.rows[p].a[j].neg()) : null);
+      let q = negs[0];
+      negs.forEach(j => { if (ratios[j].lt(ratios[q])) q = j; });
+      const tieCols = negs.filter(j => j !== q && ratios[j].eq(ratios[q]));
+      res.steps.push({ ...st, kind: 'D', p, q, ratios, inf, negs, tieRows, tieCols, bland });
+      st = pivot(st, p, q);
+    }
+    if (!res.status) res.status = 'cycle';
+    res.last = res.steps[res.steps.length - 1];
+    res.iters = res.steps.filter(s => s.kind !== 'end').length;
+    if (res.status === 'optimal') {
+      const last = res.last;
+      const zM = last.z.b.m;
+      if (res.bound && !zM.isZero()) { res.status = 'unbounded'; res.mCoef = zM; return res; }
+      // решение не зависит от M в цели; если координаты зависят от M — берём наименьшее целое M0 ≥ 0, при котором все b ≥ 0
+      let M0 = Z();
+      last.rows.forEach(r => { if (r.b.m.s > 0) { const t = r.b.a.neg().div(r.b.m); const c = new Q(t.n / t.d + (t.n % t.d !== 0n && t.n > 0n ? 1n : 0n)); if (c.gt(M0)) M0 = c; } });
+      res.M0 = M0; res.dependsOnM = last.rows.some(r => r.b.hasM());
+      const T = atM(last, M0);
+      res.table = T;
+      const all = last.vars.map(() => Z());
+      T.basis.forEach((bj, i) => { all[bj] = T.rows[i].b; });
+      res.all = all;
+      res.x = all.slice(0, n);
+      const g = T.z.b;
+      const fl = pr.sense === 'max' ? g : g.neg();
+      res.f = pr.c0 ? fl.add(pr.c0) : fl;
+      const real = res.bound ? last.cols.filter(j => j !== res.bound.slackVar) : last.cols;
+      res.alt = real.filter(j => last.basis.indexOf(j) < 0 && last.z.a[j].isZero());
+      res.degenerate = T.rows.some((r, i) => r.b.isZero() && !(res.bound && T.basis[i] === res.bound.slackVar));
+      if (res.alt.length) {
+        const j = res.alt[0]; let p = null, best = null;
+        T.rows.forEach((r, i) => { if (r.a[j].s > 0) { const t = r.b.div(r.a[j]); if (p === null || t.lt(best)) { p = i; best = t; } } });
+        if (p === null) res.altInfo = { j, ray: true };
+        else {
+          const x2 = all.slice();
+          T.rows.forEach((r, i) => { x2[T.basis[i]] = r.b.sub(r.a[j].mul(best)); });
+          x2[j] = best;
+          res.altInfo = { j, p, theta: best, same: best.isZero(), x: x2.slice(0, n) };
+        }
+      }
+    } else if (res.status === 'infeasible') {
+      res.row = res.last.p;
+    }
+    return res;
+  }
+
+  return { solve, prepare, pivot, atM, check, value };
 })();
 
 
@@ -2516,21 +2742,22 @@ const VIEWS = (() => {
   }
 
   /* =================== Общие помощники сцен =================== */
-  const vkClass = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'vk-x' : v.kind === 't' ? 'vk-t' : v.sign < 0 ? 'vk-e' : 'vk-s'; };
-  const vkTag = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'исходная' : v.kind === 't' ? 'искусств.' : v.sign < 0 ? 'излишек' : 'остаток'; };
+  const vkClass = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'vk-x' : v.kind === 't' ? 'vk-t' : v.bound ? 'vk-b' : v.sign < 0 ? 'vk-e' : 'vk-s'; };
+  const vkTag = (vars, j) => { const v = vars[j]; return v.kind === 'x' ? 'исходная' : v.kind === 't' ? 'искусств.' : v.bound ? 'строка M' : v.sign < 0 ? 'излишек' : 'остаток'; };
   const vK = (vars, j) => `<span class="${vkClass(vars, j)}">${vname(vars, j)}</span>`;
   const ft = q => q.toText();                                   // число для подписей SVG (без разметки)
   const zName = st => st.z.label.replace('−', '');
 
   // таблица сцены: каждое число — отдельный элемент .cv (его можно копировать и подсвечивать)
   function dtb(st, o = {}) {
-    const m = st.rows.length, cols = st.cols;
-    const cell = (v, i, j, cls) => `<td class="${cls || ''}" data-i="${i}" data-j="${j}"><span class="cv">${v == null ? '' : fq(v)}</span></td>`;
+    const m = st.rows.length, cols = st.cols, fq = o.fq || R.fq;
+    const hlc = (i, j) => o.hl && st.q != null ? (j === st.q && i === st.p ? ' pe' : j === st.q ? ' pc' : i === st.p ? ' pr' : '') : '';
+    const cell = (v, i, j, cls) => `<td class="${(cls || '') + hlc(i, j)}" data-i="${i}" data-j="${j}"><span class="cv">${v == null ? '' : fq(v)}</span></td>`;
     let h = `<div class="tblwrap ${o.cls || ''}"><table class="sx dmsx"><thead><tr><th class="bh">Базис</th><th data-j="-1">b</th>${cols.map(j => `<th data-j="${j}" class="${vkClass(st.vars, j)}">${vname(st.vars, j)}<span class="vtag">${vkTag(st.vars, j)}</span></th>`).join('')}${o.ratio ? '<th class="rth">b ÷ a</th>' : ''}</tr></thead><tbody>`;
     st.rows.forEach((r, i) => {
       h += `<tr data-i="${i}"><td class="bas" data-i="${i}" data-j="bas"><span class="cv">${vK(st.vars, st.basis[i])}</span></td>` + cell(o.blank ? null : r.b, i, -1, 'bcol') + cols.map(j => cell(o.blank ? null : r.a[j], i, j)).join('') + (o.ratio ? `<td class="rt" data-i="${i}"><span class="cv dh"></span></td>` : '') + '</tr>';
     });
-    h += `<tr class="zrow" data-i="${m}"><td class="bas" data-i="${m}" data-j="bas"><span class="cv">${zlab(st.z.label)}</span></td>` + cell(o.blankZ || o.blank ? null : st.z.b, m, -1, 'bcol') + cols.map(j => cell(o.blankZ || o.blank ? null : st.z.a[j], m, j)).join('') + (o.ratio ? '<td class="rt"></td>' : '') + '</tr></tbody></table></div>';
+    h += `<tr class="zrow" data-i="${m}"><td class="bas" data-i="${m}" data-j="bas"><span class="cv">${zlab(st.z.label)}</span></td>` + cell(o.blankZ || o.blank ? null : st.z.b, m, -1, 'bcol') + cols.map(j => cell(o.blankZ || o.blank ? null : st.z.a[j], m, j)).join('') + (o.ratio ? '<td class="rt"></td>' : '') + '</tr>' + (o.rratio ? `<tr class="rrow"><td class="bas"><span class="cv">θ</span></td><td></td>${cols.map(j => `<td class="rr" data-i="r" data-j="${j}"><span class="cv dh"></span></td>`).join('')}</tr>` : '') + '</tbody></table></div>';
     return h;
   }
   // быстрые доступы внутри сцены: C(t,i,j) — ячейка, V(t,i,j) — её число
@@ -2544,6 +2771,7 @@ const VIEWS = (() => {
   /* =================== Пересчёт симплекс-таблицы =================== */
   // s — таблица с выбранными q, p; nxt — таблица после пересчёта. opts.drive — вывод искусственной переменной.
   function pivotSpec(s, nxt, o = {}) {
+    const fq = o.fq || R.fq, par = o.par || R.par;
     const m = s.rows.length, q = s.q, p = s.p, vars = s.vars, cols = s.cols, zl = zlab(s.z.label);
     const enter = vK(vars, q), leave = p != null ? vK(vars, s.basis[p]) : '';
     const piv = p != null ? s.rows[p].a[q] : null;
@@ -2553,7 +2781,7 @@ const VIEWS = (() => {
     const getN = (i, j) => { const r = i === m ? nxt.z : nxt.rows[i]; return j < 0 ? r.b : r.a[j]; };
     const allJ = [-1, ...cols];
     const newShell = nxt ? { ...nxt, basis: s.basis } : null;
-    const html = `<div class="pvwrap"><div><div class="dmh">было: таблица</div>${dtb(s, { cls: 'tO', ratio: true })}</div>${nxt ? `<div><div class="dmh">стало: новая таблица</div>${dtb(newShell, { cls: 'tN', blank: true })}</div>` : ''}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const html = `<div class="pvwrap"><div><div class="dmh">было: таблица</div>${dtb(s, o.dual ? { cls: 'tO', rratio: true, fq: o.fq } : { cls: 'tO', ratio: true })}</div>${nxt ? `<div><div class="dmh">стало: новая таблица</div>${dtb(newShell, { cls: 'tN', blank: true, fq: o.fq })}</div>` : ''}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
     const negs = cols.filter(j => s.z.a[j].s < 0);
     const bland = negs.some(j => s.z.a[j].lt(s.z.a[q]));
     const script = async A => {
@@ -2561,7 +2789,9 @@ const VIEWS = (() => {
       const colAll = j => [H('tO', j), ...[...Array(m + 1).keys()].map(i => C('tO', i, j))];
       const rowAll = i => [C('tO', i, 'bas'), ...allJ.map(j => C('tO', i, j))];
       await A.wait(250);
-      if (o.drive) {
+      if (o.sel) {
+        await o.sel(A, { C, V, H, fm, sum, rowAll, colAll, enter, leave, piv, cols, m, zl });
+      } else if (o.drive) {
         A.cap(`${leave} осталась в базисе (значение 0) — её нужно вывести`);
         A.cls(rowAll(p), 'k-sel'); A.cls(C('tO', p, 'bas'), 'k-del');
         await A.pulse(V('tO', p, 'bas'));
@@ -2676,8 +2906,8 @@ const VIEWS = (() => {
         }
       }
       // 8. итог шага
-      const oldV = realZ(s), newV = realZ(nxt), nm = zName(s), minus = s.z.label.startsWith('−');
-      const dirTxt = nm === 'h' ? 'уменьшается' : minus ? 'уменьшается' : 'растёт';
+      const rzf = o.realZ || realZ, oldV = rzf(s), newV = rzf(nxt), nm = zName(s), minus = s.z.label.startsWith('−');
+      const dirTxt = o.dual ? (newV.gt(oldV) ? 'растёт' : newV.lt(oldV) ? 'уменьшается' : 'без изменений') : nm === 'h' ? 'уменьшается' : minus ? 'уменьшается' : 'растёт';
       const bs = nxt.basis.map((bj, i) => `${vK(vars, bj)} = ${fq(nxt.rows[i].b)}`).join(', ');
       A.cap(`Таблица готова: ${nm} ${fq(oldV).replace(/<[^>]+>/g, '')} → ${fq(newV).replace(/<[^>]+>/g, '')}`);
       A.set(fm, '');
@@ -4623,11 +4853,402 @@ const VIEWS = (() => {
     requestAnimationFrame(tick);
   }
 
+  /* =====================================================================
+     Раздел 2.5: двойственный симплекс-метод. Анимации строятся по трассе ALGD.solve.
+     ===================================================================== */
+  const fqM = v => {
+    if (!(v instanceof QM)) return fq(v);
+    if (!v.hasM()) return fq(v.a);
+    const mp = (v.m.eq(ONE()) ? '' : v.m.eq(ONE().neg()) ? '−' : fq(v.m)) + '<i class="bm">M</i>';
+    return v.a.isZero() ? mp : mp + (v.a.s < 0 ? ' − ' : ' + ') + fq(v.a.abs());
+  };
+  const parM = v => (v instanceof QM ? v.hasM() || v.a.s < 0 : v.s < 0) ? '(' + fqM(v) + ')' : fqM(v);
+  const dualRz = pr => s => { const v = pr.sense === 'max' ? s.z.b : s.z.b.neg(); return pr.c0 ? v.add(pr.c0) : v; };
+  const dsNeg = (A, cells, ok) => A.each(cells, async c => { A.cls(c, 'k-act'); await A.wait(70); A.cls(c, 'k-act', false); A.cls(c, ok ? 'k-ok' : 'k-del'); });
+
+  /* Выбор выходящей строки и входящего столбца (шаг 'D'): после него pivotSpec рисует пересчёт таблицы. */
+  const dualSel = s => async (A, X) => {
+    const { C, V, fm, rowAll, colAll, enter, leave, piv, cols, m, zl } = X, p = s.p, q = s.q, vars = s.vars, f = fqM, row = s.rows[p];
+    const pc = j => C('tO', p, j), rrc = j => A.q(`.tO td.rr[data-j="${j}"]`), rrv = j => A.q(`.tO td.rr[data-j="${j}"] .cv`);
+    const bCells = s.rows.map((_, i) => C('tO', i, -1));
+    // 1. отрицательные b
+    A.cap(`Смотрим на столбец b: отрицательное b — базисная переменная меньше нуля, такой базис недопустим`);
+    A.cls(bCells, 'k-dim');
+    await A.each(s.inf, async i => { A.cls(C('tO', i, -1), 'k-dim', false); A.cls(C('tO', i, -1), 'k-act'); await A.pulse(V('tO', i, -1)); await A.wait(100); });
+    // 2. выходящая строка
+    const tie = s.bland ? ' (повтор базиса — правило Бленда: берём меньший номер переменной)' : s.tieRows.length ? ' (такое b в нескольких строках — берём меньший номер переменной)' : '';
+    A.cap(s.inf.length > 1 ? `Выходит переменная с самым отрицательным b = ${f(row.b)} — это ${leave}${tie}` : `Единственное отрицательное b = ${f(row.b)} — выходит ${leave}`);
+    A.cls(bCells, 'k-dim', false); A.cls(s.inf.map(i => C('tO', i, -1)), 'k-act', false);
+    A.cls(rowAll(p), 'k-sel');
+    await A.pulse(V('tO', p, 'bas'));
+    A.set(fm, `<span class="fmh">${leave} = ${f(row.b)} &lt; 0 — недопустимо; остальные строки с b ≥ 0 исправлять не нужно</span>`);
+    // 3. кандидаты: отрицательные числа в выбранной строке
+    A.cap(`В строке ${leave} ищем отрицательные числа: ведущий элемент обязан быть отрицательным — тогда b ÷ (отрицательное) станет положительным`);
+    A.cls(cols.map(pc), 'k-dim');
+    await A.each(s.negs, async j => { A.cls(pc(j), 'k-dim', false); A.cls(pc(j), 'k-act'); await A.pulse(V('tO', p, j)); await A.wait(100); });
+    A.set(fm, `<span class="fmh">числа ≥ 0 в этой строке не годятся: после деления на них b остался бы отрицательным</span>`);
+    // 4. отношения θ = d ÷ |a|
+    A.cap(`Для каждого такого столбца считаем θ = d ÷ |a|: d — число строки ${zl} над ним, a — число выбранной строки`);
+    await A.each(cols, async j => {
+      const r = rrv(j);
+      if (s.ratios[j]) {
+        A.cls([C('tO', m, j), pc(j)], 'k-act');
+        await Promise.all([A.fly(V('tO', m, j), r), A.fly(V('tO', p, j), r)]);
+        A.set(r, `${f(s.z.a[j])} ÷ ${f(row.a[j].abs())} = <b>${f(s.ratios[j])}</b>`); await A.pop(r, { d: 300 });
+        A.cls([C('tO', m, j), pc(j)], 'k-act', false);
+      } else { A.set(r, `${f(row.a[j])} ≥ 0 — не берём`); await A.pop(r, { d: 220 }); A.cls(rrc(j), 'k-dim'); }
+    });
+    // 5. наименьшее θ
+    const mn = s.ratios[q], others = s.negs.filter(j => j !== q);
+    A.cls(cols.map(pc), 'k-dim', false);
+    A.cap(s.tieCols.length ? `Наименьшее θ = ${f(mn)} у нескольких столбцов — берём с меньшим номером: ${enter}` : `Наименьшее θ = ${f(mn)} — столбец ${enter} входит в базис`);
+    others.forEach(j => A.cls(rrc(j), 'k-dim')); A.cls(rrc(q), 'k-ok');
+    A.cls(colAll(q), 'k-sel');
+    await A.pulse(rrv(q));
+    A.set(fm, `<span class="fmh">${enter} входит в базис: только при наименьшем θ все числа строки ${zl} остаются ≥ 0 (двойственная допустимость сохраняется)</span>`);
+    // 6. почему не другие столбцы
+    for (const j of others) {
+      const dq = s.z.a[q].sub(s.ratios[j].mul(row.a[q].abs()));
+      A.cls(rrc(j), 'k-dim', false); A.cls(rrc(j), 'k-act');
+      if (dq.s < 0) {
+        A.cap(`Почему не ${vK(vars, j)}: θ = ${f(s.ratios[j])} больше — тогда число строки ${zl} в столбце ${enter} стало бы ${f(s.z.a[q])} − ${f(s.ratios[j])}·${f(row.a[q].abs())} = ${f(dq)} < 0`);
+        A.cls(C('tO', m, q), 'k-del');
+      } else A.cap(`${vK(vars, j)}: такое же θ = ${f(s.ratios[j])} — тоже годится (получится d = 0), берём меньший номер`);
+      await A.pulse(rrv(j)); await A.wait(150);
+      A.cls(rrc(j), 'k-act', false); A.cls(rrc(j), 'k-dim'); A.cls(C('tO', m, q), 'k-del', false);
+    }
+    // 7. ведущий элемент
+    A.cap(`Пересечение выбранных строки и столбца — ведущий элемент ${f(piv)} (отрицательный)`);
+    A.cls(C('tO', p, q), 'k-pe'); await A.pulse(V('tO', p, q));
+    A.set(fm, `<span class="fmh">ведущий элемент = <b>${f(piv)}</b></span>`);
+  };
+
+  /* Вспомогательный шаг: строка M делает таблицу двойственно допустимой. */
+  const mSel = s => async (A, X) => {
+    const { C, V, fm, rowAll, colAll, enter, piv, cols, m, zl } = X, p = s.p, q = s.q, vars = s.vars, f = fqM;
+    A.cap(`В строке ${zl} есть отрицательные d: ${s.cand.map(j => `${plain(vname(vars, j))}: ${plain(f(s.z.a[j]))}`).join(', ')} — таблица не двойственно допустима`);
+    A.cls(cols.map(j => C('tO', m, j)), 'k-dim');
+    await A.each(s.cand, async j => { A.cls(C('tO', m, j), 'k-dim', false); A.cls(C('tO', m, j), 'k-del'); await A.pulse(V('tO', m, j)); });
+    A.set(fm, `<span class="fmh bad">обычный поворот здесь не сохранил бы d ≥ 0 — вводим ограничение «Σ небазисных ≤ M»</span>`);
+    A.cap(`Ведущая строка — добавленная строка M: Σ небазисных переменных + ${vname(vars, s.basis[p])} = M`);
+    A.cls(rowAll(p), 'k-sel'); await A.pulse(V('tO', p, 'bas'));
+    A.cap(`Ведущий столбец — с самым отрицательным d: ${f(s.z.a[q])}, это ${enter}`);
+    A.cls(cols.map(j => C('tO', m, j)), 'k-dim', false); A.cls(colAll(q), 'k-sel'); await A.pulse(V('tO', m, q));
+    A.set(fm, `<span class="fmh">после поворота на этот столбец все d станут ≥ 0 (двойственная допустимость восстановится)</span>`);
+    A.cap(`Ведущий элемент — ${f(piv)} (строка M, столбец ${enter})`);
+    A.cls(C('tO', p, q), 'k-pe'); await A.pulse(V('tO', p, q));
+  };
+
+  /* Итоговая таблица: критерии завершения и особые случаи. */
+  function dualEndSpec(pr, res, s) {
+    const m = s.rows.length, vars = s.vars, cols = s.cols, zl = zlab(s.z.label), f = fqM, T = s.terminal;
+    const html = `<div class="pvwrap one"><div>${dtb(s, { cls: 'tO', fq: fqM })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const { C, V } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      await A.wait(250);
+      if (T === 'infeasible') {
+        const p = s.p, row = s.rows[p], leave = vK(vars, s.basis[p]);
+        A.cap(`Строка ${leave}: b = ${f(row.b)} < 0 — переменная должна стать неотрицательной`);
+        A.cls([C('tO', p, 'bas'), C('tO', p, -1), ...cols.map(j => C('tO', p, j))], 'k-sel'); await A.pulse(V('tO', p, -1));
+        A.cap('Ищем в этой строке отрицательное число для ведущего элемента');
+        await A.each(cols, async j => { A.cls(C('tO', p, j), 'k-act'); await A.wait(70); A.cls(C('tO', p, j), 'k-act', false); if (row.a[j].s >= 0) A.cls(C('tO', p, j), 'k-del', true); });
+        A.cap('Все числа строки ≥ 0 — ведущего элемента нет, поворот невозможен');
+        A.set(fm, `<span class="fmh bad">${lin(row.a, j => vK(vars, j))} = ${f(row.b)}</span>`); await A.pulse(fm);
+        A.cap(`Все переменные ≥ 0 и все коэффициенты ≥ 0, значит левая часть ≥ 0, а правая равна ${plain(f(row.b))} < 0 — равенство невозможно`);
+        sum.innerHTML = `<b>Допустимых решений нет.</b> Ограничение, выраженное строкой ${leave}, несовместно с условием x ≥ 0${res.bound ? ' (добавленная строка M лишь сужает область, так что и исходная задача несовместна)' : ''}.`;
+        await A.show(sum);
+        return;
+      }
+      if (T === 'cycle') {
+        A.cap('Лимит итераций исчерпан — метод не завершился');
+        sum.innerHTML = '<b>Алгоритм не смог завершиться (зацикливание).</b>'; await A.show(sum); return;
+      }
+      A.cap('Проверяем столбец b: допустимость — все b ≥ 0' + (res.bound ? ' (при достаточно большом M)' : ''));
+      await dsNeg(A, s.rows.map((_, i) => C('tO', i, -1)), true);
+      A.cap(`Проверяем строку ${zl}: двойственная допустимость — все d ≥ 0`);
+      await dsNeg(A, cols.map(j => C('tO', m, j)), true);
+      A.cap('Отрицательных b нет и все d ≥ 0 — решение допустимо и оптимально, метод останавливается');
+      A.set(fm, `<span class="fmh ok">допустимость (b ≥ 0) + оптимальность (d ≥ 0) ⇒ ответ найден</span>`); await A.pulse(fm);
+      if (res.bound) {
+        const zb = s.z.b;
+        if (res.status === 'unbounded') {
+          A.cap(`Но значение цели в b строки ${zl} зависит от M: ${plain(f(zb))}`);
+          A.cls(C('tO', m, -1), 'k-del'); await A.pulse(V('tO', m, -1));
+          A.set(fm, `<span class="fmh bad">${zl} = ${f(zb)}: чем больше M, тем лучше цель — предела нет</span>`); await A.pulse(fm);
+          A.cap('Ограничение «Σ небазисных ≤ M» оказалось существенным: исходная задача не ограничена');
+          sum.innerHTML = `<b>Целевая функция не ограничена.</b> При любом M найдётся допустимая точка, в которой цель лучше; допустимые x(M) = (${[...Array(pr.n).keys()].map(j => { const i = s.basis.indexOf(j); return i < 0 ? '0' : f(s.rows[i].b); }).join('; ')}).`;
+          await A.show(sum);
+          return;
+        }
+        A.cap(`Значение цели ${plain(f(zb))} не содержит M — ограничение M не мешало: найден оптимум исходной задачи`);
+        A.cls(C('tO', m, -1), 'k-ok');
+      }
+      A.cap('Читаем решение: базисная переменная равна своему b, остальные — 0');
+      await A.each(s.rows.map((_, i) => i), async i => { A.cls([C('tO', i, 'bas'), C('tO', i, -1)], 'k-sel'); await A.pulse(V('tO', i, -1)); });
+      const T2 = res.table;
+      sum.innerHTML = `${s.basis.map((bj, i) => `${vK(vars, bj)} = ${f(T2.rows[i].b)}`).join(', ')}; остальные переменные = 0. &nbsp;<b>${zName(s)}</b> = ${fq(res.f)}`;
+      await A.show(sum);
+      if (res.alt.length) {
+        A.cap(`Под ${res.alt.map(j => vK(vars, j)).join(', ')} в строке ${zl} стоит 0 — есть и другие оптимальные решения`);
+        A.cls(res.alt.map(j => C('tO', m, j)), 'k-act'); await A.seq(res.alt, 100, j => A.pulse(V('tO', m, j)));
+      }
+      const zb = s.basis.filter((bj, i) => T2.rows[i].b.isZero() && !(res.bound && bj === res.bound.slackVar));
+      if (zb.length) {
+        A.cap(`Базисная ${zb.map(j => vK(vars, j)).join(', ')} равна 0 — решение вырожденное`);
+        s.rows.forEach((r, i) => { if (T2.rows[i].b.isZero()) A.cls(C('tO', i, -1), 'k-act'); });
+      }
+    };
+    return { html, script, opts: {} };
+  }
+
+  function dualScene(pr, res, k) {
+    const steps = res.steps, s = steps[k];
+    if (s.kind === 'end') {
+      const title = s.terminal === 'infeasible' ? 'ограничение несовместно' : s.terminal === 'cycle' ? 'зацикливание' : res.status === 'unbounded' ? 'неограниченность' : 'проверка оптимальности';
+      return { title: `Таблица ${k}: ${title}`, ...dualEndSpec(pr, res, s) };
+    }
+    const sp = pivotSpec(s, steps[k + 1], { dual: true, sel: s.kind === 'M' ? mSel(s) : dualSel(s), fq: fqM, par: parM, realZ: dualRz(pr) });
+    return { title: s.kind === 'M' ? `Шаг ${k + 1}: строка M, таблица ${k} → таблица ${k + 1}` : `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, ...sp };
+  }
+
+  /* Пошаговый просмотр: кнопки таблиц + анимация выбранного шага. */
+  function dstepper(pr, res) {
+    const id = 'ds' + (++dmUid), steps = res.steps;
+    R.hooks.push(() => {
+      const root = document.getElementById(id); if (!root) return;
+      const box = root.querySelector('.ds-demo'); let k = 0, ctl = null;
+      const show = (kk, quiet) => {
+        k = kk; if (ctl) { ctl.dispose(); ctl = null; }
+        root.querySelectorAll('.ds-btn').forEach((b, i) => b.classList.toggle('on', i === k));
+        root.querySelector('.ds-prev').disabled = k === 0; root.querySelector('.ds-next').disabled = k === steps.length - 1;
+        const sc = dualScene(pr, res, kk);
+        ctl = mountInto(box, sc.title, sc.html, sc.script, { ...sc.opts, autoplay: !quiet });
+      };
+      root.querySelector('.ds-prev').onclick = () => k > 0 && show(k - 1);
+      root.querySelector('.ds-next').onclick = () => k < steps.length - 1 && show(k + 1);
+      root.querySelectorAll('.ds-btn').forEach((b, i) => { b.onclick = () => show(i); });
+      show(0, true);
+    });
+    return `<div class="stepper dsteps" id="${id}"><div class="btnrow"><button class="btn ds-prev">← Назад</button>${steps.map((_, i) => `<button class="btn ds-btn" title="таблица ${i}">${i}</button>`).join('')}<button class="btn ds-next">Вперёд →</button></div><div class="ds-demo"></div></div>`;
+  }
+
+  const dualHint = s => s.kind === 'M' ? `добавлена строка M; входит ${vname(s.vars, s.q)} (самое отрицательное d = ${fqM(s.z.a[s.q])}), выходит ${vname(s.vars, s.basis[s.p])}, ведущий элемент ${fqM(s.rows[s.p].a[s.q])}`
+    : s.kind === 'D' ? `выходит ${vname(s.vars, s.basis[s.p])} (b = ${fqM(s.rows[s.p].b)}), входит ${vname(s.vars, s.q)} (θ = ${fqM(s.ratios[s.q])}), ведущий элемент ${fqM(s.rows[s.p].a[s.q])}`
+    : s.terminal === 'infeasible' ? ` — строка ${vname(s.vars, s.basis[s.p])}: b &lt; 0, отрицательных чисел нет, допустимых решений нет` : s.terminal === 'cycle' ? ' — лимит итераций' : ' — итоговая (все b ≥ 0, все d ≥ 0)';
+  const dAllTables = res => res.steps.map((s, i) => `<div class="tcap">Таблица ${i}${s.kind === 'end' ? '' : ' — '}${dualHint(s)}</div>${dtb(s, { fq: fqM, hl: true })}`).join('');
+
+  /* Строки рабочей формы → стартовая таблица: откуда взялось каждое число. */
+  function demoDForm(pr, res) {
+    const prep = res.prep, st0 = prep.base, work = prep.work, m = work.length, vars = st0.vars, cols = st0.cols, max = pr.sense === 'max', n = pr.n;
+    const sfx = w => w.kind === 'eq-le' ? '′' : w.kind === 'eq-ge' ? '″' : '';
+    const lineHtml = (w, t) => { const r = pr.rows[w.src]; return `<div class="drow dfr${w.kind === 'eq-ge' ? ' dh' : ''}" data-t="${t}"><span class="kbd">(${w.src + 1}${sfx(w)})</span> <span class="lhs">${eqTerms(r.a, xlab)}</span><span class="ex ex-s"></span> <span class="rs">${sg(r.s)}</span> <span class="rb">${fq(r.b)}</span></div>`; };
+    const leg = '<div class="vleg"><span class="vk-x">● исходные переменные</span><span class="vk-s">■ добавляем остатки</span></div>';
+    const html = `${leg}<div class="pvwrap"><div><div class="dmh">условие → равенства</div>${objLine2(pr)}${work.map(lineHtml).join('')}</div><div><div class="dmh">таблица двойственного симплекса</div>${dtb(st0, { cls: 'tN', blank: true, blankZ: true, fq: fqM })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const { C, V, H } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum'), line = t => A.q(`.dfr[data-t="${t}"]`);
+      A.cls(cols.map(j => H('tN', j)), 'dh');
+      work.forEach((w, t) => A.set(V('tN', t, 'bas'), ''));
+      await A.wait(250);
+      A.cap('Столбцы таблицы — переменные: исходные x и добавочные, которые появятся ниже');
+      await A.seq(cols, 80, j => A.pop(H('tN', j), { d: 300 }));
+      for (let t = 0; t < m; t++) {
+        const w = work[t], rw = line(t), r = pr.rows[w.src], i1 = w.src + 1, tag = `${i1}${sfx(w)}`;
+        let lhs = rw.querySelector('.lhs'); const rs = rw.querySelector('.rs'), rb = rw.querySelector('.rb'), ex = rw.querySelector('.ex-s');
+        const eff = w.kind === 'eq-le' ? '<=' : w.kind === 'eq-ge' ? '>=' : r.s;
+        A.cls(rw, 'on');
+        if (w.kind === 'eq-le') {
+          A.cap(`(${i1}) — равенство, и ни одна переменная не стоит только в нём: готового базиса нет. Заменяем равенство двумя неравенствами: «≤» и «≥»`);
+          const rw2 = line(t + 1); await A.pop(rw2);
+          await Promise.all([A.swap(rs, '≤', 420), A.swap(rw2.querySelector('.rs'), '≥', 420)]);
+        }
+        if (eff === '>=') {
+          A.cap(`(${tag}) «≥»: умножаем на −1 — знак станет «≤», все числа сменят знак`);
+          await Promise.all([A.swap(lhs, eqTerms(r.a.map(v => v.neg()), xlab), 520), A.swap(rs, '≤', 520), A.swap(rb, fq(r.b.neg()), 520)]);
+        }
+        if (w.slack) {
+          A.cap(`(${tag}) «≤»: прибавляем остаток ${vK(vars, w.slackVar)} ≥ 0 — получаем равенство`);
+          ex.innerHTML = `&nbsp;+&nbsp;${vK(vars, w.slackVar)}`; ex.classList.add('vk-s'); await A.pop(ex);
+          await A.swap(rs, '=', 420);
+        } else {
+          const bt = lhs.querySelector(`.tw[data-j="${w.basic}"]`);
+          A.cap(`(${i1}) — равенство: переменная ${vK(vars, w.basic)} входит только в него, её делаем базисной${w.cands && w.cands.length > 1 ? ` (кандидаты: ${w.cands.map(j => plain(vname(vars, j))).join(', ')}; берём ту, при которой все d остаются ≥ 0)` : ''}`);
+          A.cls(bt, 'k-sel'); await A.pulse(bt);
+          if (!w.mult.eq(ONE())) {
+            A.cap(`Делим равенство на ${plain(par(r.a[w.basic]))}, чтобы при ${vK(vars, w.basic)} стояла единица`);
+            await Promise.all([A.swap(lhs, eqTerms(r.a.map(v => v.mul(w.mult)), xlab), 520), A.swap(rb, fq(r.b.mul(w.mult)), 520)]);
+          }
+        }
+        lhs = rw.querySelector('.lhs');
+        // перенос в таблицу
+        A.cap(`Строку (${tag}) записываем в таблицу: каждое число — в столбец своей переменной`);
+        const bj = st0.basis[t], row = st0.rows[t];
+        await A.put(w.slack ? ex : lhs.querySelector(`.tw[data-j="${w.basic}"]`), V('tN', t, 'bas'), vK(vars, bj));
+        for (const j of cols) {
+          const cell = V('tN', t, j), tw = j < n ? lhs.querySelector(`.tw[data-j="${j}"]`) : null;
+          if (tw) await A.put(tw, cell, fqM(row.a[j]), { d: 450 });
+          else if (w.slack && j === w.slackVar) await A.put(ex, cell, fqM(row.a[j]), { d: 450 });
+          else { A.set(cell, fqM(row.a[j])); A.cls(C('tN', t, j), 'zc'); await A.pop(cell, { d: 160 }); }
+        }
+        await A.put(rb, V('tN', t, -1), fqM(row.b), { d: 450 });
+        A.cls(rw, 'on', false); A.cls(rw, 'done');
+      }
+      // строка цели
+      const ob = A.q('.cnobj'), z = prep.raw, zl = plain(zlab(z.label));
+      A.cap(max ? `Цель f → max заменяем на g = −f → min: в строку ${zl} переносим коэффициенты цели с обратным знаком` : `Цель f → min: в строку ${zl} переносим коэффициенты цели как есть`);
+      A.cls(ob, 'on');
+      await A.put(A.q('.cnobj .gs'), V('tN', m, 'bas'), zlab(z.label));
+      for (const j of cols) {
+        const cell = V('tN', m, j), tw = j < n ? ob.querySelector(`.tw[data-j="${j}"]`) : null;
+        if (tw) {
+          await A.put(tw, cell, fq(pr.c[j]), { d: 450 });
+          if (max) { A.cls(C('tN', m, j), 'k-act'); await A.swap(cell, fqM(z.a[j]), 480); A.cls(C('tN', m, j), 'k-act', false); }
+        } else { A.set(cell, fqM(z.a[j])); A.cls(C('tN', m, j), 'zc'); await A.pop(cell, { d: 160 }); }
+      }
+      A.set(V('tN', m, -1), fqM(z.b)); await A.pop(V('tN', m, -1), { d: 200 });
+      A.cls(ob, 'on', false);
+      if (pr.c0 && !pr.c0.isZero()) A.cap(`Свободный член цели ${plain(fq(pr.c0))} в таблицу не входит — прибавим его к ответу`);
+      // приведение строки цели к базису
+      let zc = z;
+      if (!prep.elim.length) {
+        A.cap('Под базисными переменными в строке цели уже нули — приводить её к базису не нужно');
+        A.cls(st0.basis.map(bj => C('tN', m, bj)), 'k-ok');
+      }
+      for (const e of prep.elim) {
+        const kk = zc.a[e.bj], row = st0.rows[e.i], nb = { b: zc.b.sub(row.b.scale(kk)), a: zc.a.map((v, j) => v.sub(kk.mul(row.a[j]))) };
+        A.cap(`Под базисной ${plain(vname(vars, e.bj))} в строке ${zl} стоит ${plain(fq(kk))}, а должен быть 0`);
+        A.cls(C('tN', m, e.bj), 'k-del'); A.cls(['bas', -1, ...cols].map(j => C('tN', e.i, j)), 'k-sel'); await A.pulse(V('tN', m, e.bj));
+        A.cap(`Вычитаем из строки ${zl} строку ${plain(vname(vars, e.bj))}, умноженную на ${plain(fq(kk))}`);
+        for (const j of [-1, ...cols]) {
+          const old = j < 0 ? zc.b : zc.a[j], nw = j < 0 ? nb.b : nb.a[j], cellv = j < 0 ? row.b : row.a[j];
+          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="fr">□</b></span>`);
+          A.cls(C('tN', m, j), 'k-act');
+          await A.put(V('tN', m, j), A.q('.pvfm .fo'), fqM(old), { d: 420 });
+          await A.put(V('tN', m, e.bj), A.q('.pvfm .fk'), parM(kk), { d: 420 });
+          await A.put(V('tN', e.i, j), A.q('.pvfm .fn'), parM(cellv), { d: 420 });
+          await A.swap(A.q('.pvfm .fr'), fqM(nw), 360);
+          await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 450 });
+          A.set(V('tN', m, j), fqM(nw)); await A.pop(V('tN', m, j), { d: 220 });
+          A.cls(C('tN', m, j), 'k-act', false);
+        }
+        zc = nb; A.cls(['bas', -1, ...cols].map(j => C('tN', e.i, j)), 'k-sel', false); A.cls(C('tN', m, e.bj), 'k-del', false); A.cls(C('tN', m, e.bj), 'k-ok');
+      }
+      A.set(fm, '');
+      A.cap('Таблица готова: базисная переменная равна своему b, остальные переменные равны 0');
+      sum.innerHTML = `Базис: ${st0.basis.map((bj, i) => `${vK(vars, bj)} = ${fqM(st0.rows[i].b)}`).join(', ')}; остальные = 0. &nbsp;${zlab(st0.z.label)}: b = ${fqM(st0.z.b)}`;
+      await A.show(sum);
+    };
+    return demo('шаг за шагом: условие → рабочая форма → стартовая таблица', html, script);
+  }
+
+  /* Проверка стартовой таблицы: d ≥ 0 и знаки b. */
+  function demoDStart(pr, res) {
+    const st = res.base, m = st.rows.length, cols = st.cols, vars = st.vars, zl = zlab(st.z.label);
+    const negB = st.rows.map((r, i) => r.b.s < 0 ? i : -1).filter(i => i >= 0), negD = res.negD;
+    const html = `<div class="pvwrap one"><div>${dtb(st, { cls: 'tO', fq: fqM })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const script = async A => {
+      const { C, V } = sceneTools(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
+      await A.wait(250);
+      A.cap(`Двойственная допустимость: все числа d строки ${plain(zl)} должны быть ≥ 0 — тот же знак, что признак оптимальности обычного симплекса`);
+      for (const j of cols) { const bad = st.z.a[j].s < 0; A.cls(C('tO', m, j), 'k-act'); await A.wait(80); A.cls(C('tO', m, j), 'k-act', false); A.cls(C('tO', m, j), bad ? 'k-del' : 'k-ok'); if (bad) await A.pulse(V('tO', m, j)); }
+      if (negD.length) { A.cap(`Есть d < 0 (${negD.map(j => plain(vname(vars, j))).join(', ')}) — таблица не двойственно допустима`); A.set(fm, `<span class="fmh bad">d &lt; 0: двойственный симплекс с этой таблицы напрямую не стартует</span>`); }
+      else { A.cap('Все d ≥ 0 — двойственная допустимость есть, таблица годится для старта'); A.set(fm, `<span class="fmh ok">все d ≥ 0 — метод сохранит это свойство на всех шагах</span>`); }
+      await A.pulse(fm);
+      A.cap('Теперь столбец b: допустимость базиса — все b должны быть ≥ 0');
+      for (let i = 0; i < m; i++) { const bad = st.rows[i].b.s < 0; A.cls(C('tO', i, -1), 'k-act'); await A.wait(80); A.cls(C('tO', i, -1), 'k-act', false); A.cls(C('tO', i, -1), bad ? 'k-del' : 'k-ok'); if (bad) await A.pulse(V('tO', i, -1)); }
+      if (negB.length) A.cap(`b < 0 в строках ${negB.map(i => plain(vname(vars, st.basis[i]))).join(', ')}: базис недопустим — именно его исправляет двойственный симплекс-метод`);
+      else A.cap('Все b ≥ 0: базисное решение допустимо');
+      if (negD.length) {
+        sum.innerHTML = `<b>Старт не двойственно допустим.</b> Добавляем искусственное ограничение «Σ небазисных ≤ M» — оно вернёт d ≥ 0 (следующая анимация).`;
+      } else if (!negB.length) {
+        sum.innerHTML = '<b>Таблица допустима и оптимальна сразу</b> — итераций не нужно.';
+      } else {
+        sum.innerHTML = `<b>Старт подходит:</b> d ≥ 0 (двойственная допустимость) при b < 0 (прямая недопустимость) — запускаем итерации.`;
+      }
+      await A.show(sum);
+    };
+    return demo('проверка стартовой таблицы: d ≥ 0 и знаки b', html, script);
+  }
+
+  /* Добавление искусственного ограничения: Σ небазисных + s = M. */
+  function demoDBound(pr, res) {
+    const B = res.bound, tb = B.table, p = B.row, vars = tb.vars, cols = tb.cols, sv = B.slackVar, nonb = B.nonb, m = tb.rows.length;
+    const terms = nonb.map((j, k) => `<span class="tw" data-j="${j}"><span class="sgn">${k ? '&nbsp;+&nbsp;' : ''}</span><span class="cf" data-one="1"></span>${vK(vars, j)}</span>`).join('') + `<span class="tw" data-j="${sv}"><span class="sgn">&nbsp;+&nbsp;</span><span class="cf" data-one="1"></span>${vK(vars, sv)}</span>`;
+    const html = `<div class="drow bdl"><span class="kbd">(M)</span> <span class="lhs">${terms}</span> = <span class="rb"><i class="bm">M</i></span></div><div class="pvwrap one"><div>${dtb(tb, { cls: 'tN', fq: fqM })}</div></div><div class="pvfm"></div>`;
+    const script = async A => {
+      const { C, V, H } = sceneTools(A), fm = A.q('.pvfm'), rw = A.q('.bdl');
+      A.cls(rw, 'dh'); cols.forEach(j => { A.set(V('tN', p, j), ''); }); A.set(V('tN', p, 'bas'), ''); A.set(V('tN', p, -1), '');
+      await A.wait(250);
+      A.cap(`Строка ${plain(zlab(tb.z.label))} содержит d < 0: ${res.negD.map(j => plain(vname(vars, j))).join(', ')}. Приём: добавить ограничение «сумма небазисных переменных ≤ M», где M — очень большое число`);
+      A.cls(res.negD.map(j => C('tN', m, j)), 'k-del');
+      await A.pop(rw);
+      A.cap(`Небазисные переменные: ${nonb.map(j => plain(vname(vars, j))).join(', ')} — они входят в сумму с коэффициентом 1`);
+      A.cls(nonb.map(j => H('tN', j)), 'k-sel'); await A.seq(nonb, 80, j => A.pulse(H('tN', j)));
+      A.cap(`Остаток ${vK(vars, sv)} ≥ 0 превращает неравенство в равенство и становится базисной переменной новой строки`);
+      A.cls(rw.querySelector(`.tw[data-j="${sv}"]`), 'k-sel'); await A.pulse(rw.querySelector(`.tw[data-j="${sv}"]`));
+      A.cap('Переносим строку M в таблицу: каждая единица — в столбец своей переменной');
+      await A.put(rw.querySelector(`.tw[data-j="${sv}"]`), V('tN', p, 'bas'), vK(vars, sv));
+      for (const j of cols) {
+        const cell = V('tN', p, j), tw = rw.querySelector(`.tw[data-j="${j}"]`);
+        if (tw) await A.put(tw, cell, '1', { d: 450 });
+        else { A.set(cell, '0'); A.cls(C('tN', p, j), 'zc'); await A.pop(cell, { d: 160 }); }
+      }
+      await A.put(rw.querySelector('.rb'), V('tN', p, -1), fqM(tb.rows[p].b), { d: 450 });
+      A.cls(H('tN', 0), 'k-sel', false); A.cls(nonb.map(j => H('tN', j)), 'k-sel', false);
+      A.cap('Ограничение лишь отрезает область «за M»: при большом M оптимум исходной задачи в неё попадает. Если оптимум «упрётся» в M — задача неограничена');
+      A.set(fm, `<span class="fmh">x<sub>небазисных</sub> суммарно ≤ <i class="bm">M</i> — искусственная рамка, а не часть условия</span>`);
+    };
+    return demo('искусственное ограничение: возвращаем двойственную допустимость', html, script);
+  }
+
+  function dsimplex(pr, meta) {
+    const res = ALGD.solve(pr), S = [], n = pr.n, m = pr.rows.length, prep = res.prep;
+    const optimal = res.status === 'optimal';
+    S.push(sec('cond', 'Условие', system(pr) + `<p class="kbd">${meta ? meta.title : 'Собственные коэффициенты'}.</p>`));
+    const facts = [`итераций: ${res.iters}`, ...(res.bound ? ['искусственное ограничение M'] : []), ...(prep.split.length ? ['равенство заменено парой неравенств'] : []),
+      ...(optimal && res.alt.length ? ['оптимум не единственный'] : []), ...(optimal && res.degenerate ? ['вырожденное решение'] : [])];
+    S.push(summaryCard({ main: resMain(res), facts, badges: [bookBadge(pr, res, meta), checkBadge(pr, optimal ? res.x : null)],
+      links: [['reduce', 'Рабочая форма'], ['iter', 'Итерации'], ['res', 'Ответ'], ['check', 'Проверка']] }));
+    S.push(sec('how', 'Как решается', `<ol class="howl">
+      <li><b>Рабочая форма.</b> Цель приводим к min (для max берём g = −f). «≤» — прибавляем остаток; «≥» — умножаем на −1 и прибавляем остаток; «=» — базисной делаем переменную, которая входит только в это уравнение (если такой нет — заменяем равенство парой «≤», «≥»).</li>
+      <li><b>Таблица и знаки.</b> Как и в симплекс-методе проекта, строка f хранит числа d<sub>j</sub> (для min — коэффициенты цели, для max — со сменой знака), в её b стоит значение цели. Признак оптимальности обычного симплекса — «все d ≥ 0» — здесь называется <b>двойственной допустимостью</b>: её сохраняют на всех шагах, а исправляют правые части b.</li>
+      <li><b>Шаг 1. Критерий остановки.</b> Нет отрицательных b — решение допустимо; вместе с d ≥ 0 оно оптимально.</li>
+      <li><b>Шаг 2. Выходящая строка.</b> Берём строку с самым отрицательным b — эта базисная переменная выходит.</li>
+      <li><b>Шаг 3. Несовместность.</b> Если в выбранной строке нет отрицательных чисел — при x ≥ 0 левая часть не меньше нуля, а правая отрицательна: допустимых решений нет.</li>
+      <li><b>Шаг 4. Входящий столбец.</b> Среди отрицательных a строки берём столбец с наименьшим θ = d ÷ |a|. Новое d<sub>k</sub> = d<sub>k</sub> − d<sub>q</sub>·a<sub>pk</sub>/a<sub>pq</sub> остаётся ≥ 0 именно при минимальном θ.</li>
+      <li><b>Шаг 5. Пересчёт.</b> Ведущую строку делим на ведущий элемент, из остальных вычитаем её, умноженную на их число в ведущем столбце.</li></ol>
+      <p class="kbd">Если стартовая таблица не двойственно допустима (есть d &lt; 0), добавляется искусственное ограничение «Σ небазисных ≤ M» (M — большое число): первый поворот по самому отрицательному d возвращает d ≥ 0. Если в конце цель зависит от M — задача неограничена.</p>`));
+    S.push(sec('reduce', 'Рабочая форма и стартовая таблица', demoDForm(pr, res) + `<p>Строки таблицы: ${prep.work.map((w, t) => `(${w.src + 1}${w.kind === 'eq-le' ? '′' : w.kind === 'eq-ge' ? '″' : ''}) → базис ${vname(prep.vars, prep.base.basis[t])}`).join('; ')}. Цель ${pr.sense === 'max' ? 'f → max заменена на g = −f → min' : 'f → min взята как есть'}${pr.c0 && !pr.c0.isZero() ? `; свободный член ${fq(pr.c0)} в таблицу не входит` : ''}.</p>` + dtb(res.base, { fq: fqM })));
+    S.push(sec('t0', 'Проверка стартовой таблицы', demoDStart(pr, res) + (res.bound ? demoDBound(pr, res) : '') +
+      (res.bound ? `<div class="note">Стартовая таблица не двойственно допустима (d &lt; 0 у ${res.negD.map(j => vname(prep.vars, j)).join(', ')}), поэтому нет корректного стартового базиса для двойственного метода «как есть». Применён стандартный приём — искусственное ограничение: оно не меняет задачу, пока M достаточно велико, и даёт допустимую по d таблицу после одного поворота.</div>` : res.negD.length ? '' : '<div class="note ok">Все d ≥ 0 — стартовый базис корректен для двойственного симплекс-метода.</div>')));
+    S.push(sec('iter', 'Итерации двойственного симплекс-метода', dstepper(pr, res) +
+      (res.bland ? '<div class="note">Обнаружен повтор базиса — далее применено правило Бленда, чтобы избежать зацикливания.</div>' : '') +
+      (res.status === 'infeasible' ? `<div class="note bad"><b>Допустимых решений нет.</b> В строке ${vname(res.last.vars, res.last.basis[res.last.p])} b &lt; 0, а отрицательных чисел для ведущего элемента нет: условие «ведущий элемент &lt; 0» не выполнено ни в одном столбце. Итерации остановлены.</div>` : '') +
+      (res.status === 'unbounded' ? '<div class="note bad"><b>Целевая функция не ограничена.</b> Таблица оптимальна только при ограничении Σ ≤ M, а значение цели зависит от M. Итерации остановлены.</div>' : '') +
+      (res.status === 'cycle' ? '<div class="note bad"><b>Метод не завершился</b> за допустимое число итераций.</div>' : '')));
+    S.push(sec('all', 'Все таблицы подряд', dAllTables(res)));
+    let rh;
+    if (optimal) {
+      const last = res.last, T = res.table;
+      rh = `<p>В итоговой таблице слева стоят ${last.basis.map(bj => vname(last.vars, bj)).join(', ')} — они равны своему b, остальные переменные равны 0. Добавочные переменные в ответ не входят.</p>
+        <p class="answer"><i>x</i>* = ${vec(res.x)}, &nbsp;<i>f</i>* = ${fq(res.f)}${approx(res.f)}</p>`;
+      if (res.dependsOnM) rh += `<div class="note">Координаты зависят от M; для проверки взято M = ${fq(res.M0)} (при любом большем M значение f то же).</div>`;
+      if (res.alt.length) {
+        const ai = res.altInfo;
+        rh += `<div class="note">В строке f под небазисной переменной ${res.alt.map(j => vname(last.vars, j)).join(', ')} стоит 0 — есть и другие оптимальные решения с тем же f*.${ai && ai.ray ? ' Столбец этой переменной не содержит положительных чисел: оптимальные решения образуют неограниченное множество.' : ai ? (ai.same ? ' Поворот по ней вырожденный — даёт ту же вершину.' : ` Другая оптимальная вершина: <i>x</i> = ${vec(ai.x)} (поворот по ${vname(last.vars, ai.j)}).`) : ''}</div>`;
+      }
+      if (res.degenerate) rh += '<div class="note">Есть базисная переменная, равная 0, — решение <b>вырожденное</b>.</div>';
+    } else rh = `<div class="note bad"><b>${statusText(res.status)}.</b></div>`;
+    S.push(sec('res', 'Ответ', (optimal ? demoAnswer(pr, res.x, res.f, res.table, { alt: res.alt, degenerate: res.degenerate }) : '') + rh));
+    const crit = optimal ? `<div class="badges" style="align-items:flex-start;flex-direction:row;flex-wrap:wrap;gap:6px;margin:6px 0"><span class="badge ok">✓ все b ≥ 0 — допустимость</span><span class="badge ok">✓ все d ≥ 0 — оптимальность</span>${ALG.check(pr, res.x).every(c => c.ok) ? '<span class="badge ok">✓ подстановка в ограничения</span>' : '<span class="badge bad">✗ ограничение нарушено</span>'}${ALGZ.fv(pr, res.x).eq(res.f) ? '<span class="badge ok">✓ f по x совпадает с таблицей</span>' : '<span class="badge bad">✗ f по x не совпадает с таблицей</span>'}</div>` : '';
+    S.push(sec('check', checkTitle(meta), (optimal ? crit + checkTable(pr, res.x) + valueLine(pr, res.x) : noCheck(res)) + compare(pr, res, meta)));
+    return S;
+  }
+
   R.bridge.pivot = (box, steps, k, auto) => {
     const s = steps[k], sp = s.q == null ? optSpec(s) : pivotSpec(s, s.unbounded ? null : steps[k + 1]);
     return mountInto(box, s.q == null ? `Таблица ${k}: проверка оптимальности` : s.unbounded ? `Таблица ${k}: неограниченность` : `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, sp.html, sp.script, { ...sp.opts, autoplay: auto });
   };
-  return { graph, simplex, artificial, dual, statusText, graphZ, dualZ, verdictZ, quiz, trainerFlow, stopAllDemos };
+  return { graph, simplex, artificial, dual, dsimplex, statusText, graphZ, dualZ, verdictZ, quiz, trainerFlow, stopAllDemos };
 })();
 
 </script>
@@ -4642,10 +5263,12 @@ const APP = (() => {
   const SPOIL = ['sum', 'res', 'all', 'verts', 'opt', 'check', 'end1', 'cs', 'sys', 'dplot', 'solve'];
   const TYPES = ['graph', 'simplex', 'artificial', 'dual'];
   const isZ = () => state.src === 'zyk';
+  const typesFor = () => isZ() ? ['graph', 'simplex', 'artificial', 'dsimplex', 'dual'] : TYPES;
   const SRC = () => isZ() ? DB_ZYK : DB;
   const structOf = () => isZ() ? DB_ZYK.types[state.type] : DB.types[state.type === 'dual' ? state.base : state.type];
   const ckey = () => isZ() ? 'z-' + state.type : state.type === 'dual' ? state.base : state.type;
   const sub = k => String(k).split('').map(d => '₀₁₂₃₄₅₆₇₈₉'[d]).join('');
+  const noTr = () => isZ() && state.type === 'dsimplex';
 
   /* Запись базы → задача с точными дробями. */
   const toProblem = (t, v) => ({ n: t.n, sense: t.sense, c: v.c.map(Q.of), rows: v.rows.map(r => ({ a: r.a.map(Q.of), s: r.s, b: Q.of(r.b) })) });
@@ -4720,7 +5343,7 @@ const APP = (() => {
     const cur = state.custom[key], n = cur.n, m = cur.rows.length;
     const val = x => String(x).replace('-', '−').replace('.', ',');
     const opt = (a, b, sel) => [...Array(b - a + 1)].map((_, i) => `<option${a + i === sel ? ' selected' : ''}>${a + i}</option>`).join('');
-    let h = `<div class="form" id="cform"><div class="kbd">Структура задачи задаётся свободно: число переменных и ограничений, max или min, знак каждого ограничения «≤», «≥» или «=»${dual ? ', условие на знак каждой переменной (другие границы, например x ≥ 10, вводятся как обычные ограничения)' : ', все x ≥ 0'}. Числа — целые, десятичные или дроби вида 3/7.</div>`;
+    let h = `<div class="form" id="cform"><div class="kbd">Структура задачи задаётся свободно: число переменных и ограничений, max или min, знак каждого ограничения «≤», «≥» или «=»${dual ? ', условие на знак каждой переменной (другие границы, например x ≥ 10, вводятся как обычные ограничения)' : ', все x ≥ 0'}. Числа — целые, десятичные или дроби вида 3/7.${state.type === 'dsimplex' ? ' Метод — двойственный симплекс: подойдут любые знаки ограничений; если стартовая таблица не двойственно допустима, решение покажет искусственное ограничение M.' : ''}</div>`;
     h += `<div class="frow"><label>Переменных <select id="zn">${opt(1, 8, n)}</select></label> <label>Ограничений <select id="zm">${opt(1, 10, m)}</select></label> <label>Цель <select id="zs"><option value="max"${cur.sense === 'max' ? ' selected' : ''}>max</option><option value="min"${cur.sense === 'min' ? ' selected' : ''}>min</option></select></label></div>`;
     h += `<div class="frow"><span class="flab"><i>L</i> =</span><input class="num" data-r="c0" value="${val(cur.c0)}" aria-label="свободный член"><span class="xl">+</span>${cur.c.map((c, j) => `<input class="num" data-r="c" data-j="${j}" value="${val(c)}" aria-label="c${j + 1}"><span class="xl"><i>x</i>${sub(j + 1)}${j < n - 1 ? ' +' : ''}</span>`).join('')}</div>`;
     cur.rows.forEach((r, i) => {
@@ -4776,14 +5399,14 @@ const APP = (() => {
   function controls() {
     const T = SRC().types;
     let h = `<div class="srcsw"><span class="kbd">Источник задач</span><span class="seg2"><button class="btn${isZ() ? '' : ' on'}" data-src="rgr">Методичка РГР · Девятерикова, Борисовский</button><button class="btn${isZ() ? ' on' : ''}" data-src="zyk">Сборник для практических занятий · Зыкина</button></span></div>`;
-    h += `<div class="tabs">${TYPES.map(k => `<button class="tab${state.type === k ? ' on' : ''}" data-type="${k}"><span class="n">${T[k].id}</span>${T[k].short}</button>`).join('')}</div>`;
+    h += `<div class="tabs"><label for="taskType">Тема:</label><select id="taskType">${typesFor().map(k => `<option value="${k}"${state.type === k ? ' selected' : ''}>Раздел ${T[k].id} · ${T[k].short}</option>`).join('')}</select></div>`;
     h += `<div class="ctl card"><div class="kbd">${T[state.type].title}. ${T[state.type].task}${isZ() ? ` Страницы сборника: ${T[state.type].pages}.` : ''}</div><div class="ctlrow">`;
     if (state.type === 'dual' && !isZ()) h += `<label>Прямая задача: <select id="cbase">${DB.types.dual.bases.map(b => `<option value="${b.type}"${b.type === state.base ? ' selected' : ''}>${b.label}</option>`).join('')}</select></label>`;
     h += `<label class="rad"><input type="radio" name="mode" value="db"${state.mode === 'db' ? ' checked' : ''}> ${isZ() ? 'задача из сборника' : 'вариант из методички'}</label>`;
-    h += `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${isZ() ? 'задача' : 'вариант'} ${v.v}${v.note && (isZ() || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join('')}</select>`;
+    h += `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${isZ() ? 'задача' : 'вариант'} ${v.v}${v.page ? ` (с. ${v.page})` : ''}${v.note && (isZ() || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join('')}</select>`;
     h += `<label class="rad"><input type="radio" name="mode" value="custom"${state.mode === 'custom' ? ' checked' : ''}> свои коэффициенты</label>`;
-    h += `<label class="trsw${state.trainer ? ' on' : ''}" title="Решать задачу по шагам, выбирая ответы"><input type="checkbox" id="trmode"${state.trainer ? ' checked' : ''}> Тренажёр</label><button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
-    if (state.trainer) h += `<div class="kbd" style="margin-top:6px">Режим тренажёра: задача решается по шагам — на каждом шаге выберите решение по готовым вычислениям. Таблицы и график строятся по мере ответов.</div>`;
+    h += `<label class="trsw${state.trainer && !noTr() ? ' on' : ''}" title="${noTr() ? 'Для двойственного симплекс-метода тренажёра нет — смотрите пошаговые анимации' : 'Решать задачу по шагам, выбирая ответы'}"><input type="checkbox" id="trmode"${state.trainer && !noTr() ? ' checked' : ''}${noTr() ? ' disabled' : ''}> Тренажёр</label><button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
+    if (state.trainer && !noTr()) h += `<div class="kbd" style="margin-top:6px">Режим тренажёра: задача решается по шагам — на каждом шаге выберите решение по готовым вычислениям. Таблицы и график строятся по мере ответов.</div>`;
     if (state.mode === 'custom') h += isZ() ? formZ() : formHTML();
     h += '</div>';
     return h;
@@ -4795,7 +5418,7 @@ const APP = (() => {
     if (state.mode === 'db' && isZ()) {
       const v = t.variants.find(x => x.v === state.v);
       pr = toProblemZ(v);
-      meta = { title: `Задача ${v.v} сборника ПЗ (${t.title.split('.')[0].toLowerCase()}, с. ${t.pages})`, zyk: true, answerZ: v.answer, note: v.note };
+      meta = { title: `Задача ${v.v} сборника ПЗ (${t.title.split('. ')[0].toLowerCase()}, с. ${v.page || t.pages})`, zyk: true, answerZ: v.answer, note: v.note };
     } else if (state.mode === 'db') {
       const v = t.variants.find(x => x.v === state.v);
       pr = toProblem(t, v);
@@ -4812,6 +5435,7 @@ const APP = (() => {
         if (state.type === 'graph') secs = VIEWS.graphZ(pr, meta);
         else if (state.type === 'simplex') secs = VIEWS.artificial(pr, meta, { artificialAll: false, zyk: true });
         else if (state.type === 'artificial') secs = VIEWS.artificial(pr, meta, { artificialAll: true, zyk: true });
+        else if (state.type === 'dsimplex') secs = VIEWS.dsimplex(pr, meta);
         else secs = VIEWS.dualZ(pr, meta);
       }
       else if (state.type === 'graph') secs = VIEWS.graph(pr, meta);
@@ -4819,7 +5443,7 @@ const APP = (() => {
       else if (state.type === 'artificial') secs = VIEWS.artificial(pr, meta);
       else secs = VIEWS.dual(pr, meta, state.base, () => { state.type = state.base; if (state.mode === 'custom') state.custom[state.base] = fromProblem(pr); render(); });
     } catch (e) { return `<div class="card note bad">Ошибка вычислений: ${e.message}</div>`; }
-    if (state.trainer) secs = [secs[0], VIEWS.trainerFlow(state.type, pr, meta)];
+    if (state.trainer && !noTr()) secs = [secs[0], VIEWS.trainerFlow(state.type, pr, meta)];
     return secs.join('');
   }
   function render() {
@@ -4831,7 +5455,7 @@ const APP = (() => {
     const secs = [...document.querySelectorAll('#solution section.sol')];
     $('#secnav').innerHTML = `<div class="kbd navh">Разделы решения</div>` + secs.map(s => `<a href="#${s.id}">${s.dataset.title}</a>`).join('');
     R.hooks.forEach(f => f());
-    document.body.classList.toggle('trainer', state.trainer);
+    document.body.classList.toggle('trainer', state.trainer && !noTr());
     SPOIL.forEach(id => { const s = document.getElementById(id); if (!s) return; s.classList.add('spoiler'); s.addEventListener('click', () => s.classList.add('peek'), { once: true }); });
     // переходы по ссылкам итоговой карточки и меню разделов: плавная прокрутка и подсветка раздела
     document.querySelectorAll('#solution a[data-jump], #secnav a').forEach(a => a.onclick = e => {
@@ -4843,8 +5467,9 @@ const APP = (() => {
     if (state.mode === 'db') { const q = new URLSearchParams({ s: state.src, t: state.type, v: state.v }); if (state.type === 'dual' && state.src === 'rgr') q.set('b', state.base); try { history.replaceState(null, '', '#' + q); } catch (_) { /* file:// в некоторых браузерах */ } }
   }
   function bind() {
-    document.querySelectorAll('.tab').forEach(b => b.onclick = () => { state.type = b.dataset.type; if (state.mode === 'custom') state.lastCustom = null; render(); });
-    document.querySelectorAll('[data-src]').forEach(b => b.onclick = () => { if (state.src === b.dataset.src) return; state.vs = state.vs || {}; state.vs[state.src] = state.v; state.src = b.dataset.src; if (state.vs[state.src]) state.v = state.vs[state.src]; state.lastCustom = null; render(); });
+    const typeSelect = $('#taskType');
+    if (typeSelect) typeSelect.onchange = () => { state.type = typeSelect.value; if (state.mode === 'custom') state.lastCustom = null; render(); };
+    document.querySelectorAll('[data-src]').forEach(b => b.onclick = () => { if (state.src === b.dataset.src) return; state.vs = state.vs || {}; state.vs[state.src] = state.v; state.src = b.dataset.src; if (state.vs[state.src]) state.v = state.vs[state.src]; if (!typesFor().includes(state.type)) state.type = 'graph'; state.lastCustom = null; render(); });
     ['#zn', '#zm', '#zs'].forEach(s => { const e = $(s); if (e && s !== '#zs') e.onchange = resizeZ; });
     const pb = $('#printbtn');
     if (pb) pb.onclick = () => {
@@ -4872,7 +5497,7 @@ const APP = (() => {
     // открыть вариант по ссылке
     const q = new URLSearchParams(location.hash.slice(1));
     if (['rgr', 'zyk'].includes(q.get('s'))) state.src = q.get('s');
-    if (TYPES.includes(q.get('t'))) state.type = q.get('t');
+    if (typesFor().includes(q.get('t'))) state.type = q.get('t');
     if (q.get('v')) state.v = +q.get('v');
     if (['graph', 'simplex'].includes(q.get('b'))) state.base = q.get('b');
     render();
