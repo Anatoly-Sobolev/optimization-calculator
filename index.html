@@ -93,6 +93,50 @@ details summary{cursor:pointer;color:var(--accent);margin:8px 0}
 .pair{border:1px solid var(--line);border-radius:12px;padding:9px 13px;background:#fff;font-family:"Cambria Math","Times New Roman",serif}
 .pair .ph{font-weight:700}.pair .ps{color:var(--muted);margin:3px 0}.pair.eq{border-color:#f4a300;background:#fffaf0}.pair.zero{border-color:var(--accent);background:#f2f4ff}.pair.none .po{color:var(--muted)}
 .tv{color:#c2185b}
+.stage{display:grid;gap:6px;background:#f7f8ff;border:1px solid #dfe3fb;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:15px}
+.stage .stk{display:inline-block;min-width:74px;font-weight:700;color:var(--accent);margin-right:8px}
+.stflow{display:flex;flex-wrap:wrap;gap:6px 0;margin:4px 0 2px}
+.stc{flex:1 1 120px;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:8px 6px 10px;border-radius:12px;color:inherit;text-decoration:none;transition:background .2s}
+.stc:hover{background:var(--accent-soft)}
+.stc:not(:last-child)::after{content:"";position:absolute;top:25px;left:calc(50% + 22px);right:calc(-50% + 22px);height:2px;background:#d5daf7}
+.stn{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 6px rgba(60,80,200,.25)}
+.stt{font-weight:600;font-size:15px}.str{font-size:13px;color:var(--muted);line-height:1.3}
+@media(max-width:620px){.stflow{flex-direction:column}.stc{flex-direction:row;text-align:left;gap:10px;padding:6px 8px}.stc::after{display:none}.str::before{content:"— "}}
+.demo{border:1px solid #dfe3fb;border-radius:14px;background:linear-gradient(#fbfcff,#fff);padding:10px 14px 12px;margin:4px 0 10px}
+.dmhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.dmtag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--accent);border-radius:999px;padding:2px 9px}
+.dmtl{font-weight:600}.dmbtns{margin-left:auto;display:flex;gap:6px}.dmbtns .btn{padding:4px 10px;font-size:13px}
+.demo.playing .dmtag{animation:dmblink 1s infinite alternate}@keyframes dmblink{to{opacity:.45}}
+.dmstage{position:relative;min-height:60px;padding:6px 2px;font-family:"Cambria Math","Cambria","Times New Roman",serif;font-size:18px;line-height:2;perspective:700px}
+.dmcap{min-height:26px;font-size:15px;color:var(--accent);font-weight:600;font-family:"Segoe UI",sans-serif}
+.demo .ch,.demo .tm{display:inline-block;border-radius:6px;padding:0 3px;transition:background .3s,color .3s,opacity .3s}
+.demo .dh{opacity:0}
+.dmfly{position:absolute;z-index:5;pointer-events:none;background:#ffd36b;border-radius:6px;padding:0 5px;box-shadow:0 4px 14px rgba(0,0,0,.2);font-family:"Cambria Math","Times New Roman",serif;font-size:18px;line-height:1.6;white-space:nowrap}
+.demo .drow{padding:1px 8px;border-radius:8px;transition:background .3s;border-left:3px solid transparent}
+.demo .drow.on,.demo .dl.on{background:var(--col);border-left-color:#f4a300}.demo .drow.done{background:var(--ok-soft)}
+.demo td.on,.demo th.on{background:var(--col)!important}.demo td.onb{background:#ece2ff!important}
+.demo .bx{background:#ffe6b0;font-family:"Segoe UI",sans-serif;font-size:14px;margin-left:10px}
+.demo .okc{color:var(--ok);font-weight:700;margin-left:6px}
+.dmcols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}@media(max-width:820px){.dmcols{grid-template-columns:1fr}}
+.dmh{font-family:"Segoe UI",sans-serif;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.dmpair{display:flex;align-items:center;gap:10px;padding:1px 8px;border-radius:8px;flex-wrap:wrap;transition:background .3s}.dmpair.on{background:#fffaf0}
+.dmpair .arr{color:var(--accent);font-weight:700;transform-origin:left center}
+.demo .pos{background:#ffe6b0;font-weight:700}.demo .zero{background:#e3e8ff;color:#2b3fb8;font-weight:700}.demo .dim{opacity:.35}
+.demo .strike{text-decoration:line-through;color:var(--pe)}
+.demo .tm.cut{overflow:hidden;white-space:nowrap;vertical-align:bottom}
+.dmbig{font-size:22px}.dmres{display:inline-block;border-radius:10px;padding:2px 10px}.dmres.fin{background:var(--ok-soft)}
+.dmdown{font-family:"Segoe UI",sans-serif;font-size:14px;color:var(--accent);font-weight:600}
+.dmbars{display:grid;gap:6px;margin-top:8px;font-family:"Segoe UI",sans-serif;font-size:14px;max-width:520px}
+.dmbar{display:grid;grid-template-columns:34px 1fr 90px;align-items:center;gap:8px}.dmbar i{display:block;height:16px;border-radius:8px;background:var(--accent);width:0}.dmbar.f i{background:#f4a300}
+.dmdots{display:flex;gap:5px;margin:2px 0 6px;flex-wrap:wrap}.dmdots span{width:10px;height:10px;border-radius:50%;background:#dfe3fb;transition:background .3s,transform .3s}.dmdots span.p1{background:#f6dbe5}.dmdots span.on{background:var(--accent);transform:scale(1.3)}
+.dmtv{font-size:16px;line-height:1.4}
+.demo table.sx td{transition:background .35s,color .35s}
+.demo table.sx.h0 td.pc,.demo table.sx.h0 td.pr,.demo table.sx.h0 td.pe,.demo table.sx.h1 td.pr{background:#fff;color:inherit;font-weight:inherit}
+.demo table.sx.h0 tr.zrow td,.demo table.sx.h1 tr.zrow td.pr{background:#f1f3ff}
+.demo table.sx.h1 td.pe{background:var(--col);color:inherit}
+.demo.fast *{transition:none!important}
+details.dmmore>summary{font-size:14px}
+@media print{.dmbtns{display:none}}
 .plotgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
 @media(max-width:820px){.plotgrid{grid-template-columns:1fr}}
 .plot{width:100%;height:auto;display:block}
@@ -2207,56 +2251,286 @@ const VIEWS = (() => {
     return S;
   }
 
+  /* =================== Анимации «было → стало» для этапов =================== */
+  // demo(подпись, html, сценарий): сцена сразу показывает итог; при появлении на экране сценарий проигрывается с начала.
+  // Сценарий — async (A) => …, A: q/qa (поиск в сцене), wait, anim, pop, hide, swap (перелистывание содержимого), fly (перелёт копии), cls, cap, seq.
+  const DM_STOP = {};
+  let dmUid = 0;
+  function demo(title, html, script) {
+    const id = 'dm' + (++dmUid);
+    R.hooks.push(() => {
+      const root = document.getElementById(id); if (!root) return;
+      const stage = root.querySelector('.dmstage'), capEl = root.querySelector('.dmcap');
+      let token = 0;
+      const run = async fast => {
+        const my = ++token;
+        stage.innerHTML = html; capEl.innerHTML = '';
+        root.classList.toggle('fast', fast); root.classList.toggle('playing', !fast);
+        const alive = () => { if (my !== token || !root.isConnected) throw DM_STOP; };
+        const kf = (el, frames, o = {}) => el.animate(frames, { duration: fast ? 0 : (o.d || 450), delay: fast ? 0 : (o.delay || 0), easing: o.ease || 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+        const A = {
+          fast,
+          q: s => stage.querySelector(s), qa: s => [...stage.querySelectorAll(s)],
+          wait: ms => fast ? Promise.resolve() : new Promise(r => setTimeout(r, ms)).then(alive),
+          anim: (el, frames, o) => { if (!el) return Promise.resolve(); const a = kf(el, frames, o); return fast ? Promise.resolve() : a.finished.then(alive, alive); },
+          pop: (el, o) => A.anim(el, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.18)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], { d: 420, ...o }),
+          hide: (el, o) => A.anim(el, [{ opacity: 1 }, { opacity: 0 }], { d: 300, ...o }),
+          pulse: (el, o) => A.anim(el, [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { d: 420, ...o }),
+          swap: async (el, h, d = 420) => {
+            if (!el) return; if (fast) { el.innerHTML = h; return; }
+            await el.animate([{ transform: 'rotateX(0)' }, { transform: 'rotateX(90deg)' }], { duration: d / 2, fill: 'forwards' }).finished.then(alive, alive);
+            el.innerHTML = h;
+            await el.animate([{ transform: 'rotateX(90deg)' }, { transform: 'rotateX(0)' }], { duration: d / 2, fill: 'forwards' }).finished.then(alive, alive);
+          },
+          fly: (from, to, h, o = {}) => {
+            if (fast || !from || !to) return Promise.resolve();
+            const sr = stage.getBoundingClientRect(), a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+            const c = document.createElement('span'); c.className = 'dmfly'; c.innerHTML = h == null ? from.innerHTML : h;
+            c.style.left = (a.left - sr.left) + 'px'; c.style.top = (a.top - sr.top) + 'px'; stage.appendChild(c);
+            const w = c.getBoundingClientRect(), dx = b.left + b.width / 2 - (a.left + w.width / 2), dy = b.top + b.height / 2 - (a.top + w.height / 2);
+            return c.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx / 2}px,${dy / 2 - 28}px) scale(1.3)`, offset: .5 }, { transform: `translate(${dx}px,${dy}px) scale(1)` }],
+              { duration: o.d || 750, delay: o.delay || 0, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove(), () => c.remove()).then(alive);
+          },
+          cls: (el, c, on = true) => { if (el) (Array.isArray(el) ? el : [el]).forEach(e => e.classList.toggle(c, on)); },
+          cap: h => { capEl.innerHTML = h; if (!fast) capEl.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 300 }); },
+          seq: (list, gap, fn) => Promise.all(list.map((x, k) => A.wait(k * gap).then(() => fn(x, k)))),
+        };
+        try { await script(A); } catch (e) { if (e !== DM_STOP) throw e; }
+        if (my === token) root.classList.remove('playing');
+      };
+      root.querySelector('.dmre').onclick = () => run(false);
+      root.querySelector('.dmend').onclick = () => run(true);
+      run(true);
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); run(false); } }, { threshold: 0.4 });
+        io.observe(root);
+      }
+    });
+    return `<div class="demo" id="${id}"><div class="dmhead"><span class="dmtag">было → стало</span><span class="dmtl">${title}</span><span class="dmbtns"><button class="btn dmre">↺ Заново</button><button class="btn dmend">⏭ Итог</button></span></div><div class="dmstage">${html}</div><div class="dmcap"></div></div>`;
+  }
+  const more = h => `<details class="dmmore"><summary>Подробно (текст и таблицы)</summary>${h}</details>`;
+  // слагаемые Σ aⱼ·lab(j) по отдельности: [{ j, h }]; lab(j, единичный_коэффициент)
+  const termIn = (a, lab) => { let first = true; const r = []; a.forEach((v, j) => { if (v.isZero()) return; const one = v.abs().eq(new Q(1n)); r.push({ j, h: (first ? (v.s < 0 ? '−' : '') : (v.s < 0 ? '&nbsp;−&nbsp;' : '&nbsp;+&nbsp;')) + (one ? '' : fq(v.abs())) + lab(j, one) }); first = false; }); return r; };
+  const TM = (a, lab, cls = '') => { const r = termIn(a, lab); return r.length ? r.map(t => `<span class="tm ${cls}" data-j="${t.j}">${t.h}</span>`).join('') : `<span class="tm ${cls}">0</span>`; };
+  const ylab = i => yv(i + 1), xlab = j => xv(j + 1);
+
+  // Этап «приведение»: неравенства «≥» умножаются на −1 — коэффициенты и знак переворачиваются
+  function demoNorm(pr, norm) {
+    const html = `<div>${pr.rows.map((r, i) => `<div class="drow" data-i="${i}"><span class="ch kbd">(${i + 1})</span> <span class="lhs">${TM(r.a, xlab)}</span> <span class="ch rs">${sg(r.s)}</span> <span class="ch rb">${fq(r.b)}</span>${norm[i].flipped ? '<span class="ch bx dh">× (−1)</span>' : '<span class="ch okc dh">✓ уже «≤»</span>'}</div>`).join('')}</div>`;
+    return demo('неравенства «≥» → «≤»', html, async A => {
+      await A.wait(400);
+      for (let i = 0; i < norm.length; i++) {
+        const row = A.q(`.drow[data-i="${i}"]`), r = norm[i];
+        if (!r.flipped) { await A.pop(row.querySelector('.okc')); continue; }
+        A.cls(row, 'on'); A.cap(`(${i + 1}): умножаем на −1`);
+        await A.pop(row.querySelector('.bx'));
+        const nt = termIn(r.a, xlab);
+        await A.seq([...row.querySelectorAll('.tm')], 110, (el, k) => A.swap(el, nt[k].h));
+        await A.swap(row.querySelector('.rs'), '≤', 520);
+        await A.swap(row.querySelector('.rb'), fq(r.b));
+        await A.hide(row.querySelector('.bx'));
+        A.cls(row, 'on', false); A.cls(row, 'done');
+        await A.wait(250);
+      }
+      A.cap(norm.some(r => r.flipped) ? 'все ограничения имеют вид «≤»' : 'преобразования не нужны');
+    });
+  }
+
+  // Этап «построение»: столбцы матрицы перелетают в строки двойственной задачи, b — в цель g
+  function demoBuild(P, D) {
+    const n = P.c.length, m = P.rows.length, yS = D.signs || [...Array(m)].map(() => '>=');
+    let t = `<table class="sx dmt"><tr><th></th>${[...Array(n)].map((_, j) => `<th data-cj="${j}">${xv(j + 1)}</th>`).join('')}<th></th><th>b</th></tr>`;
+    P.rows.forEach((r, i) => { t += `<tr><td class="bas">${yv(i + 1)}</td>${r.a.map((v, j) => `<td data-cj="${j}"><span class="ch" data-i="${i}" data-j="${j}">${fq(v)}</span></td>`).join('')}<td>${sg(r.s)}</td><td class="bcol" data-bb="1"><span class="ch" data-b="${i}">${fq(r.b)}</span></td></tr>`; });
+    t += `<tr class="zrow"><td class="bas"><i>c</i></td>${P.c.map((v, j) => `<td data-cj="${j}"><span class="ch" data-c="${j}">${fq(v)}</span></td>`).join('')}<td colspan="2">→ ${P.sense}</td></tr></table>`;
+    const gl = `<div class="dl" data-g="1"><i>g</i> = ${TM(D.c, ylab, 'dh')} → <span class="ch gs">${P.sense}</span></div>`;
+    const rows = D.rows.map((r, j) => `<div class="dl" data-d="${j}">${TM(r.a, ylab, 'dh')} <span class="ch dh rs">${sg(r.s)}</span> <span class="ch dh" data-r="${j}">${fq(r.b)}</span> <span class="kbd">(Д${j + 1})</span></div>`).join('');
+    const sl = `<div class="dl">${yS.map((s, i) => `<span class="ch dh ysg">${signTxt(s, yv(i + 1))}${i < m - 1 ? ',' : ''}</span>`).join(' ')}</div>`;
+    const html = `<div class="dmcols"><div><div class="dmh">было: прямая задача</div><div class="tblwrap" style="overflow:visible">${t}</div></div><div><div class="dmh">стало: двойственная</div><div class="dual">${gl}${rows}${sl}</div></div></div>`;
+    return demo('столбцы → строки, b → цель, max ↔ min', html, async A => {
+      await A.wait(500);
+      for (let j = 0; j < n; j++) {
+        const col = A.qa(`.dmt [data-cj="${j}"]`), drow = A.q(`[data-d="${j}"]`);
+        A.cls(col, 'on'); A.cls(drow, 'on'); A.cap(`столбец ${xv(j + 1)} → ограничение Д${j + 1}`);
+        await A.seq([...Array(m).keys()], 110, i => {
+          const from = A.q(`.dmt [data-i="${i}"][data-j="${j}"]`), to = drow.querySelector(`.tm[data-j="${i}"]`);
+          return to ? A.fly(from, to).then(() => A.pop(to)) : A.pulse(from);
+        });
+        await A.fly(A.q(`.dmt [data-c="${j}"]`), drow.querySelector(`[data-r="${j}"]`));
+        await Promise.all([A.pop(drow.querySelector(`[data-r="${j}"]`)), A.pop(drow.querySelector('.rs'))]);
+        await A.wait(300);
+        A.cls(col, 'on', false); A.cls(drow, 'on', false);
+      }
+      const bc = A.qa('.dmt [data-bb]'), gl2 = A.q('[data-g]');
+      A.cls(bc, 'onb'); A.cls(gl2, 'on'); A.cap('столбец b → коэффициенты цели g');
+      await A.seq([...Array(m).keys()], 110, i => { const to = gl2.querySelector(`.tm[data-j="${i}"]`); return to ? A.fly(A.q(`.dmt [data-b="${i}"]`), to).then(() => A.pop(to)) : Promise.resolve(); });
+      await A.swap(gl2.querySelector('.gs'), D.sense, 600);
+      A.cls(bc, 'onb', false); A.cls(gl2, 'on', false);
+      A.cap('каждому ограничению — своя переменная yᵢ');
+      await A.seq(A.qa('.ysg'), 120, el => A.pop(el));
+      A.cap('двойственная задача построена');
+    });
+  }
+
+  // Значения «?» → числа (решение задачи)
+  function demoReveal(title, lines, capText) {
+    // lines: [{ name, lab, vals: [Q], fname, f }]
+    const html = lines.map((L, k) => `<div class="dmbig" data-l="${k}"><span class="dmres">${L.name}* = (${L.vals.map((_, j) => `<span class="ch v" data-j="${j}">${L.lab(j)} = ?</span>`).join('; ')}), &nbsp;<i>${L.fname}</i>* = <span class="ch fv">?</span></span></div>`).join('');
+    return demo(title, html, async A => {
+      await A.wait(400);
+      for (let k = 0; k < lines.length; k++) {
+        const L = lines[k], box = A.q(`[data-l="${k}"]`);
+        await A.seq([...box.querySelectorAll('.v')], 220, (el, j) => A.swap(el, `<b>${fq(L.vals[j])}</b>`, 500).then(() => A.cls(el, L.vals[j].isZero() ? 'zero' : 'pos')));
+        await A.swap(box.querySelector('.fv'), `<b>${fq(L.f)}</b>`, 500);
+        A.cls(box.querySelector('.dmres'), 'fin'); await A.pulse(box.querySelector('.dmres'));
+      }
+      A.cap(capText);
+    });
+  }
+
+  // Этап УДН: x* > 0 делает ограничение Д равенством, запас > 0 обнуляет y
+  function demoCS(pr, res) {
+    const P = res.primal, D = res.D, cs = res.cs;
+    const A1 = pr.c.map((_, j) => `<div class="dmpair" data-pj="${j}"><span class="ch xc">${xv(j + 1)} = ${fq(P.x[j])}</span><span class="ch arr dh">⟹</span><span class="drow">${TM(D.rows[j].a, ylab)} <span class="ch rs">≥</span> ${fq(D.rows[j].b)}</span></div>`).join('');
+    const A2 = res.norm.map((r, i) => `<div class="dmpair" data-pi="${i}"><span class="ch sc">запас (${i + 1}) = ${fq(cs.slack[i])}</span><span class="ch arr dh">⟹</span><span class="ch yc">${yv(i + 1)} ≥ 0</span></div>`).join('');
+    const html = `<div class="dmcols"><div><div class="dmh">x* → ограничения Д</div>${A1}</div><div><div class="dmh">запас ресурса → y</div>${A2}</div></div>`;
+    const arrow = el => A0 => A0.anim(el, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { d: 380 });
+    return demo('подставляем x* — находим равенства и нули', html, async A => {
+      await A.wait(400);
+      for (let j = 0; j < pr.n; j++) {
+        const p = A.q(`[data-pj="${j}"]`), pos = cs.eqJ[j];
+        A.cls(p, 'on'); A.cap(pos ? `${xv(j + 1)} > 0 ⇒ Д${j + 1} выполняется как равенство` : `${xv(j + 1)} = 0 ⇒ про Д${j + 1} ничего не следует`);
+        await A.pulse(p.querySelector('.xc')); A.cls(p.querySelector('.xc'), pos ? 'pos' : 'dim');
+        await arrow(p.querySelector('.arr'))(A);
+        if (pos) { await A.swap(p.querySelector('.rs'), '<b>=</b>', 560); A.cls(p.querySelector('.drow'), 'on'); }
+        else A.cls(p.querySelector('.drow'), 'dim');
+        await A.wait(350); A.cls(p, 'on', false);
+      }
+      for (let i = 0; i < res.norm.length; i++) {
+        const p = A.q(`[data-pi="${i}"]`), z = cs.zeroY[i];
+        A.cls(p, 'on'); A.cap(z ? `ресурс (${i + 1}) не израсходован ⇒ ${yv(i + 1)} = 0` : `ресурс (${i + 1}) израсходован полностью ⇒ ${yv(i + 1)} пока неизвестна`);
+        await A.pulse(p.querySelector('.sc')); A.cls(p.querySelector('.sc'), z ? 'pos' : 'dim');
+        await arrow(p.querySelector('.arr'))(A);
+        if (z) { await A.swap(p.querySelector('.yc'), `${yv(i + 1)} = 0`, 560); A.cls(p.querySelector('.yc'), 'zero'); }
+        else A.cls(p.querySelector('.yc'), 'dim');
+        await A.wait(350); A.cls(p, 'on', false);
+      }
+      A.cap('осталась система уравнений для ненулевых y');
+    });
+  }
+
+  // Этап «система»: нулевые y вычёркиваются, метод Гаусса даёт y*
+  function demoSys(res) {
+    const D = res.D, cs = res.cs, J = D.rows.map((_, j) => j).filter(j => cs.eqJ[j]);
+    const eqs = J.map((j, k) => `<div class="drow" data-e="${k}"><span class="lhs">${TM(D.rows[j].a, ylab)}</span> = ${fq(D.rows[j].b)}</div>`).join('');
+    const html = `<div>${eqs || '<div class="kbd">уравнений из УДН нет</div>'}<div class="dmdown dh">↓ метод Гаусса${res.unique ? '' : ' + симплекс-метод на множестве УДН'}</div><div class="dmbig"><span class="dmres dh">y* = (${res.y.map((_, i) => `<span class="ch v" data-i="${i}">${yv(i + 1)}</span>`).join('; ')})</span></div></div>`;
+    return demo('вычёркиваем y = 0 и решаем систему', html, async A => {
+      await A.wait(400);
+      const zero = A.qa('.lhs .tm').filter(el => cs.zeroY[+el.dataset.j]);
+      if (zero.length) {
+        A.cap(`${cs.zeroY.map((z, i) => z ? yv(i + 1) : null).filter(Boolean).join(', ')} = 0 — убираем из уравнений`);
+        A.cls(zero, 'strike'); await A.wait(600);
+        await A.seq(zero, 60, el => { const w = el.offsetWidth; A.cls(el, 'cut'); return A.anim(el, [{ width: w + 'px', opacity: 1 }, { width: '0px', opacity: 0, padding: 0 }], { d: 500 }); });
+        await A.seq(A.qa('[data-e]'), 100, (el, k) => A.swap(el.querySelector('.lhs'), TM(cs.eqs[k].a, kk => yv(cs.U[kk] + 1))));
+      }
+      await A.pop(A.q('.dmdown'));
+      A.cap('решаем систему'); await A.pop(A.q('.dmres'));
+      await A.seq(A.qa('.v'), 200, (el, i) => A.swap(el, `<b>${fq(res.y[i])}</b>`, 500).then(() => A.cls(el, cs.zeroY[i] ? 'zero' : 'pos')));
+      A.cls(A.q('.dmres'), 'fin'); await A.pulse(A.q('.dmres'));
+      A.cap(res.unique ? 'y* найден однозначно' : 'решение системы неединственно — взята оптимальная вершина');
+    });
+  }
+
+  // Две полосы растут одновременно и совпадают: оптимумы равны
+  const bars = (a, b) => `<div class="dmbars"><div class="dmbar"><b>${a[0]}</b><i data-w="1"></i><span>${fq(a[1])}</span></div><div class="dmbar f"><b>${b[0]}</b><i data-w="2"></i><span>${fq(b[1])}</span></div><div class="ch okc dh eqp">${a[0]} = ${b[0]} ✓</div></div>`;
+  async function growBars(A, a, b) {
+    const va = Math.abs(a.toNumber()), vb = Math.abs(b.toNumber()), mx = Math.max(va, vb) || 1;
+    await Promise.all([A.anim(A.q('[data-w="1"]'), [{ width: '0%' }, { width: (va / mx * 100 || 100) + '%' }], { d: 1100 }), A.anim(A.q('[data-w="2"]'), [{ width: '0%' }, { width: (vb / mx * 100 || 100) + '%' }], { d: 1100 })]);
+    await A.pop(A.q('.eqp'));
+  }
+  // Этап «проверка»: подставляем y* в ограничения Д, затем сравниваем g* и f*
+  function demoCheck(res) {
+    const D = res.D, y = res.y;
+    const rows = D.rows.map((r, j) => `<div class="drow" data-j="${j}"><span class="lhs">${TM(r.a, ylab)}</span> <span class="ch">≥</span> ${fq(r.b)} <span class="ch okc dh">✓</span></div>`).join('');
+    const html = `<div>${rows}${bars(['g*', res.g], ['f*', res.primal.f])}</div>`;
+    return demo('подставляем y* — ограничения выполнены, g* = f*', html, async A => {
+      await A.wait(400); A.cap(`подставляем y* = ${vec(y)}`);
+      for (let j = 0; j < D.rows.length; j++) {
+        const row = A.q(`.drow[data-j="${j}"]`), r = D.rows[j], st = termIn(r.a, (i, one) => (one ? '' : '·') + par(y[i]));
+        A.cls(row, 'on');
+        await A.seq([...row.querySelectorAll('.tm')], 100, (el, k) => A.swap(el, st[k] ? st[k].h : el.innerHTML));
+        await A.wait(350);
+        const lhs = r.a.reduce((s, v, i) => s.add(v.mul(y[i])), Zq());
+        await A.swap(row.querySelector('.lhs'), `<b>${fq(lhs)}</b>`, 500);
+        await A.pop(row.querySelector('.okc'));
+        A.cls(row, 'on', false); A.cls(row, 'done');
+      }
+      A.cap('сравниваем оптимальные значения');
+      await growBars(A, res.g, res.primal.f);
+      A.cap('y* допустим, g* = f* — решение верно');
+    });
+  }
+
+  /* =================== Этапы решения: номер, цель, методы =================== */
+  // st(id, заголовок, цель, методы, тело) — раздел «Этап k»; plan() — схема этапов: номер, короткое название, результат.
+  // Цель и методы подробно — в начале каждого раздела, в схеме только короткие подписи.
+  const STAGE_SHORT = {
+    norm: ['Приведение', '«≥» × (−1)'], build: ['Построение', 'двойственная задача'], primal: ['Прямая задача', 'x*, f*'],
+    cs: ['УДН', 'равенства и нули y'], sys: ['Система', 'y* методом Гаусса'], check: ['Проверка', 'допустимость, оптимумы равны'],
+    prep: ['Знаки', 'условия на x и y'], solve: ['Решение', 'x* и y*']
+  };
+  function stager() {
+    const list = [];
+    const st = (id, title, goal, methods, body) => {
+      list.push({ id, title, goal, methods });
+      return sec(id, `Этап ${list.length}. ${title}`, `<div class="stage"><div><span class="stk">Цель</span>${goal}</div><div><span class="stk">Методы</span>${methods}</div></div>` + body);
+    };
+    const plan = () => sec('plan', 'Этапы решения', `<div class="stflow">${list.map((s, k) => { const [t, r] = STAGE_SHORT[s.id] || [s.title, '']; return `<a class="stc" href="#${s.id}" data-jump="1" title="${s.title}"><span class="stn">${k + 1}</span><span class="stt">${t}</span><span class="str">${r}</span></a>`; }).join('')}</div>`);
+    return { st, plan };
+  }
   /* =================== Задание 4: двойственная задача =================== */
   function dual(pr, meta, baseKey, onOpenBase) {
     const res = ALG.dual(pr), S = [], n = pr.n, m = pr.rows.length, D = res.D;
+    const { st, plan } = stager();
     S.push(sec('cond', 'Прямая задача', system(pr) + `<p class="kbd">${meta ? meta.title : 'Собственные коэффициенты'} (структура задания ${baseKey === 'graph' ? '1' : '2'}).</p>`));
     S.push(summaryCard({ main: res.status === 'optimal' ? `<i>y</i>* = ${vec(res.y)}, &nbsp;<i>g</i>* = ${fq(res.g)}${approx(res.g)}` : `Прямая задача: ${statusText(res.primal.status)}`,
       facts: res.status === 'optimal' ? [`прямая: f* = ${fq(res.primal.f)}`, res.unique ? 'y* найден из УДН однозначно' : 'УДН не определяют y однозначно'] : [],
       badges: res.status === 'optimal' ? [res.g.eq(res.primal.f) ? '<span class="badge ok">✓ g* = f*</span>' : '<span class="badge bad">✗ g* ≠ f*</span>', res.dcheck.every(c => c.ok) && res.y.every(v => v.s >= 0) ? '<span class="badge ok">✓ y допустим</span>' : '<span class="badge bad">✗ y недопустим</span>'] : [],
-      links: [['build', 'Построение'], ['cs', 'УДН'], ['check', 'Проверка']] }));
-    S.push(sec('how', 'Как решается', `<ol class="howl">
-      <li>Задача на max: все неравенства приводим к виду «≤» (неравенство «≥» умножаем на −1).</li>
-      <li>Каждому ограничению — переменная yᵢ ≥ 0; цель g = Σ bᵢyᵢ → min.</li>
-      <li>Каждому условию xⱼ ≥ 0 — ограничение двойственной: Σ aᵢⱼyᵢ ≥ cⱼ (столбец коэффициентов при xⱼ).</li>
-      <li><b>УДН:</b> в каждой паре сопряжённых условий хотя бы одно выполняется как равенство: xⱼ &gt; 0 ⇒ ограничение j двойственной — равенство; ограничение i прямой строгое ⇒ yᵢ = 0.</li>
-      <li>Решаем полученную систему, проверяем допустимость y и равенство g* = f*.</li></ol>`));
+      links: [['plan', 'Этапы'], ['build', 'Построение'], ['cs', 'УДН'], ['check', 'Проверка']] }));
+    // сводная таблица этапов вставляется сюда, когда известны все этапы
+    const planAt = S.length;
+    const done = () => { S.splice(planAt, 0, plan()); return S; };
+    // приведение к «≤» — только если в прямой задаче есть «≥»
     const flips = res.norm.filter(r => r.flipped);
-    S.push(sec('norm', 'Приведение к виду «≤»', flips.length ? `<p>${flips.map(r => `Ограничение (${r.i + 1}) умножаем на −1: <span class="m">${rowLine(pr.rows[r.i])} → <b>${rowLine(r)}</b></span>`).join('<br>')}</p>` : '<p>Все ограничения уже имеют вид «≤».</p>'));
-    // построение: интерактивная матрица
-    const bid = 'bd' + Math.random().toString(36).slice(2, 8);
-    let mt = `<table class="sx" id="${bid}t"><tr><th></th>${[...Array(n)].map((_, j) => `<th class="pcol" data-j="${j}">${xv(j + 1)}</th>`).join('')}<th></th><th>b</th></tr>`;
-    res.norm.forEach((r, i) => { mt += `<tr><td class="bas prow${r.flipped ? ' flip' : ''}" data-i="${i}">(${i + 1}) ↔ ${yv(i + 1)}</td>${r.a.map((v2, j) => `<td data-i="${i}" data-j="${j}">${fq(v2)}</td>`).join('')}<td>≤</td><td class="bcol" data-i="${i}" data-b="1">${fq(r.b)}</td></tr>`; });
-    mt += `<tr class="zrow"><td class="bas"><i>f</i></td>${pr.c.map((v2, j) => `<td data-j="${j}">${fq(v2)}</td>`).join('')}<td colspan="2">→ max</td></tr></table>`;
-    const dl = `<div class="dual" id="${bid}d"><div class="dl" data-o="1"><i>g</i> = ${lin(D.c, i => yv(i + 1))} → min</div>${D.rows.map((r, j) => `<div class="dl" data-j="${j}">${lin(r.a, i => yv(i + 1))} ≥ ${fq(r.b)} <span class="kbd">(Д${j + 1})</span></div>`).join('')}<div class="dl">${[...Array(m)].map((_, i) => yv(i + 1)).join(', ')} ≥ 0</div></div>`;
-    S.push(sec('build', 'Построение двойственной задачи', `<p class="kbd">Нажмите на столбец xⱼ, строку ограничения или столбец b — подсветится соответствующая часть двойственной задачи.</p><div class="grid2"><div class="tblwrap">${mt}</div>${dl}</div><div class="note" id="${bid}m">Столбцы прямой задачи становятся строками двойственной.</div>`));
-    R.hooks.push(() => {
-      const T = document.getElementById(bid + 't'), Dd = document.getElementById(bid + 'd'), M = document.getElementById(bid + 'm'); if (!T) return;
-      const clear = () => { T.querySelectorAll('.hc,.hr,.hb').forEach(e => e.classList.remove('hc', 'hr', 'hb')); Dd.querySelectorAll('.hl').forEach(e => e.classList.remove('hl')); };
-      T.querySelectorAll('th.pcol').forEach(e => e.onclick = () => { const j = +e.dataset.j; clear(); T.querySelectorAll(`[data-j="${j}"]`).forEach(x => x.classList.add('hc')); Dd.querySelector(`[data-j="${j}"]`).classList.add('hl'); M.innerHTML = `Столбец ${xv(j + 1)} и число c<sub>${j + 1}</sub> = ${fq(pr.c[j])} дают ограничение Д${j + 1}: ${lin(D.rows[j].a, i => yv(i + 1))} ≥ ${fq(D.rows[j].b)}. Пара: ${xv(j + 1)} ≥ 0 ↔ Д${j + 1}.`; });
-      T.querySelectorAll('td.prow').forEach(e => e.onclick = () => { const i = +e.dataset.i; clear(); T.querySelectorAll(`[data-i="${i}"]`).forEach(x => x.classList.add('hr')); M.innerHTML = `Ограничение (${i + 1}) ↔ переменная ${yv(i + 1)} ≥ 0. Его коэффициенты стоят при ${yv(i + 1)} во всех ограничениях Д, правая часть ${fq(res.norm[i].b)} — коэффициент при ${yv(i + 1)} в g.`; });
-      T.querySelectorAll('[data-b]').forEach(e => e.onclick = () => { clear(); T.querySelectorAll('[data-b]').forEach(x => x.classList.add('hb')); Dd.querySelector('[data-o]').classList.add('hl'); M.innerHTML = 'Столбец b — коэффициенты целевой функции g, направление max меняется на min.'; });
-    });
+    if (flips.length) S.push(st('norm', 'Приведение прямой задачи к виду «≤»',
+      'привести все ограничения к виду Σ aᵢⱼxⱼ ≤ bᵢ — так задана прямая задача в правилах построения двойственной.',
+      'неравенство «≥» умножаем на −1.',
+      demoNorm(pr, res.norm) + more(`<p>${flips.map(r => `Ограничение (${r.i + 1}) умножаем на −1: <span class="m">${rowLine(pr.rows[r.i])} → <b>${rowLine(r)}</b></span>`).join('<br>')}</p>`)));
+    // построение
+    const dl = `<div class="dual"><div class="dl"><i>g</i> = ${lin(D.c, i => yv(i + 1))} → min</div>${D.rows.map((r, j) => `<div class="dl">${lin(r.a, i => yv(i + 1))} ≥ ${fq(r.b)} <span class="kbd">(Д${j + 1})</span></div>`).join('')}<div class="dl">${[...Array(m)].map((_, i) => yv(i + 1)).join(', ')} ≥ 0</div></div>`;
+    S.push(st('build', 'Построение двойственной задачи',
+      'записать задачу, двойственную к прямой: её переменные, целевую функцию и ограничения.',
+      'правила построения из методички: m переменных yᵢ, цель Σ bᵢyᵢ → min; ограничению Σ aᵢⱼxⱼ ≤ bᵢ соответствует yᵢ ≥ 0; условию xⱼ ≥ 0 — ограничение Σ aᵢⱼyᵢ ≥ cⱼ (столбец коэффициентов при xⱼ).',
+      demoBuild({ rows: res.norm, c: pr.c, sense: 'max' }, D) + more(dl)));
     // решение прямой
-    const P = res.primal;
-    let ph = P.status === 'optimal' ? `<p class="answer"><i>x</i>* = ${vec(P.x)}, &nbsp;<i>f</i>* = ${fq(P.f)}${approx(P.f)}</p>` : `<div class="note bad">Прямая задача: ${statusText(P.status)}.</div>`;
-    ph += `<p><button class="btn" id="${bid}o">Открыть подробное решение прямой задачи (${baseKey === 'graph' ? 'графический метод' : 'симплекс-метод'})</button></p>`;
+    const P = res.primal, bid = 'bd' + Math.random().toString(36).slice(2, 8);
+    let ph = P.status === 'optimal' ? demoReveal(`решение задания ${baseKey === 'graph' ? '1' : '2'}`, [{ name: '<i>x</i>', lab: xlab, vals: P.x, fname: 'f', f: P.f }], 'оптимальный план прямой задачи известен') : `<div class="note bad">Прямая задача: ${statusText(P.status)}. По теореме двойственности у двойственной задачи тогда тоже нет оптимального решения — УДН применять не к чему.</div>`;
+    ph += `<p><button class="btn" id="${bid}o">Открыть решение прямой задачи (${baseKey === 'graph' ? 'задание 1, графический метод' : 'задание 2, симплекс-метод'})</button></p>`;
     R.hooks.push(() => { const b = document.getElementById(bid + 'o'); if (b) b.onclick = onOpenBase; });
-    S.push(sec('primal', 'Решение прямой задачи', ph));
-    if (P.status !== 'optimal') {
-      const dl2 = res.dualLP.status;
-      S.push(sec('cs', 'Вывод по теории двойственности', `<div class="note bad">${P.status === 'infeasible'
-        ? `У прямой задачи нет допустимых решений. По теореме двойственности двойственная задача тогда либо не имеет допустимых решений, либо её цель не ограничена. Решение двойственной задачи симплекс-методом: <b>${dl2 === 'unbounded' ? 'g не ограничена снизу' : dl2 === 'infeasible' ? 'допустимых решений нет' : statusText(dl2)}</b>. УДН применять нечего — оптимальных решений нет.`
-        : `Цель прямой задачи не ограничена. Тогда у двойственной задачи нет допустимых решений (проверка симплекс-методом: ${dl2 === 'infeasible' ? 'допустимых решений нет ✓' : statusText(dl2)}).`}</div>`));
-      return S;
-    }
+    S.push(st('primal', 'Решение прямой задачи',
+      `взять оптимальный план x* и значение f* из задания ${baseKey === 'graph' ? '1' : '2'} — они нужны для УДН и для проверки g* = f*.`,
+      baseKey === 'graph' ? 'графический метод (задание 1).' : 'симплекс-метод (задание 2).',
+      ph));
+    if (P.status !== 'optimal') return done();
     // УДН
     const cs = res.cs;
     let cards = '<div class="pairs">';
     pr.c.forEach((_, j) => { const pos = cs.eqJ[j]; cards += `<div class="pair ${pos ? 'eq' : 'none'}"><div class="ph">${xv(j + 1)} ≥ 0 ↔ Д${j + 1}</div><div class="ps">${xv(j + 1)} = ${fq(P.x[j])}${pos ? ' &gt; 0' : ''}</div><div class="po">⇒ ${pos ? `Д${j + 1} — <b>равенство</b>: ${lin(D.rows[j].a, i => yv(i + 1))} = ${fq(D.rows[j].b)}` : 'уже равенство → ничего не следует'}</div></div>`; });
     res.norm.forEach((r, i) => { const strict = cs.zeroY[i]; const lhs = r.b.sub(cs.slack[i]); cards += `<div class="pair ${strict ? 'zero' : 'none'}"><div class="ph">(${i + 1}) ↔ ${yv(i + 1)} ≥ 0</div><div class="ps">${fq(lhs)} ${strict ? '&lt;' : '='} ${fq(r.b)}${strict ? ` (запас ${fq(cs.slack[i])})` : ''}</div><div class="po">⇒ ${strict ? `<b>${yv(i + 1)} = 0</b>` : 'уже равенство → ничего не следует'}</div></div>`; });
     cards += '</div>';
-    S.push(sec('cs', 'Условия дополняющей нежёсткости', `<p>Подставляем x* = ${vec(P.x)} и проверяем все ${n + m} пар:</p>` + cards));
+    S.push(st('cs', 'Условия дополняющей нежёсткости (УДН)',
+      'по известному x* определить, какие ограничения двойственной задачи выполняются как равенства и какие yᵢ равны нулю.',
+      'УДН: в каждой паре сопряжённых ограничений хотя бы одно выполняется как равенство — xⱼ* > 0 ⇒ Дj равенство; ограничение (i) выполнено строго ⇒ yᵢ = 0.',
+      demoCS(pr, res) + more(`<p>Подставляем x* = ${vec(P.x)} и проверяем все ${n + m} пар:</p>` + cards)));
     // система
     const sol = cs.sol, U = cs.U;
     let sh = `<p>Обнуляются: ${cs.zeroY.map((z, i) => z ? yv(i + 1) : null).filter(Boolean).join(', ') || 'ни одна переменная'}. Неизвестные: ${U.map(i => yv(i + 1)).join(', ') || '—'}.</p>`;
@@ -2268,11 +2542,7 @@ const VIEWS = (() => {
       const fr = sol.free.map(k => yv(U[k] + 1));
       sh += `<div class="note warn"><b>Уравнений меньше, чем неизвестных</b> (ранг ${sol.rank} &lt; ${U.length}): УДН сами по себе не определяют y однозначно. Свободные неизвестные: ${fr.join(', ')}.</div>`;
       if (sol.piv.length) sh += `<p>Выражаем через свободные: ${sol.piv.map((c, r) => `${yv(U[c] + 1)} = ${fq(sol.M[r][U.length])}${sol.free.map(fk => { const v2 = sol.M[r][fk].neg(); return v2.isZero() ? '' : (v2.s < 0 ? ' − ' : ' + ') + fq(v2.abs()) + '·' + yv(U[fk] + 1); }).join('')}`).join('; ')}.</p>`;
-      if (P.status === 'optimal') {
-        const G = baseKey === 'graph' ? ALG.graph(pr) : null;
-        if (G && G.degenerate) sh += `<p class="kbd">Причина: в оптимальной вершине ${vec(G.optVertex.p)} прямой задачи сходятся ${G.optVertex.on.length} границы (вырожденная вершина).</p>`;
-      }
-      sh += `<p>Добавляем оставшиеся ограничения двойственной как <b>неравенства</b> и y ≥ 0 и ищем минимум g симплекс-методом на этом множестве.</p>`;
+      sh += `<p>Добавляем оставшиеся ограничения двойственной как <b>неравенства</b> и y ≥ 0 и ищем минимум g на этом множестве.</p>`;
       if (res.family) {
         const F = res.family, t = yv(U[F.ft] + 1);
         sh += `<p>Одна свободная неизвестная ${t}. Допустимые значения: ${F.lo ? `${t} ≥ ${fq(F.lo)}` : ''}${F.lo && F.hi ? ', ' : ''}${F.hi ? `${t} ≤ ${fq(F.hi)}` : ''}. Значение g = ${fq(F.g0)}${F.g1.isZero() ? '' : (F.g1.s < 0 ? ' − ' : ' + ') + fq(F.g1.abs()) + '·' + t}.</p>`;
@@ -2280,34 +2550,22 @@ const VIEWS = (() => {
       }
       sh += `<p class="answer"><i>y</i>* = ${vec(res.y)}</p>`;
     }
-    S.push(sec('sys', 'Система уравнений и её решение', sh));
-    // график двойственной, если осталось две неизвестные
-    if (U.length === 2 && res.status === 'optimal') {
-      const N = q => q.toNumber(), u = U;
-      const lines = D.rows.map((r, j) => ({ a: [N(r.a[u[0]]), N(r.a[u[1]])], b: N(r.b), s: '>=', name: 'Д' + (j + 1), eq: cs.eqJ[j] }));
-      const cfg = { purpose: 'двойственную задачу на плоскости двух оставшихся y (остальные y = 0 по УДН). Смотрите: 1) жирные прямые — ограничения, которые по УДН выполняются как равенства; 2) минимум g достигается в их пересечении — там же, где решение системы из раздела выше; 3) значение g* совпадает с f* прямой задачи.', lines, c: [N(D.c[u[0]]), N(D.c[u[1]])], sense: 'min', pts: [[N(res.y[u[0]]), N(res.y[u[1]])]], ax: ['y' + '₀₁₂₃₄₅₆₇₈₉'[u[0] + 1], 'y' + '₀₁₂₃₄₅₆₇₈₉'[u[1] + 1]], opt: [N(res.y[u[0]]), N(res.y[u[1]])], fval: N(res.g), fname: 'g', optLabel: 'y*' };
-      if (res.family && res.family.constG) {
-        // множество оптимальных решений: y = y0 + t·d, t от lo до hi (или до бесконечности)
-        const F = res.family, at = t => [N(F.y0[0].add(F.d[0].mul(t))), N(F.y0[1].add(F.d[1].mul(t)))];
-        const t1 = F.lo || F.hi, t2 = F.lo && F.hi ? F.hi : F.lo ? F.lo.mul(Q.of('1.6')).add(Q.of(1)) : F.hi.sub(Q.of(1));
-        cfg.optSeg = [at(t1), at(t2)]; cfg.pts.push(at(t2));
-        cfg.endText = 'линия уровня легла на границу — оптимален целый участок (зелёный)';
-      }
-      else cfg.endText = `g* = ${res.g.toText()}`;
-      S.push(sec('dplot', 'График двойственной задачи', `<p class="kbd">Плоскость (${yv(u[0] + 1)}, ${yv(u[1] + 1)}), остальные y = 0 по УДН. Ищем минимум g — двигаем линию уровня по антиградиенту.</p>` + plot(cfg)));
-    }
+    S.push(st('sys', 'Составление и решение системы уравнений',
+      'найти оптимальный план двойственной задачи y* из равенств, выписанных по УДН.',
+      `система линейных уравнений относительно y₁…yₘ (yᵢ = 0 подставлены); метод Гаусса${sol.free && sol.free.length ? '; решение системы не единственно — минимум g ищется на множестве, заданном УДН и оставшимися неравенствами' : ''}.`,
+      (res.y ? demoSys(res) : '') + more(sh)));
     // проверка
     let kh = '';
     if (res.status === 'optimal') {
       kh += `<p><b>1. Допустимость.</b> ${res.y.map((v2, i) => `${yv(i + 1)} = ${fq(v2)} ${v2.s >= 0 ? '≥ 0 ✓' : '&lt; 0 ✗'}`).join('; ')}</p>`;
       kh += checkTable(D, res.y, yv).replace(/<td>\((\d+)\)<\/td>/g, '<td>Д$1</td>');
       kh += `<p><b>2. Равенство оптимумов.</b></p>` + valueLine(D, res.y, 'g') + `<div class="note ${res.g.eq(P.f) ? 'ok' : 'bad'}">${res.g.eq(P.f) ? '✓' : '✗'} <b>g* = ${fq(res.g)}, f* = ${fq(P.f)}</b> — ${res.g.eq(P.f) ? 'оптимальные значения совпадают' : 'не совпадают'}.</div>`;
-      const dl2 = res.dualLP;
-      kh += `<p><b>3. Независимая проверка:</b> двойственная задача решена двухэтапным симплекс-методом: ${dl2.status === 'optimal' ? `g* = ${fq(dl2.f)}, y = ${vec(dl2.x)} ${dl2.f.eq(res.g) ? '✓ значение совпадает' : '✗'}` : statusText(dl2.status)}.${!res.unique && dl2.status === 'optimal' && !dl2.x.every((v2, i) => v2.eq(res.y[i])) ? ' (Решение другое, но тоже оптимальное — оптимум не единственный.)' : ''}</p>`;
-      if (res.fromTable) kh += `<p><b>4. По таблице прямой задачи:</b> в строке f итоговой симплекс-таблицы под дополнительными переменными стоят ${res.fromTable.map(fq).join(', ')} — ${res.fromTable.every((v2, i) => v2.eq(res.y[i])) ? 'это и есть y* ✓' : 'одно из оптимальных решений двойственной'}.</p>`;
     } else kh = `<div class="note bad">${res.status}</div>`;
-    S.push(sec('check', 'Проверка и итог', kh + (res.status === 'optimal' ? `<p class="answer"><i>y</i>* = ${vec(res.y)}, &nbsp;<i>g</i>* = ${fq(res.g)}${approx(res.g)}</p>` : '')));
-    return S;
+    S.push(st('check', 'Проверка и итог',
+      'убедиться, что y* — допустимое решение двойственной задачи и что g* совпадает с оптимумом прямой задачи.',
+      'подстановка y* в ограничения Д и условия yᵢ ≥ 0; сравнение g* = Σ bᵢyᵢ* с f*.',
+      (res.status === 'optimal' ? demoCheck(res) : '') + more(kh) + (res.status === 'optimal' ? `<p class="answer"><i>y</i>* = ${vec(res.y)}, &nbsp;<i>g</i>* = ${fq(res.g)}${approx(res.g)}</p>` : '')));
+    return done();
   }
 
   /* =================== Сборник ПЗ: сравнение с напечатанным ответом =================== */
@@ -2397,6 +2655,7 @@ const VIEWS = (() => {
   const signTxt = (s, lab) => s === '>=' ? `${lab} ≥ 0` : s === '<=' ? `${lab} ≤ 0` : `${lab} — любого знака`;
   function dualZ(pr, meta) {
     const S = [], P = ALGZ.normalize(pr), D = ALGZ.dualOf(P), n = P.n, m = P.rows.length, max = P.sense === 'max';
+    const { st, plan } = stager();
     const sp = ALGZ.solve(P), sd = ALGZ.solve(D);
     const bLine = (pr.bounds || []).map(B => `${xv(B.j + 1)} ${sg(B.s)} ${fq(B.b)}`).join(', ');
     S.push(sec('cond', 'Исходная задача', `<div class="sys">${objLine(pr)}<br>${pr.rows.map((r, i) => rowLine(r) + ` <span class="kbd">(${i + 1})</span>`).join('<br>')}${bLine ? '<br>' + bLine : ''}</div><p class="kbd">${meta ? meta.title : 'Собственные коэффициенты'}.</p>`));
@@ -2406,8 +2665,9 @@ const VIEWS = (() => {
       S.push(summaryCard({ main: `<i>g</i> = ${withC0(D, lin(D.c, i => yv(i + 1)))} → ${D.sense}<div class="kbd" style="font-size:14px">${D.rows.length} ограничений, ${D.n} переменных y — полностью в разделе «Двойственная задача»</div>`,
         facts: [`исходная: ${st(sp)}`, `двойственная: ${st(sd)}`],
         badges: [cons ? '<span class="badge ok">✓ согласуется с теоремами двойственности</span>' : '<span class="badge bad">✗ не согласуется</span>', '<span class="badge info">в сборнике ответа нет</span>'],
-        links: [['prep', 'Условия на переменные'], ['build', 'Двойственная задача'], ['check', 'Проверка']] }));
+        links: [['plan', 'Этапы'], ['prep', 'Условия на переменные'], ['build', 'Двойственная задача'], ['check', 'Проверка']] }));
     }
+    const planAt = S.length;
     const rule = max
       ? [['ограничение «≤»', 'yᵢ ≥ 0'], ['ограничение «≥»', 'yᵢ ≤ 0'], ['ограничение «=»', 'yᵢ любого знака'], ['xⱼ ≥ 0', 'Σ aᵢⱼyᵢ ≥ cⱼ'], ['xⱼ ≤ 0', 'Σ aᵢⱼyᵢ ≤ cⱼ'], ['xⱼ любого знака', 'Σ aᵢⱼyᵢ = cⱼ'], ['L → max', 'g = Σ bᵢyᵢ → min']]
       : [['ограничение «≥»', 'yᵢ ≥ 0'], ['ограничение «≤»', 'yᵢ ≤ 0'], ['ограничение «=»', 'yᵢ любого знака'], ['xⱼ ≥ 0', 'Σ aᵢⱼyᵢ ≤ cⱼ'], ['xⱼ ≤ 0', 'Σ aᵢⱼyᵢ ≥ cⱼ'], ['xⱼ любого знака', 'Σ aᵢⱼyᵢ = cⱼ'], ['L → min', 'g = Σ bᵢyᵢ → max']];
@@ -2423,7 +2683,10 @@ const VIEWS = (() => {
     const free = P.signs.map((s, j) => s === 'free' ? xv(j + 1) : null).filter(Boolean);
     ph += `<p>${free.length ? `Без условия на знак: ${free.join(', ')} — переменные любого знака.` : 'Все переменные имеют условие на знак.'}</p>`;
     ph += `<div class="sys">${objLine(P)}<br>${P.rows.map((r, i) => rowLine(r) + ` <span class="kbd">(${i + 1}) ↔ ${yv(i + 1)}</span>`).join('<br>')}<br>${P.signs.map((s, j) => signTxt(s, xv(j + 1))).join(', ')}</div>`;
-    S.push(sec('prep', 'Условия на переменные', ph));
+    S.push(st('prep', 'Анализ условий на переменные',
+      'разделить ограничения исходной задачи на условия на знак переменных и обычные ограничения, сопоставить каждому ограничению (i) переменную yᵢ.',
+      'классификация границ: xⱼ ≥ 0 / xⱼ ≤ 0 — условия на знак, прочие границы — обычные ограничения; переменная без условия — любого знака.',
+      ph));
     let mt = `<div class="tblwrap"><table class="sx"><tr><th></th>${[...Array(n)].map((_, j) => `<th>${xv(j + 1)}</th>`).join('')}<th></th><th>b</th><th>переменная</th></tr>`;
     P.rows.forEach((r, i) => { mt += `<tr><td class="bas">(${i + 1})</td>${r.a.map(v2 => `<td>${fq(v2)}</td>`).join('')}<td>${sg(r.s)}</td><td class="bcol">${fq(r.b)}</td><td class="m">${signTxt(D.signs[i], yv(i + 1))}</td></tr>`; });
     mt += `<tr class="zrow"><td class="bas"><i>c</i></td>${P.c.map(v2 => `<td>${fq(v2)}</td>`).join('')}<td colspan="3">→ ${P.sense}</td></tr><tr><td class="bas">знак</td>${P.signs.map(s => `<td>${s === 'free' ? 'любой' : sg(s) + ' 0'}</td>`).join('')}<td colspan="3"></td></tr></table></div>`;
@@ -2452,12 +2715,18 @@ const VIEWS = (() => {
         Qz.querySelector('.qshow').onclick = () => { Qz.querySelectorAll('select').forEach(s => { s.value = s.dataset.ans; s.classList.add('qok'); }); fin(); };
       });
     } else bodyB += `<p><b>Ответ — двойственная задача:</b></p>${dl}`;
-    S.push(sec('build', 'Двойственная задача', bodyB));
+    S.push(st('build', 'Построение двойственной задачи',
+      'записать двойственную задачу: направление цели, знаки ограничений Дj и условия на знак yᵢ.',
+      `транспонирование матрицы A; правила соответствия для задачи на ${P.sense} (знак ограничения (i) → знак yᵢ, знак xⱼ → вид ограничения Дj, b → коэффициенты g, ${P.sense} → ${D.sense}).`,
+      demoBuild(P, D) + (R.TR.on ? bodyB : more(bodyB))));
     // решение обеих задач
     const stl = (s, nm, v2, val) => s.status === 'optimal' ? `<span class="m">${nm}* = ${vec(s.x)}, ${val}* = ${fq(s.f)}${approx(s.f)}</span>` : statusText(s.status);
     let sh = `<p class="kbd">Для решения переменные ≤ 0 заменяются на −x′, переменные любого знака — на разность x′ − x″ (обе ≥ 0); полученные задачи решаются двухэтапным симплекс-методом.</p>`;
     sh += `<p><b>Исходная:</b> ${stl(sp, '<i>x</i>', 0, '<i>L</i>')}.</p><p><b>Двойственная:</b> ${stl(sd, '<i>y</i>', 0, '<i>g</i>')}.</p>`;
-    S.push(sec('solve', 'Решение обеих задач', sh));
+    S.push(st('solve', 'Решение исходной и двойственной задач',
+      'найти оптимальные планы обеих задач, чтобы проверить построение двойственной.',
+      'замена переменных: xⱼ ≤ 0 → −x′ⱼ, xⱼ любого знака → x′ⱼ − x″ⱼ; двухэтапный симплекс-метод (метод искусственного базиса).',
+      (sp.status === 'optimal' && sd.status === 'optimal' ? demoReveal('обе задачи решены', [{ name: '<i>x</i>', lab: xlab, vals: sp.x, fname: 'L', f: sp.f }, { name: '<i>y</i>', lab: ylab, vals: sd.x, fname: 'g', f: sd.f }], 'оптимальные планы обеих задач найдены') : '') + more(sh)));
     // проверка по теоремам двойственности
     let kh = '', ok;
     if (sp.status === 'optimal' && sd.status === 'optimal') {
@@ -2479,7 +2748,11 @@ const VIEWS = (() => {
     } else { ok = false; kh += `<div class="note bad">${statusText(sp.status)}</div>`; }
     kh += `<div class="note">В сборнике ответ к этому заданию не приведён — построение проверено теоремами двойственности.</div>`;
     if (meta && meta.note) kh += `<p class="kbd"><b>Комментарий к записи базы:</b> ${meta.note}</p>`;
-    S.push(sec('check', 'Проверка', kh));
+    S.push(st('check', 'Проверка по теоремам двойственности',
+      'подтвердить, что двойственная задача построена верно.',
+      'первая теорема двойственности (L* = g* или согласованные исходы «несовместна / не ограничена»); вторая теорема — условия дополняющей нежёсткости (произведение переменной на невязку сопряжённого ограничения равно 0).',
+      (sp.status === 'optimal' && sd.status === 'optimal' && sp.f.eq(sd.f) ? demo('оптимальные значения сравниваются', bars(['L*', sp.f], ['g*', sd.f]), async A => { await A.wait(300); await growBars(A, sp.f, sd.f); A.cap('L* = g* — двойственная построена верно'); }) : '') + more(kh)));
+    S.splice(planAt, 0, plan());
     S.consistent = ok;
     return S;
   }
