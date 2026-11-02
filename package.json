@@ -1,0 +1,6 @@
+{
+  "name": "optimization-learning-checks",
+  "private": true,
+  "scripts": { "test": "node tests/learning.cjs" },
+  "devDependencies": { "playwright": "1.58.2" }
+}

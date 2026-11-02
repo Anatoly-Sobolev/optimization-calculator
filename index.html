@@ -7136,6 +7136,7 @@ const APP = (() => {
     return h;
   }
   function solve() {
+    LEARN.begin();
     VIEWS.stopAllDemos(); R.hooks.length = 0; R.offAll(); R.TR.on = false;
     const t = structOf(), key = ckey();
     if (NEWKINDS.has(state.type)) return solveNew(t);
@@ -7189,6 +7190,7 @@ const APP = (() => {
       t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
     });
     bind();
+    LEARN.mount(state, structOf());
     if (state.mode === 'db') { const q = new URLSearchParams({ s: state.src, t: state.type, v: state.v }); if (state.type === 'dual' && state.src === 'rgr') q.set('b', state.base); try { history.replaceState(null, '', '#' + q); } catch (_) { /* file:// в некоторых браузерах */ } }
   }
   function bind() {
@@ -7243,5 +7245,7 @@ const APP = (() => {
 document.addEventListener('DOMContentLoaded', APP.init);
 
 </script>
+<link rel="stylesheet" href="learning.css">
+<script src="learning.js"></script>
 </body>
 </html>

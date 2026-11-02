@@ -1,0 +1,20 @@
+const {chromium}=require('playwright');
+const {pathToFileURL}=require('node:url');
+const path=require('node:path');
+(async()=>{
+  const browser=await chromium.launch({headless:true,executablePath:path.join(process.env.LOCALAPPDATA,'ms-playwright/chromium-1217/chrome-win64/chrome.exe')});
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.goto(pathToFileURL(path.resolve('index.html')).href+'#s=rgr&t=transp&v=1');
+  await page.evaluate(()=>{const t=LEARN.registry().find(t=>t.src==='zyk'&&t.type==='transp');Object.assign(APP.state,{src:t.src,type:t.type,v:t.variants[0].v});APP.render();});
+  await page.getByRole('button',{name:'Начать обучение',exact:true}).click();
+  await page.locator('#learning').scrollIntoViewIfNeeded();
+  await page.screenshot({path:'test-results/learning-mobile.png'});
+  await page.setViewportSize({width:1366,height:1000});
+  await page.locator('#learning').scrollIntoViewIfNeeded();
+  await page.screenshot({path:'test-results/learning-desktop.png'});
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>{while(LEARN.session.index<LEARN.stages.length){document.querySelector('[data-learn="reveal"]').click();document.querySelector('[data-learn="next"]').click();}});
+  console.log(await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,wide:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1&&e.getBoundingClientRect().width>0).map(e=>({tag:e.tagName,id:e.id,cls:e.className,width:e.getBoundingClientRect().width,text:e.textContent.slice(0,90)})).slice(0,20)})));
+  await page.screenshot({path:'test-results/layout.png',fullPage:true});
+  await browser.close();
+})();
