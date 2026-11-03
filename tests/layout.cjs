@@ -6,7 +6,7 @@ const path=require('node:path');
   const page=await browser.newPage({viewport:{width:390,height:844}});
   await page.goto(pathToFileURL(path.resolve('index.html')).href+'#s=rgr&t=transp&v=1');
   await page.evaluate(()=>{const t=LEARN.registry().find(t=>t.src==='zyk'&&t.type==='transp');Object.assign(APP.state,{src:t.src,type:t.type,v:t.variants[0].v});APP.render();});
-  await page.getByRole('button',{name:'Начать обучение',exact:true}).click();
+  await page.locator('#learn-presentation').selectOption('learning');
   await page.locator('#learning').scrollIntoViewIfNeeded();
   await page.screenshot({path:'test-results/learning-mobile.png'});
   await page.setViewportSize({width:1366,height:1000});

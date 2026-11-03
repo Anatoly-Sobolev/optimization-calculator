@@ -332,7 +332,7 @@ table.sx th .vtag{display:block;font:600 10px/1.1 "Segoe UI",sans-serif;color:#6
 .demo .tblwrap{overflow-x:auto}
 .demo table.dmsx{font-size:15px}.demo table.dmsx td,.demo table.dmsx th{padding:5px 8px;min-width:38px}
 .pvfm{min-height:46px;background:#f7f8ff;border-radius:10px;padding:6px 12px;margin:8px 0;font-size:19px;line-height:1.8}
-.pvfm .fo,.pvfm .fk,.pvfm .fn,.pvfm .fp,.pvfm .fr,.pvfm .sl0,.pvfm .sl1,.pvfm .sa,.pvfm .sb,.pvfm .sc,.pvfm .fv,.pvfm [class^="h"]{display:inline-block;min-width:28px;text-align:center;border-radius:6px;background:#fff;border:1px dashed #b9c0ee;padding:0 6px}
+.pvfm .fo,.pvfm .fk,.pvfm .fn,.pvfm .fp,.pvfm .calc-result,.pvfm .sl0,.pvfm .sl1,.pvfm .sa,.pvfm .sb,.pvfm .sc,.pvfm .fv,.pvfm [class^="h"]{display:inline-block;min-width:28px;text-align:center;border-radius:6px;background:#fff;border:1px dashed #b9c0ee;padding:0 6px}
 .pvfm .fmh{font:600 15px "Segoe UI",sans-serif;color:var(--accent)}.pvfm .fmh.ok{color:var(--ok)}.pvfm .fmh.bad{color:var(--pe)}
 .pvfm .vok{color:var(--ok)}.pvfm .vbad{color:var(--pe)}
 .pvsum{font:16px "Segoe UI",sans-serif;background:var(--ok-soft);border-radius:10px;padding:8px 12px;margin:6px 0}
@@ -3443,24 +3443,24 @@ const VIEWS = (() => {
         const srcO = V('tO', i, j), ph = (x, f) => fl ? '□' : f(x);
         A.cls(C('tO', i, j), 'k-act'); A.cls(C('tN', i, j), 'k-act');
         if (isP) {
-          A.set(fm, `<span class="fo">${ph(old, fq)}</span> ÷ <span class="fp">${ph(piv, par)}</span> = <b class="fr">${ph(nw, fq)}</b>`);
+          A.set(fm, `<span class="fo">${ph(old, fq)}</span> ÷ <span class="fp">${ph(piv, par)}</span> = <b class="calc-result">${ph(nw, fq)}</b>`);
           if (fl) {
             const jobs = [() => A.put(srcO, A.q('.pvfm .fo'), fq(old), { d }), () => A.put(V('tO', p, q), A.q('.pvfm .fp'), par(piv), { d })];
             if (sq) for (const f of jobs) await f(); else await Promise.all(jobs.map(f => f()));
-            await A.swap(A.q('.pvfm .fr'), fq(nw), sq ? 380 : 240);
+            await A.swap(A.q('.pvfm .calc-result'), fq(nw), sq ? 380 : 240);
           }
         } else {
           const kk = getO(i, q), npv = getN(p, j);
-          A.set(fm, `<span class="fo">${ph(old, fq)}</span> − <span class="fk">${ph(kk, par)}</span> × <span class="fn">${ph(npv, par)}</span> = <b class="fr">${ph(nw, fq)}</b>`);
+          A.set(fm, `<span class="fo">${ph(old, fq)}</span> − <span class="fk">${ph(kk, par)}</span> × <span class="fn">${ph(npv, par)}</span> = <b class="calc-result">${ph(nw, fq)}</b>`);
           if (fl) {
             A.cls(C('tO', i, q), 'k-sel'); A.cls(C('tN', p, j), 'k-ok');
             const jobs = [() => A.put(srcO, A.q('.pvfm .fo'), fq(old), { d }), () => A.put(V('tO', i, q), A.q('.pvfm .fk'), par(kk), { d }), () => A.put(V('tN', p, j), A.q('.pvfm .fn'), par(npv), { d })];
             if (sq) for (const f of jobs) await f(); else await Promise.all(jobs.map(f => f()));
             A.cls(C('tO', i, q), 'k-sel', false); A.cls(C('tN', p, j), 'k-ok', false); A.cls(C('tN', p, j), 'k-ok');
-            await A.swap(A.q('.pvfm .fr'), fq(nw), sq ? 380 : 240);
+            await A.swap(A.q('.pvfm .calc-result'), fq(nw), sq ? 380 : 240);
           }
         }
-        await A.fly(A.q('.pvfm .fr'), V('tN', i, j), null, { d: sq ? 750 : 420 });
+        await A.fly(A.q('.pvfm .calc-result'), V('tN', i, j), null, { d: sq ? 750 : 420 });
         A.set(V('tN', i, j), fq(nw)); await A.pop(V('tN', i, j), { d: 260 });
         A.cls(C('tO', i, j), 'k-act', false); A.cls(C('tN', i, j), 'k-act', false); A.cls(C('tN', i, j), 'k-ok');
       };
@@ -3684,17 +3684,17 @@ const VIEWS = (() => {
           if (st.parts.length) {
             const slot = k => A.q(`.gfm .sl${k}`);
             const f = st.op === 'neg' ? `${st.lhs} = −<span class="fo sl0">□</span> · ${st.t.toText()} ÷ <span class="fo sl1">□</span>` : `${st.lhs.replace('x', 'x')} = <span class="fo sl0">□</span> ${st.op} <span class="fo sl1">□</span>`;
-            A.set(fm, `<span class="fmh">${f.replace('x₁', xv(1)).replace('x₂', xv(2))} = <b class="fr">□</b></span>`);
+            A.set(fm, `<span class="fmh">${f.replace('x₁', xv(1)).replace('x₂', xv(2))} = <b class="calc-result">□</b></span>`);
             const src = p => p.k === 'b' ? row.querySelector('.rb') : (cfOf(p.j).textContent ? cfOf(p.j) : row.querySelector(`.tw[data-j="${p.j}"]`));
             const val = p => p.k === 'b' ? fq(r.b) : par(r.a[p.j]);
             await A.put(src(st.parts[0]), A.q('.gfm .sl0'), val(st.parts[0]));
             await A.put(src(st.parts[1]), A.q('.gfm .sl1'), val(st.parts[1]));
-            await A.swap(A.q('.gfm .fr'), fq(st.res), 380);
+            await A.swap(A.q('.gfm .calc-result'), fq(st.res), 380);
           } else A.set(fm, `<span class="fmh">${st.note || st.cap}</span>`);
           const dotSel = `.gpt[data-pt="${i}_${q}"]`;
           if (inside) {
             const dot = S(dotSel);
-            await A.fly(A.q('.gfm .fr') || fm, dot, '●');
+            await A.fly(A.q('.gfm .calc-result') || fm, dot, '●');
             await A.pop(dot);
           }
         }
@@ -4039,10 +4039,10 @@ const VIEWS = (() => {
         A.cap(`Столбец ${nm}: складываем числа строк с t и меняем знак`);
         A.cls(['bas', -1, ...cols].map(jj => artRows.concat([m]).map(i => C('tN', i, jj))).flat(), 'k-act', false);
         A.cls(artRows.map(i => C('tN', i, j)), 'k-act');
-        A.set(fm, `<span class="fmh">−( ${artRows.map((_, k) => `<span class="fo h${k}">□</span>`).join(' + ')} ) = <b class="fr">□</b></span>`);
+        A.set(fm, `<span class="fmh">−( ${artRows.map((_, k) => `<span class="fo h${k}">□</span>`).join(' + ')} ) = <b class="calc-result">□</b></span>`);
         for (let k = 0; k < artRows.length; k++) await A.put(V('tN', artRows[k], j), A.q(`.pvfm .h${k}`), par(vals[k]), { d: 500 });
-        await A.swap(A.q('.pvfm .fr'), fq(res0), 420);
-        await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 600 });
+        await A.swap(A.q('.pvfm .calc-result'), fq(res0), 420);
+        await A.fly(A.q('.pvfm .calc-result'), V('tN', m, j), null, { d: 600 });
         A.set(V('tN', m, j), fq(res0)); await A.pop(V('tN', m, j), { d: 260 });
         A.cls(artRows.map(i => C('tN', i, j)), 'k-act', false); A.cls(C('tN', m, j), 'k-ok');
       };
@@ -4120,13 +4120,13 @@ const VIEWS = (() => {
         A.cap(`Вычитаем из строки ${zl} строку ${plain(vname(vars, e.bj))}, умноженную на ${plain(fq(kk))}`);
         for (const j of [-1, ...cols]) {
           const old = j < 0 ? zc.b : zc.a[j], nw = j < 0 ? nb.b : nb.a[j], cell = row2 => j < 0 ? row2.b : row2.a[j];
-          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="fr">□</b></span>`);
+          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="calc-result">□</b></span>`);
           A.cls(C('tN', m, j), 'k-act');
           await A.put(V('tN', m, j), A.q('.pvfm .fo'), fq(old), { d: 420 });
           await A.put(V('tN', m, e.bj), A.q('.pvfm .fk'), par(kk), { d: 420 });
           await A.put(V('tN', e.i, j), A.q('.pvfm .fn'), par(cell(row)), { d: 420 });
-          await A.swap(A.q('.pvfm .fr'), fq(nw), 360);
-          await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 450 });
+          await A.swap(A.q('.pvfm .calc-result'), fq(nw), 360);
+          await A.fly(A.q('.pvfm .calc-result'), V('tN', m, j), null, { d: 450 });
           A.set(V('tN', m, j), fq(nw)); await A.pop(V('tN', m, j), { d: 220 });
           A.cls(C('tN', m, j), 'k-act', false);
         }
@@ -5707,13 +5707,13 @@ const VIEWS = (() => {
         A.cap(`Вычитаем из строки ${zl} строку ${plain(vname(vars, e.bj))}, умноженную на ${plain(fq(kk))}`);
         for (const j of [-1, ...cols]) {
           const old = j < 0 ? zc.b : zc.a[j], nw = j < 0 ? nb.b : nb.a[j], cellv = j < 0 ? row.b : row.a[j];
-          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="fr">□</b></span>`);
+          A.set(fm, `<span class="fmh"><span class="fo">□</span> − <span class="fk">□</span> × <span class="fn">□</span> = <b class="calc-result">□</b></span>`);
           A.cls(C('tN', m, j), 'k-act');
           await A.put(V('tN', m, j), A.q('.pvfm .fo'), fqM(old), { d: 420 });
           await A.put(V('tN', m, e.bj), A.q('.pvfm .fk'), parM(kk), { d: 420 });
           await A.put(V('tN', e.i, j), A.q('.pvfm .fn'), parM(cellv), { d: 420 });
-          await A.swap(A.q('.pvfm .fr'), fqM(nw), 360);
-          await A.fly(A.q('.pvfm .fr'), V('tN', m, j), null, { d: 450 });
+          await A.swap(A.q('.pvfm .calc-result'), fqM(nw), 360);
+          await A.fly(A.q('.pvfm .calc-result'), V('tN', m, j), null, { d: 450 });
           A.set(V('tN', m, j), fqM(nw)); await A.pop(V('tN', m, j), { d: 220 });
           A.cls(C('tN', m, j), 'k-act', false);
         }
@@ -5930,10 +5930,10 @@ const VIEWS2 = (() => {
         }
         A.cls(cell, 'k-sel');
         A.cap(`Клетка (${s.i + 1}; ${s.j + 1}): запас ${plain(fq(s.a0))}, спрос ${plain(fq(s.b0))} — перевозим меньшее из двух`);
-        A.set(fm, `<span class="fmh">x<sub>${s.i + 1}${s.j + 1}</sub> = min(<span class="fo">□</span>; <span class="fp">□</span>) = <b class="fr">□</b></span>`);
+        A.set(fm, `<span class="fmh">x<sub>${s.i + 1}${s.j + 1}</sub> = min(<span class="fo">□</span>; <span class="fp">□</span>) = <b class="calc-result">□</b></span>`);
         await Promise.all([A.put(T.sup(s.i), A.q('.pvfm .fo'), fq(s.a0), { d: 500 }), A.put(T.dem(s.j), A.q('.pvfm .fp'), fq(s.b0), { d: 500 })]);
-        await A.swap(A.q('.pvfm .fr'), fq(s.x), 360);
-        await A.put(A.q('.pvfm .fr'), T.val(s.i, s.j), fq(s.x), { d: 600 });
+        await A.swap(A.q('.pvfm .calc-result'), fq(s.x), 360);
+        await A.put(A.q('.pvfm .calc-result'), T.val(s.i, s.j), fq(s.x), { d: 600 });
         A.cap(`Остаток запаса: ${plain(fq(s.a0))} − ${plain(fq(s.x))} = ${plain(fq(s.a1))}; остаток спроса: ${plain(fq(s.b0))} − ${plain(fq(s.x))} = ${plain(fq(s.b1))}`);
         await Promise.all([A.swap(T.sup(s.i), fq(s.a1), 380), A.swap(T.dem(s.j), fq(s.b1), 380)]);
         A.cls(cell, 'k-sel', false); A.cls(cell, 'k-ok');
@@ -5976,11 +5976,11 @@ const VIEWS2 = (() => {
         const unk = o.kind === 'v' ? `v<sub>${o.k + 1}</sub>` : `u<sub>${o.k + 1}</sub>`, known = o.kind === 'v' ? it.pot.u[fi] : it.pot.v[fj];
         A.cap(`Базисная клетка (${fi + 1}; ${fj + 1}): u<sub>${fi + 1}</sub> + v<sub>${fj + 1}</sub> = c = ${plain(fq(cc))} ⇒ ${plain(unk)} = ${plain(fq(o.val))}`);
         A.cls(T.cell(fi, fj), 'k-act');
-        A.set(fm, `<span class="fmh">${unk} = <span class="fo">□</span> − <span class="fk">□</span> = <b class="fr">□</b></span>`);
+        A.set(fm, `<span class="fmh">${unk} = <span class="fo">□</span> − <span class="fk">□</span> = <b class="calc-result">□</b></span>`);
         await Promise.all([A.put(T.cst(fi, fj), A.q('.pvfm .fo'), fq(cc), { d: 450 }), A.put(o.kind === 'v' ? T.pu(fi) : T.pv(fj), A.q('.pvfm .fk'), fqp(known), { d: 450 })]);
-        await A.swap(A.q('.pvfm .fr'), fq(o.val), 320);
+        await A.swap(A.q('.pvfm .calc-result'), fq(o.val), 320);
         const dst = o.kind === 'v' ? T.pv(o.k) : T.pu(o.k);
-        await A.put(A.q('.pvfm .fr'), dst, fq(o.val), { d: 500 });
+        await A.put(A.q('.pvfm .calc-result'), dst, fq(o.val), { d: 500 });
         A.cls(T.cell(fi, fj), 'k-act', false);
       }
       A.set(fm, '');
@@ -5991,10 +5991,10 @@ const VIEWS2 = (() => {
       for (const [i, j, d] of free) {
         A.cls(T.cell(i, j), 'k-act');
         if (A.detail || firstFree) {
-          A.set(fm, `<span class="fmh">Δ<sub>${i + 1}${j + 1}</sub> = <span class="fo">□</span> − (<span class="fk">□</span> + <span class="fn">□</span>) = <b class="fr">□</b></span>`);
+          A.set(fm, `<span class="fmh">Δ<sub>${i + 1}${j + 1}</sub> = <span class="fo">□</span> − (<span class="fk">□</span> + <span class="fn">□</span>) = <b class="calc-result">□</b></span>`);
           await Promise.all([A.put(T.cst(i, j), A.q('.pvfm .fo'), fq(P.c[i][j]), { d: 380 }), A.put(T.pu(i), A.q('.pvfm .fk'), fqp(it.pot.u[i]), { d: 380 }), A.put(T.pv(j), A.q('.pvfm .fn'), fqp(it.pot.v[j]), { d: 380 })]);
-          await A.swap(A.q('.pvfm .fr'), fq(d), 300);
-          await A.put(A.q('.pvfm .fr'), T.del(i, j), fq(d), { d: 420 });
+          await A.swap(A.q('.pvfm .calc-result'), fq(d), 300);
+          await A.put(A.q('.pvfm .calc-result'), T.del(i, j), fq(d), { d: 420 });
           firstFree = false;
         } else { A.set(T.del(i, j), fq(d)); await A.pop(T.del(i, j), { d: 140 }); }
         A.cls(T.cell(i, j), 'k-act', false);
@@ -6020,7 +6020,7 @@ const VIEWS2 = (() => {
       const minus = it.cyc.filter(c => c.sign === '−');
       A.cap(`θ = наименьшая перевозка в клетках со знаком «−»: min(${minus.map(c => plain(fq(it.X[c.i][c.j]))).join('; ')}) = ${plain(fq(it.theta))}`);
       await A.each(minus, async c => { A.cls(T.cell(c.i, c.j), 'k-act'); await A.pulse(T.val(c.i, c.j)); });
-      A.set(fm, `<span class="fmh">θ = min(${minus.map(c => `<span class="fo m${c.i}_${c.j}">□</span>`).join('; ')}) = <b class="fr">${fq(it.theta)}</b></span>`);
+      A.set(fm, `<span class="fmh">θ = min(${minus.map(c => `<span class="fo m${c.i}_${c.j}">□</span>`).join('; ')}) = <b class="calc-result">${fq(it.theta)}</b></span>`);
       await Promise.all(minus.map(c => A.put(T.val(c.i, c.j), A.q(`.pvfm .m${c.i}_${c.j}`), fq(it.X[c.i][c.j]), { d: 500 })));
       minus.forEach(c => A.cls(T.cell(c.i, c.j), 'k-act', false));
       A.cap(`Из клетки (${it.leave.i + 1}; ${it.leave.j + 1}) перевозка уходит в ноль — она выходит из базиса${it.ties.length ? ' (θ достигается и в других клетках — берём клетку с меньшим номером; остальные остаются в базисе с нулём: вырождение)' : ''}`);
@@ -7244,8 +7244,8 @@ const APP = (() => {
 document.addEventListener('DOMContentLoaded', APP.init);
 
 </script>
-<link rel="stylesheet" href="learning.css?v=3">
-<script src="learning.js?v=3"></script>
+<link rel="stylesheet" href="learning.css?v=4">
+<script src="learning.js?v=4"></script>
 <script src="table-fit.js?v=2"></script>
 </body>
 </html>

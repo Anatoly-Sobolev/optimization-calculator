@@ -49,7 +49,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     }
     if(report.errors.length)throw new Error(report.errors.slice(0,10).join('\n'));
     if(!finishOnly)report.checks.push('All database variants: rendered, stages nonempty, valid answers, unchanged original solution text');
-    await page.getByRole('button',{name:'Начать обучение',exact:true}).click();
+    await page.locator('#learn-presentation').selectOption('learning');
     for(const t of (finishOnly?[]:registry)){
       const variant=t.variants.find(v=>!v.broken).v;
       for(const mode of ['understand','next','error','self','quiz','exam']){
@@ -116,7 +116,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     assert.equal(await page.evaluate(()=>LEARN.session.index),before);assert.equal(await page.locator('[data-learn="next"]').count(),0);
     await page.locator('[data-learn="hint"]').click();await page.locator('[data-learn="reveal"]').click();
     assert.ok(await page.evaluate(()=>{const a=LEARN.session.answers[LEARN.stages[LEARN.session.index].id];return a.errors===1&&a.hint&&a.revealed&&a.solved;}));
-    await page.reload();await page.getByRole('button',{name:'Начать обучение',exact:true}).click();
+    await page.reload();await page.locator('#learn-presentation').selectOption('learning');
     assert.ok(await page.evaluate(()=>Object.values(LEARN.session.answers).some(a=>a.errors===1&&a.hint&&a.revealed)));
     report.checks.push('Wrong answer blocks; hint/reveal recorded; reload restores session');
     await page.emulateMedia({reducedMotion:'reduce'});

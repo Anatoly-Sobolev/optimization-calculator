@@ -226,6 +226,7 @@ const LEARN = (() => {
     return unique.map(o=>({...o,sort:digest(step.id+o.value)})).sort((a,b)=>a.sort.localeCompare(b.sort));
   }
   function mount(state,structure) {
+    active=data.settings.presentation==='learning';
     recording=false; context={state:{...state},structure,variant:structure.variants.find(v=>v.v===state.v)};
     document.getElementById('learning')?.remove();
     root=document.createElement('section'); root.id='learning';root.className='card';root.setAttribute('aria-label','Обучение');
@@ -256,15 +257,15 @@ const LEARN = (() => {
     const hidden=!staticMode && active && stages.length>0 && session.index<stages.length;
     document.getElementById('solution').hidden=hidden;
     document.getElementById('secnav').hidden=hidden;
-    root.innerHTML=`<div class="learn-top"><div><h2>Обучение</h2><p class="kbd">От понимания метода к самостоятельному решению</p></div>${button(active?'Закрыть обучение':'Начать обучение','toggle','primary')}</div>`;
-    root.innerHTML+=`<label class="learn-presentation">Показ решения <select id="learn-presentation"><option value="animated"${!staticMode?' selected':''}>С анимациями</option><option value="text"${staticMode?' selected':''}>Без анимаций — подробный разбор</option></select></label>`;
+    root.innerHTML=`<div class="learn-top"><div><h2>Режим работы</h2><p class="kbd">Выберите, как разбирать задачу</p></div></div>`;
+    root.innerHTML+=`<label class="learn-presentation">Режим работы <select id="learn-presentation">${[['animated','Обычный разбор'],['learning','Обучение'],['text','Решение без анимаций']].map(([value,label])=>`<option value="${value}"${(data.settings.presentation||'animated')===value?' selected':''}>${label}</option>`).join('')}</select></label>`;
     if(staticMode) {
       root.innerHTML+=`<p>Все этапы открыты сразу: что делаем, почему и какой результат получаем. Полное решение и итоговые графики находятся ниже. Этот разбор можно выделить и скопировать или распечатать.</p><div class="learn-reading">${allStages.map((s,i)=>`<article><h3>${i+1}. ${esc(s.title)}</h3><h4>Исходные данные этапа</h4>${s.before}<p><strong>Что делаем.</strong> ${esc(s.prompt)}</p><p><strong>Почему.</strong> ${esc(s.reason)}</p><p><strong>Результат.</strong> ${esc(s.answer)}</p>${s.after}<p class="note">${esc(s.deep||'')}</p></article>`).join('')}</div>`;
       document.querySelectorAll('#solution details').forEach(el=>el.open=true);
       bindUI();return;
     }
-    if(!active) {root.innerHTML+=`<p>Разбирайте решение по шагам, выбирайте действия в таблицах и проверяйте себя. Шесть режимов — от знакомства с методом до подготовки к экзамену.</p>`;bindUI();return;}
-    root.innerHTML+=`<div class="learn-settings"><label>Режим<select id="learn-mode">${Object.entries(modes).map(([k,v])=>`<option value="${k}"${k===data.settings.mode?' selected':''}>${v}</option>`).join('')}</select></label><label>Глубина<select id="learn-depth">${[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']].map(([k,v])=>`<option value="${k}"${k===data.settings.depth?' selected':''}>${v}</option>`).join('')}</select></label><label>Подсказки<select id="learn-hint">${[['now','Сразу'],['error','После ошибки'],['request','По запросу']].map(([k,v])=>`<option value="${k}"${k===data.settings.hint?' selected':''}>${v}</option>`).join('')}</select></label></div><p>${descriptions[data.settings.mode]}</p>`;
+    if(!active) {root.innerHTML+=`<p>Полное решение с графиками, таблицами и пошаговыми анимациями открыто ниже. Чтобы самостоятельно выбирать действия и проверять ответы, переключитесь на обучение.</p>`;bindUI();return;}
+    root.innerHTML+=`<div class="learn-settings"><label>Учебный режим<select id="learn-mode">${Object.entries(modes).map(([k,v])=>`<option value="${k}"${k===data.settings.mode?' selected':''}>${v}</option>`).join('')}</select></label><label>Глубина<select id="learn-depth">${[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']].map(([k,v])=>`<option value="${k}"${k===data.settings.depth?' selected':''}>${v}</option>`).join('')}</select></label><label>Подсказки<select id="learn-hint">${[['now','Сразу'],['error','После ошибки'],['request','По запросу']].map(([k,v])=>`<option value="${k}"${k===data.settings.hint?' selected':''}>${v}</option>`).join('')}</select></label></div><p>${descriptions[data.settings.mode]}</p>`;
     if(!storageOK) root.innerHTML+='<p class="note warn">Браузер не разрешил сохранение: прогресс доступен только до закрытия страницы.</p>';
     const note=context.variant?.note;
     if(context.state.mode==='db'&&(note||context.variant?.warn))root.innerHTML+=`<div class="note warn">Примечание источника: ${note||esc(context.variant.warn)}</div>`;
@@ -357,7 +358,7 @@ const LEARN = (() => {
     cells.forEach(c=>{const old=before.querySelector(`td[data-i="${c.dataset.i}"][data-j="${c.dataset.j}"]`);if(!old||old.textContent!==c.textContent)animations.push(c.animate([{background:'#c7e8dd'},{background:'transparent'}],{duration:1000}));});
     if(!cells.length){const pieces=[...target.children].filter(el=>el.tagName!=='H4');pieces.forEach((el,i)=>animations.push(el.animate([{opacity:.25,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:350,delay:Math.min(i,5)*65,easing:'ease-out',fill:'backwards'})));}
   }
-  function goExam(item) { Object.assign(APP.state,{src:item.src,type:item.type,base:item.base||'graph',v:item.v,mode:'db',trainer:false,tinit:null,lastCustom:null});active=true;APP.render();root.scrollIntoView({block:'start'}); }
+  function goExam(item) { data.settings.presentation='learning';save();Object.assign(APP.state,{src:item.src,type:item.type,base:item.base||'graph',v:item.v,mode:'db',trainer:false,tinit:null,lastCustom:null});active=true;APP.render();root.scrollIntoView({block:'start'}); }
   function newExam() {
     const pool=registry().filter(t=>!t.base),chosen=[];
     for(let i=0;i<6;i++){const eligible=pool.filter(t=>t.src===(i%2?'zyk':'rgr')&&!chosen.some(c=>c.type===t.type));const t=eligible[Math.floor(Math.random()*eligible.length)];if(!t)continue;const variants=t.variants.filter(v=>!v.broken);const v=variants[Math.floor(Math.random()*variants.length)];if(v)chosen.push({src:t.src,type:t.type,v:v.v});}
@@ -366,7 +367,6 @@ const LEARN = (() => {
   function bindUI() {
     root.querySelectorAll('[data-learn]').forEach(b=>b.onclick=()=>{
       const action=b.dataset.learn,s=stages[session.index];
-      if(action==='toggle'){if(data.settings.presentation==='text'){data.settings.presentation='animated';active=true;save();APP.render();return;}active=!active;if(active&&APP.state.trainer){APP.state.trainer=false;APP.render();}else draw();}
       if(action==='hint'){const a=session.answers[s.id]||{errors:0};a.hint=true;session.answers[s.id]=a;data.streak=0;save();draw();}
       if(action==='reveal'){const a=session.answers[s.id]||{errors:0};Object.assign(a,{solved:true,revealed:true,feedback:`Ответ: ${s.answer}. ${s.reason}`});session.answers[s.id]=a;data.streak=0;save();draw();animate();}
       if(action==='next'&&session.answers[s.id]?.solved){session.index++;save();draw();root.querySelector('#learn-heading')?.focus();}
