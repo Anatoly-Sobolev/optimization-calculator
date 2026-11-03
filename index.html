@@ -2435,7 +2435,7 @@ const R = (() => {
         if (hasEq) return unb ? 'луч или прямая (есть равенство)' : 'отрезок или точка (есть равенство)';
         return unb ? 'неограниченная' : 'ограниченный многоугольник';
       };
-      const testPt = Cn => Math.abs(Cn.b) > 1e-12 ? [0, 0] : Math.abs(Cn.a[0]) > 1e-12 ? [0, 1] : [1, 0];
+      const testPt = Cn => Math.abs(Cn.b) > 1e-12 ? [0, 0] : Math.abs(Cn.a[0]) > 1e-12 ? [1, 0] : [0, 1];
       const sideText = k => {
         const Cn = C[k];
         if (Cn.axis) return `${Cn.html}: ${Cn.a[0] ? 'правее оси ' + ax[1] : 'выше оси ' + ax[0]} (включая ось).`;
@@ -2531,6 +2531,7 @@ const R = (() => {
         cancelAnimationFrame(la); const t0 = performance.now(), D = 2600, O = optInfo();
         const reg = regionOf([...C.keys()].filter(k => S.inc[k]), hb), rv = (reg.length ? reg : hb).map(val);
         const target = O.status === 'optimal' && S.revealed ? O.val : (cfg.sense === 'min' ? Math.min(...rv) : Math.max(...rv)) * (O.status === 'unbounded' ? 3 : 1);
+        if (LEARN.staticMode) { S.lvl = target; lr.value = target; linfo.innerHTML = cfg.endText || `${fname} = ${fmtN(target + f0)}`; draw(); return; }
         const start = cfg.sense === 'min' ? Math.max(...hb.map(val)) : Math.min(...rv, 0);
         const fr = now => { const e = Math.min(1, (now - t0) / D), k = start + (target - start) * (1 - (1 - e) ** 2); S.lvl = k; lr.value = k; draw(); linfo.innerHTML = e < 1 ? `${fname} = ${fmtN(k + f0)}` : (S.revealed && !modified() ? cfg.endText || '' : `${fname} = ${fmtN(k + f0)}`); if (e < 1) la = requestAnimationFrame(fr); };
         la = requestAnimationFrame(fr);
@@ -2591,7 +2592,7 @@ const R = (() => {
       (cfg.paths || []).forEach((Pt, pi) => { if (Pt.from) on('sxstep', e => { if (e.detail.id === Pt.from) { S.cur[pi] = e.detail.k; redraw(); } }); });
       if (S.lvl != null) linfo.innerHTML = `${fname} = ${fmtN(S.lvl + f0)}`;
       // ---- пошаговое пояснение графика ----
-      const anim = (from, to, D = 2200) => { cancelAnimationFrame(la); const t0 = performance.now(); const fr = now => { const e = Math.min(1, (now - t0) / D); S.lvl = from + (to - from) * (1 - (1 - e) ** 2); lr.value = S.lvl; linfo.innerHTML = `${fname} = ${fmtN(S.lvl + f0)}`; draw(); if (e < 1) la = requestAnimationFrame(fr); }; la = requestAnimationFrame(fr); setTimeout(() => { if (Math.abs(S.lvl - to) > 1e-9) { S.lvl = to; draw(); } }, D + 300); };
+      const anim = (from, to, D = 2200) => { cancelAnimationFrame(la); if (LEARN.staticMode) { S.lvl = to; lr.value = to; linfo.innerHTML = `${fname} = ${fmtN(to + f0)}`; draw(); return; } const t0 = performance.now(); const fr = now => { const e = Math.min(1, (now - t0) / D); S.lvl = from + (to - from) * (1 - (1 - e) ** 2); lr.value = S.lvl; linfo.innerHTML = `${fname} = ${fmtN(S.lvl + f0)}`; draw(); if (e < 1) la = requestAnimationFrame(fr); }; la = requestAnimationFrame(fr); setTimeout(() => { if (Math.abs(S.lvl - to) > 1e-9) { S.lvl = to; draw(); } }, D + 300); };
       const initLvl = S.lvl;
       const base = () => { S.inc = C.map(() => true); S.fill = C.map(() => false); S.hl = []; S.test = null; S.v = home.slice(); S.revealed = true; };
       const build = () => {
@@ -2785,7 +2786,7 @@ const R = (() => {
       lr3.min = cmin; lr3.max = cmax; lr3.step = (cmax - cmin) / 400 || 0.01; lr3.value = opt ? cv(opt) : (cmin + cmax) / 2;
       lr3.oninput = () => { cancelAnimationFrame(la3); S.lp = +lr3.value; li3.textContent = `${cfg.fname || 'f'} = ${fmtN(S.lp)}`; redraw(); };
       let la3 = null;
-      const anim3 = (from, to, D = 2400) => { cancelAnimationFrame(la3); const t0 = performance.now(); const fr = now => { const e = Math.min(1, (now - t0) / D); S.lp = from + (to - from) * (1 - (1 - e) ** 2); lr3.value = S.lp; li3.textContent = `${cfg.fname || 'f'} = ${fmtN(S.lp)}`; draw(); if (e < 1) la3 = requestAnimationFrame(fr); }; la3 = requestAnimationFrame(fr); setTimeout(() => { if (Math.abs(S.lp - to) > 1e-9) { S.lp = to; draw(); } }, D + 300); };
+      const anim3 = (from, to, D = 2400) => { cancelAnimationFrame(la3); if (LEARN.staticMode) { S.lp = to; lr3.value = to; li3.textContent = `${cfg.fname || 'f'} = ${fmtN(to)}`; draw(); return; } const t0 = performance.now(); const fr = now => { const e = Math.min(1, (now - t0) / D); S.lp = from + (to - from) * (1 - (1 - e) ** 2); lr3.value = S.lp; li3.textContent = `${cfg.fname || 'f'} = ${fmtN(S.lp)}`; draw(); if (e < 1) la3 = requestAnimationFrame(fr); }; la3 = requestAnimationFrame(fr); setTimeout(() => { if (Math.abs(S.lp - to) > 1e-9) { S.lp = to; draw(); } }, D + 300); };
       const lpStart = cfg.sense === 'min' ? cmax : cmin;
       root.querySelector('.lp3btn').onclick = () => anim3(lpStart, opt ? cv(opt) : (cfg.sense === 'min' ? cmin : cmax));
       // пошаговое пояснение
@@ -3178,7 +3179,7 @@ const VIEWS = (() => {
   const DM_STOP = {}, DM_HALT = {};
   let dmUid = 0;
   const DM = { all: new Set(), active: null, listening: false };
-  const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const reduceMotion = () => LEARN.staticMode || !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const SPEEDS = [['2.2', 'Медленно'], ['1', 'Обычно'], ['0.45', 'Быстро']];
   const dmLegend = '<span class="lg lg-sel">▸ синий — выбрано</span><span class="lg lg-act">● жёлтый — действие сейчас</span><span class="lg lg-del">✕ розовый — убирается / искусственная</span><span class="lg lg-ok">✓ зелёный — результат</span><span class="lg lg-dim">○ серый — не участвует</span>';
 
@@ -3744,7 +3745,7 @@ const VIEWS = (() => {
         if (G.status === 'unbounded') { A.cap('Область уходит за рамку графика — она не ограничена'); await A.pop(S('.ginf')); }
       }
     };
-    return demo('оси → прямые → полуплоскости → допустимая область', html, script);
+    return demo('оси → прямые → полуплоскости → допустимая область', html + '<p class="note">Цвет прямой соответствует номеру ограничения. Короткие стрелки показывают допустимую сторону неравенства; они появляются после проверки пробной точки. Общая область — пересечение всех ограничений. Зелёный вектор целевой функции на следующем графике показывает рост F; для минимума движемся против него.</p>', script);
   }
 
   // --- пересечение двух прямых: система → исключение → подстановка → точка ---
@@ -7243,8 +7244,8 @@ const APP = (() => {
 document.addEventListener('DOMContentLoaded', APP.init);
 
 </script>
-<link rel="stylesheet" href="learning.css?v=2">
-<script src="learning.js?v=2"></script>
+<link rel="stylesheet" href="learning.css?v=3">
+<script src="learning.js?v=3"></script>
 <script src="table-fit.js?v=2"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ const LEARN = (() => {
   const f = q => esc(txt(q));
   const sum = xs => xs.reduce((a,b) => a.add(Q.of(b)), Z());
   const KEY = 'optimization.learning.v1';
-  const fresh = () => ({version:1, settings:{mode:'next',depth:'detail',hint:'error'}, topics:{}, sessions:{}, streak:0, best:0});
+  const fresh = () => ({version:1, settings:{mode:'next',depth:'detail',hint:'error',presentation:'animated'}, topics:{}, sessions:{}, streak:0, best:0});
   let data = fresh(), storageOK = true;
   try { const d = JSON.parse(localStorage.getItem(KEY)); if (d?.version === 1 && d.settings && d.topics && d.sessions) data = {...fresh(),...d}; } catch (_) { storageOK = false; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (_) { storageOK = false; } };
@@ -251,10 +251,18 @@ const LEARN = (() => {
   const button=(label,action,cls='')=>`<button type="button" class="btn ${cls}" data-learn="${action}">${label}</button>`;
   function draw() {
     stop();
-    const hidden=active && stages.length>0 && session.index<stages.length;
+    const staticMode=data.settings.presentation==='text';
+    document.body.classList.toggle('static-reading',staticMode);
+    const hidden=!staticMode && active && stages.length>0 && session.index<stages.length;
     document.getElementById('solution').hidden=hidden;
     document.getElementById('secnav').hidden=hidden;
     root.innerHTML=`<div class="learn-top"><div><h2>Обучение</h2><p class="kbd">От понимания метода к самостоятельному решению</p></div>${button(active?'Закрыть обучение':'Начать обучение','toggle','primary')}</div>`;
+    root.innerHTML+=`<label class="learn-presentation">Показ решения <select id="learn-presentation"><option value="animated"${!staticMode?' selected':''}>С анимациями</option><option value="text"${staticMode?' selected':''}>Без анимаций — подробный разбор</option></select></label>`;
+    if(staticMode) {
+      root.innerHTML+=`<p>Все этапы открыты сразу: что делаем, почему и какой результат получаем. Полное решение и итоговые графики находятся ниже. Этот разбор можно выделить и скопировать или распечатать.</p><div class="learn-reading">${allStages.map((s,i)=>`<article><h3>${i+1}. ${esc(s.title)}</h3><h4>Исходные данные этапа</h4>${s.before}<p><strong>Что делаем.</strong> ${esc(s.prompt)}</p><p><strong>Почему.</strong> ${esc(s.reason)}</p><p><strong>Результат.</strong> ${esc(s.answer)}</p>${s.after}<p class="note">${esc(s.deep||'')}</p></article>`).join('')}</div>`;
+      document.querySelectorAll('#solution details').forEach(el=>el.open=true);
+      bindUI();return;
+    }
     if(!active) {root.innerHTML+=`<p>Разбирайте решение по шагам, выбирайте действия в таблицах и проверяйте себя. Шесть режимов — от знакомства с методом до подготовки к экзамену.</p>`;bindUI();return;}
     root.innerHTML+=`<div class="learn-settings"><label>Режим<select id="learn-mode">${Object.entries(modes).map(([k,v])=>`<option value="${k}"${k===data.settings.mode?' selected':''}>${v}</option>`).join('')}</select></label><label>Глубина<select id="learn-depth">${[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']].map(([k,v])=>`<option value="${k}"${k===data.settings.depth?' selected':''}>${v}</option>`).join('')}</select></label><label>Подсказки<select id="learn-hint">${[['now','Сразу'],['error','После ошибки'],['request','По запросу']].map(([k,v])=>`<option value="${k}"${k===data.settings.hint?' selected':''}>${v}</option>`).join('')}</select></label></div><p>${descriptions[data.settings.mode]}</p>`;
     if(!storageOK) root.innerHTML+='<p class="note warn">Браузер не разрешил сохранение: прогресс доступен только до закрытия страницы.</p>';
@@ -358,7 +366,7 @@ const LEARN = (() => {
   function bindUI() {
     root.querySelectorAll('[data-learn]').forEach(b=>b.onclick=()=>{
       const action=b.dataset.learn,s=stages[session.index];
-      if(action==='toggle'){active=!active;if(active&&APP.state.trainer){APP.state.trainer=false;APP.render();}else draw();}
+      if(action==='toggle'){if(data.settings.presentation==='text'){data.settings.presentation='animated';active=true;save();APP.render();return;}active=!active;if(active&&APP.state.trainer){APP.state.trainer=false;APP.render();}else draw();}
       if(action==='hint'){const a=session.answers[s.id]||{errors:0};a.hint=true;session.answers[s.id]=a;data.streak=0;save();draw();}
       if(action==='reveal'){const a=session.answers[s.id]||{errors:0};Object.assign(a,{solved:true,revealed:true,feedback:`Ответ: ${s.answer}. ${s.reason}`});session.answers[s.id]=a;data.streak=0;save();draw();animate();}
       if(action==='next'&&session.answers[s.id]?.solved){session.index++;save();draw();root.querySelector('#learn-heading')?.focus();}
@@ -375,9 +383,11 @@ const LEARN = (() => {
     root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>inspect(b.dataset.view));
     bindTable();
     const form=root.querySelector('#learn-answer-form');if(form)form.onsubmit=e=>{e.preventDefault();respond(root.querySelector('#learn-answer').value);};
+    const presentation=root.querySelector('#learn-presentation');
+    if(presentation)presentation.onchange=()=>{stop();data.settings.presentation=presentation.value;save();APP.render();};
     ['mode','depth','hint'].forEach(k=>{const el=root.querySelector('#learn-'+k);if(el)el.onchange=()=>{data.settings[k]=el.value;save();APP.render();};});
     // Cloned condition is informational, so strip duplicate IDs from the original solution.
     root.querySelectorAll('details [id]').forEach(el=>el.removeAttribute('id'));
   }
-  return {begin,mount,registry,build,selectStages,accept,options,get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;}};
+  return {begin,mount,registry,build,selectStages,accept,options,get staticMode(){return data.settings.presentation==='text';},get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;}};
 })();

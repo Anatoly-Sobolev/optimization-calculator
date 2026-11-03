@@ -49,3 +49,15 @@
 @media(max-width:650px) {.learn-settings,.learn-compare{grid-template-columns:1fr}.learn-top{align-items:stretch}#learning{padding:14px}.learn-question{font-size:17px}.learn-input input{width:100%}}
 @media(prefers-reduced-motion:reduce) {#learning *,#learning *::before,#learning *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print {#learning{display:none!important}#solution[hidden]{display:block!important}.mobile-fit-table{zoom:1!important;width:auto!important}}
+
+/* Hidden scene elements must win over individual graph opacity styles. */
+.demo .gsvg .dh {opacity:0}
+.learn-presentation {display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;font-weight:600}
+.learn-presentation select {max-width:100%;min-width:0}
+.learn-reading article {border-top:1px solid var(--line);padding:16px 0;overflow-wrap:anywhere}
+.learn-reading h4 {margin:12px 0 6px}
+.static-reading *, .static-reading *::before, .static-reading *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.static-reading .dmctl,.static-reading .dmprog,.static-reading .dmtag,.static-reading .dmdet {display:none!important}
+@media print {body.static-reading #learning {display:block!important} .static-reading .learn-top,.static-reading .learn-presentation {display:none!important}}
+
+.static-reading .st-auto,.static-reading .r3spin {display:none!important}
