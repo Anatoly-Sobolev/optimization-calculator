@@ -240,6 +240,7 @@ const LEARN = (() => {
       const visual=document.querySelector('#solution #plot svg, #solution #graph svg');
       if(visual) { const clone=visual.cloneNode(true); clone.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));clone.removeAttribute('id');all[all.length-1].after+=`<div class="learn-scroll">${clone.outerHTML}</div>`; }
     }
+    bindPresentation();
     allStages=all;stages=selectStages(all);
     signature=digest(JSON.stringify([state.src,state.type,state.base,state.mode,state.v,state.tinit,all.map(s=>[s.id,s.before,s.answer]),data.settings]));
     session=data.sessions[signature]||{index:0,answers:{},done:false};
@@ -249,6 +250,12 @@ const LEARN = (() => {
     const keys=Object.keys(data.sessions); if(keys.length>80) keys.slice(0,keys.length-80).forEach(k=>{if(k!==signature)delete data.sessions[k];});
     draw();
   }
+  const presentations=[['animated','Обычный разбор'],['learning','Обучение'],['text','Решение без анимаций']];
+  const notes={learning:'Выбирайте действия сами: ошибка оставляет вас на том же этапе, полное решение откроется после прохождения.',text:'Все этапы открыты сразу; текст можно выделить и скопировать.'};
+  const fieldHtml=(id,label,list,cur)=>`<div class="cfield"><span class="clab" id="lbl-${id}">${label}</span><select id="${id}" data-dd>${list.map(([k,v])=>`<option value="${k}"${k===cur?' selected':''}>${v}</option>`).join('')}</select></div>`;
+  /* Поле «Режим работы» входит в общую панель управления (controls() в index.html). */
+  const modeField=()=>fieldHtml('learn-presentation','Режим работы',presentations,data.settings.presentation||'animated');
+  const modeNote=()=>notes[data.settings.presentation]||'';
   const button=(label,action,cls='')=>`<button type="button" class="btn ${cls}" data-learn="${action}">${label}</button>`;
   function draw() {
     stop();
@@ -257,15 +264,15 @@ const LEARN = (() => {
     const hidden=!staticMode && active && stages.length>0 && session.index<stages.length;
     document.getElementById('solution').hidden=hidden;
     document.getElementById('secnav').hidden=hidden;
-    root.innerHTML=`<div class="learn-top"><div><h2>Режим работы</h2><p class="kbd">Выберите, как разбирать задачу</p></div></div>`;
-    root.innerHTML+=`<label class="learn-presentation">Режим работы <select id="learn-presentation">${[['animated','Обычный разбор'],['learning','Обучение'],['text','Решение без анимаций']].map(([value,label])=>`<option value="${value}"${(data.settings.presentation||'animated')===value?' selected':''}>${label}</option>`).join('')}</select></label>`;
+    root.hidden=!staticMode&&!active;
+    root.innerHTML='';
     if(staticMode) {
-      root.innerHTML+=`<p>Все этапы открыты сразу: что делаем, почему и какой результат получаем. Полное решение и итоговые графики находятся ниже. Этот разбор можно выделить и скопировать или распечатать.</p><div class="learn-reading">${allStages.map((s,i)=>`<article><h3>${i+1}. ${esc(s.title)}</h3><h4>Исходные данные этапа</h4>${s.before}<p><strong>Что делаем.</strong> ${esc(s.prompt)}</p><p><strong>Почему.</strong> ${esc(s.reason)}</p><p><strong>Результат.</strong> ${esc(s.answer)}</p>${s.after}<p class="note">${esc(s.deep||'')}</p></article>`).join('')}</div>`;
+      root.innerHTML+=`<div class="learn-reading">${allStages.map((s,i)=>`<article><h3>${i+1}. ${esc(s.title)}</h3><h4>Исходные данные этапа</h4>${s.before}<p><strong>Что делаем.</strong> ${esc(s.prompt)}</p><p><strong>Почему.</strong> ${esc(s.reason)}</p><p><strong>Результат.</strong> ${esc(s.answer)}</p>${s.after}<p class="note">${esc(s.deep||'')}</p></article>`).join('')}</div>`;
       document.querySelectorAll('#solution details').forEach(el=>el.open=true);
       bindUI();return;
     }
-    if(!active) {root.innerHTML+=`<p>Полное решение с графиками, таблицами и пошаговыми анимациями открыто ниже. Чтобы самостоятельно выбирать действия и проверять ответы, переключитесь на обучение.</p>`;bindUI();return;}
-    root.innerHTML+=`<div class="learn-settings"><label>Учебный режим<select id="learn-mode">${Object.entries(modes).map(([k,v])=>`<option value="${k}"${k===data.settings.mode?' selected':''}>${v}</option>`).join('')}</select></label><label>Глубина<select id="learn-depth">${[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']].map(([k,v])=>`<option value="${k}"${k===data.settings.depth?' selected':''}>${v}</option>`).join('')}</select></label><label>Подсказки<select id="learn-hint">${[['now','Сразу'],['error','После ошибки'],['request','По запросу']].map(([k,v])=>`<option value="${k}"${k===data.settings.hint?' selected':''}>${v}</option>`).join('')}</select></label></div><p>${descriptions[data.settings.mode]}</p>`;
+    if(!active) {bindUI();return;}
+    root.innerHTML+=`<div class="learn-settings">${fieldHtml('learn-mode','Учебный режим',Object.entries(modes),data.settings.mode)}${fieldHtml('learn-depth','Глубина',[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']],data.settings.depth)}${fieldHtml('learn-hint','Подсказки',[['now','Сразу'],['error','После ошибки'],['request','По запросу']],data.settings.hint)}</div><p>${descriptions[data.settings.mode]}</p>`;
     if(!storageOK) root.innerHTML+='<p class="note warn">Браузер не разрешил сохранение: прогресс доступен только до закрытия страницы.</p>';
     const note=context.variant?.note;
     if(context.state.mode==='db'&&(note||context.variant?.warn))root.innerHTML+=`<div class="note warn">Примечание источника: ${note||esc(context.variant.warn)}</div>`;
@@ -383,11 +390,15 @@ const LEARN = (() => {
     root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>inspect(b.dataset.view));
     bindTable();
     const form=root.querySelector('#learn-answer-form');if(form)form.onsubmit=e=>{e.preventDefault();respond(root.querySelector('#learn-answer').value);};
-    const presentation=root.querySelector('#learn-presentation');
-    if(presentation)presentation.onchange=()=>{stop();data.settings.presentation=presentation.value;save();APP.render();};
     ['mode','depth','hint'].forEach(k=>{const el=root.querySelector('#learn-'+k);if(el)el.onchange=()=>{data.settings[k]=el.value;save();APP.render();};});
     // Cloned condition is informational, so strip duplicate IDs from the original solution.
     root.querySelectorAll('details [id]').forEach(el=>el.removeAttribute('id'));
+    DD.enhance(root);
   }
-  return {begin,mount,registry,build,selectStages,accept,options,get staticMode(){return data.settings.presentation==='text';},get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;}};
+  /* «Режим работы» живёт в общей панели, поэтому обработчик вешается при каждом render() приложения. */
+  function bindPresentation() {
+    const presentation=document.getElementById('learn-presentation');
+    if(presentation)presentation.onchange=()=>{stop();data.settings.presentation=presentation.value;save();APP.render();};
+  }
+  return {begin,mount,modeField,modeNote,registry,build,selectStages,accept,options,get staticMode(){return data.settings.presentation==='text';},get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;}};
 })();

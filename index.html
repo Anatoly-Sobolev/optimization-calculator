@@ -19,7 +19,7 @@ header p{margin:6px 0 0;color:#b9bfdc;font-size:14.5px}
 .people>div:first-child{margin-left:0;padding-left:0;border-left:0}
 .people dt{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9aa3d6;margin-bottom:4px}
 .people dd{margin:0;font-size:15.5px;font-weight:600;white-space:nowrap}.people dd.sub{font-weight:400;font-size:13px;color:#c9cdea;margin-top:2px}
-@media(max-width:900px){header{padding:16px 14px}header h1{font-size:22px}.hdr{grid-template-columns:minmax(0,1fr);align-items:start}.people{flex-direction:column;gap:12px}.people>div{margin-left:0;padding-left:0;border-left:0}.people dd{white-space:normal}.srcsw .seg2 .btn{padding:5px 10px}}
+@media(max-width:900px){header{padding:16px 14px}header h1{font-size:22px}.hdr{grid-template-columns:minmax(0,1fr);align-items:start}.people{flex-direction:column;gap:12px}.people>div{margin-left:0;padding-left:0;border-left:0}.people dd{white-space:normal}}
 section.sol{scroll-margin-top:14px}@media(max-width:900px){section.sol{scroll-margin-top:72px}}
 .wrap{max-width:1240px;margin:0 auto;padding:18px 16px 60px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px}
 main{min-width:0}
@@ -28,12 +28,13 @@ main{min-width:0}
 #secnav a:hover{background:var(--accent-soft)}
 .navh{margin-bottom:6px}
 @media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);padding:10px 8px 40px}.card{padding:12px 12px}input.num{width:64px}#secnav{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-radius:0 0 12px 12px}#secnav .navh{display:none}#secnav a{flex:none}}
-.tabs{display:flex;align-items:center;gap:10px;margin-bottom:10px}.tabs label{font-weight:600}.tabs select{min-width:min(420px,100%);max-width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:9px 36px 9px 12px;background:#fff;color:var(--ink)}
-.srcsw{margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.srcsw .seg2{display:inline-flex;background:#e9e6dd;border-radius:999px;padding:3px}
-.srcsw .seg2 .btn{border:0;background:transparent;border-radius:999px;padding:5px 14px;font-size:13.5px;color:#4a4e5c}
-.srcsw .seg2 .btn.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
-@media(max-width:600px){.tabs{align-items:stretch;flex-direction:column;gap:4px}.tabs select{width:100%;min-width:0}}
+.cgrid{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end}
+.cfield{flex:1 1 170px;min-width:0;display:grid;gap:4px}
+.cfield.wide{flex:2 1 250px}
+.cfield.src{flex:3 1 340px}
+.clab{font-size:12.5px;font-weight:600;color:var(--muted)}
+.cnote{margin-top:10px}
+@media(max-width:600px){.cfield,.cfield.wide{flex-basis:100%}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:0 0 14px}
 .ctlrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}
 select,input.num{font:inherit;font-size:15px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff}
@@ -7119,21 +7120,27 @@ const APP = (() => {
     } catch (e) { console.error(e); return `<div class="card note bad">Ошибка вычислений: ${e.message}</div>`; }
   }
 
+  /* Поле панели: подпись + исходный select (его заменяет общий dropdown, см. dropdown.js). */
+  const field = (id, label, opts, cls = '') => `<div class="cfield${cls}"><span class="clab" id="lbl-${id}">${label}</span><select id="${id}" data-dd>${opts}</select></div>`;
+  const optList = (list, cur) => list.map(([v, l]) => `<option value="${v}"${v === cur ? ' selected' : ''}>${l}</option>`).join('');
   function controls() {
-    const T = SRC().types;
-    let h = `<div class="srcsw"><span class="kbd">Источник задач</span><span class="seg2"><button class="btn${isZ() ? '' : ' on'}" data-src="rgr">Методичка РГР · Девятерикова, Борисовский</button><button class="btn${isZ() ? ' on' : ''}" data-src="zyk">Сборник для практических занятий · Зыкина</button></span></div>`;
-    h += `<div class="tabs"><label for="taskType">Тема:</label><select id="taskType">${typesFor().map(k => `<option value="${k}"${state.type === k ? ' selected' : ''}>${isZ() ? 'Раздел' : 'Задание'} ${T[k].id} · ${T[k].short}</option>`).join('')}</select></div>`;
-    h += `<div class="ctl card"><div class="kbd">${T[state.type].title}. ${T[state.type].task}${isZ() ? ` Страницы сборника: ${T[state.type].pages}.` : ''}</div><div class="ctlrow">`;
-    if (state.type === 'dual' && !isZ()) h += `<label>Прямая задача: <select id="cbase">${DB.types.dual.bases.map(b => `<option value="${b.type}"${b.type === state.base ? ' selected' : ''}>${b.label}</option>`).join('')}</select></label>`;
-    h += `<label class="rad"><input type="radio" name="mode" value="db"${state.mode === 'db' ? ' checked' : ''}> ${isZ() ? 'задача из сборника' : 'вариант из методички'}</label>`;
-    h += NEWKINDS.has(state.type) ? `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${variantOptions(structOf().variants)}</select>`
-      : `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${isZ() ? 'задача' : 'вариант'} ${v.v}${v.page ? ` (с. ${v.page})` : ''}${v.note && (isZ() || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join('')}</select>`;
-    if (state.type === 'transp') { const vv = structOf().variants.find(x => x.v === state.v) || {}; const ti = state.tinit || vv.init || 'nw'; h += `<label>Начальный план: <select id="tinit"><option value="nw"${ti === 'nw' ? ' selected' : ''}>северо-западный угол</option><option value="mc"${ti === 'mc' ? ' selected' : ''}>минимальная стоимость</option></select></label>`; }
-    h += `<label class="rad"><input type="radio" name="mode" value="custom"${state.mode === 'custom' ? ' checked' : ''}> свои коэффициенты</label>`;
-    h += `<button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
-    if (state.mode === 'custom') h += customForm();
-    h += '</div>';
-    return h;
+    const T = SRC().types, z = isZ(), custom = state.mode === 'custom';
+    const srcOpts = optList([['rgr', 'Методичка РГР · Девятерикова, Борисовский'], ['zyk', 'Сборник для практических занятий · Зыкина']], state.src);
+    const typeOpts = typesFor().map(k => `<option value="${k}"${state.type === k ? ' selected' : ''}>${z ? 'Раздел' : 'Задание'} ${T[k].id} · ${T[k].short}</option>`).join('');
+    const varOpts = (NEWKINDS.has(state.type) ? variantOptions(structOf().variants)
+      : structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${z ? 'задача' : 'вариант'} ${v.v}${v.page ? ` (с. ${v.page})` : ''}${v.note && (z || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join(''))
+      .replace(/ selected/g, custom ? '' : ' selected') + `<option value="custom"${custom ? ' selected' : ''}>Свой вариант</option>`;
+    let h = `<div class="ctl card"><div class="cgrid">`;
+    h += field('csrc', 'Источник', srcOpts, ' wide src') + field('taskType', 'Тема', typeOpts, ' wide');
+    if (state.type === 'dual' && !z) h += field('cbase', 'Прямая задача', DB.types.dual.bases.map(b => `<option value="${b.type}"${b.type === state.base ? ' selected' : ''}>${b.label}</option>`).join(''));
+    h += field('cvar', z ? 'Задание' : 'Вариант', varOpts);
+    if (state.type === 'transp') { const vv = structOf().variants.find(x => x.v === state.v) || {}; const ti = state.tinit || vv.init || 'nw'; h += field('tinit', 'Начальный план', optList([['nw', 'северо-западный угол'], ['mc', 'минимальная стоимость']], ti)); }
+    h += (typeof LEARN !== 'undefined' && LEARN.modeField ? LEARN.modeField() : '') + '</div>';
+    h += `<div class="kbd cnote">${T[state.type].title}. ${T[state.type].task}${z ? ` Страницы сборника: ${T[state.type].pages}.` : ''}</div>`;
+    const note = typeof LEARN !== 'undefined' && LEARN.modeNote ? LEARN.modeNote() : '';
+    if (note) h += `<div class="kbd" id="modenote">${note}</div>`;
+    if (custom) h += customForm();
+    return h + '</div>';
   }
   function solve() {
     LEARN.begin();
@@ -7191,28 +7198,19 @@ const APP = (() => {
     });
     bind();
     LEARN.mount(state, structOf());
+    DD.enhance($('#controls'));
     if (state.mode === 'db') { const q = new URLSearchParams({ s: state.src, t: state.type, v: state.v }); if (state.type === 'dual' && state.src === 'rgr') q.set('b', state.base); try { history.replaceState(null, '', '#' + q); } catch (_) { /* file:// в некоторых браузерах */ } }
   }
   function bind() {
     const typeSelect = $('#taskType');
     if (typeSelect) typeSelect.onchange = () => { state.type = typeSelect.value; state.tinit = null; state.xbar = null; if (state.mode === 'custom') state.lastCustom = null; render(); };
-    document.querySelectorAll('[data-src]').forEach(b => b.onclick = () => { if (state.src === b.dataset.src) return; state.vs = state.vs || {}; state.vs[state.src] = state.v; state.src = b.dataset.src; if (state.vs[state.src]) state.v = state.vs[state.src]; if (!typesFor().includes(state.type)) state.type = 'graph'; state.lastCustom = null; render(); });
+    const cs = $('#csrc');
+    if (cs) cs.onchange = () => { if (state.src === cs.value) return; state.vs = state.vs || {}; state.vs[state.src] = state.v; state.src = cs.value; if (state.vs[state.src]) state.v = state.vs[state.src]; if (!typesFor().includes(state.type)) state.type = 'graph'; state.lastCustom = null; render(); };
     ['#zn', '#zm', '#zs'].forEach(s => { const e = $(s); if (e && s !== '#zs') e.onchange = resizeZ; });
     ['#kn_m', '#kn_n'].forEach(s => { const e = $(s); if (e) e.onchange = resizeNew; });
     const ti = $('#tinit'); if (ti) ti.onchange = () => { state.tinit = ti.value; render(); };
-    const pb = $('#printbtn');
-    if (pb) pb.onclick = () => {
-      // раскрыть свёрнутые таблицы и ответы, напечатать, вернуть как было
-      const ds = [...document.querySelectorAll('#solution details')].filter(d => !d.open);
-      ds.forEach(d => { d.open = true; });
-      document.body.classList.add('printing');
-      const back = () => { ds.forEach(d => { d.open = false; }); document.body.classList.remove('printing'); window.removeEventListener('afterprint', back); };
-      window.addEventListener('afterprint', back);
-      window.print();
-    };
     const cb = $('#cbase'); if (cb) cb.onchange = () => { state.base = cb.value; state.lastCustom = null; render(); };
-    const cv = $('#cvar'); if (cv) cv.onchange = () => { state.v = +cv.value; state.tinit = null; state.xbar = null; render(); };
-    document.querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { state.mode = r.value; state.lastCustom = null; render(); });
+    const cv = $('#cvar'); if (cv) cv.onchange = () => { state.lastCustom = null; state.tinit = null; state.xbar = null; if (cv.value === 'custom') state.mode = 'custom'; else { state.mode = 'db'; state.v = +cv.value; } render(); };
     const fs = $('#fsolve');
     if (fs) {
       fs.onclick = () => {
@@ -7244,8 +7242,10 @@ const APP = (() => {
 document.addEventListener('DOMContentLoaded', APP.init);
 
 </script>
-<link rel="stylesheet" href="learning.css?v=5">
-<script src="learning.js?v=4"></script>
+<link rel="stylesheet" href="dropdown.css?v=1">
+<link rel="stylesheet" href="learning.css?v=6">
+<script src="dropdown.js?v=1"></script>
+<script src="learning.js?v=5"></script>
 <script src="table-fit.js?v=3"></script>
 </body>
 </html>

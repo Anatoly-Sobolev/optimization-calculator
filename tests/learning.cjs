@@ -96,7 +96,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
       await page.locator('#learn-mode').selectOption('self');await page.locator('#learn-depth').selectOption('deep');await page.locator('#learn-hint').selectOption('request');await page.locator('[data-learn="restart"]').click();
       await page.evaluate(fastComplete);report.flows++;
       await page.evaluate(()=>{APP.state.custom={};APP.state.lastCustom=null;});
-      await page.locator('input[name="mode"][value="custom"]').check();await page.locator('#fsolve').click();
+      await page.locator('#cvar').selectOption('custom');await page.locator('#fsolve').click();
       assert.ok(await page.evaluate(()=>LEARN.stages.length>0),`Custom stages ${t.type}`);
       assert.equal(await page.locator('#ferr .bad').count(),0,`Custom input ${t.type}`);
     }
@@ -139,7 +139,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     await page.locator('#taskType').selectOption('graph');
     assert.ok(await page.evaluate(()=>LEARN.stages.every(s=>s.id.startsWith('graph-'))));
     assert.equal(await page.locator('#learning').evaluate(el=>el.getAnimations({subtree:true}).length),0);
-    await page.locator('[data-src="rgr"]').click();await page.locator('[data-src="zyk"]').click();
+    await page.locator('#csrc').selectOption('rgr');await page.locator('#csrc').selectOption('zyk');
     const nextVariant=await page.locator('#cvar').evaluate(el=>el.options[1].value);
     await page.locator('#cvar').selectOption(nextVariant);
     assert.equal(await page.evaluate(()=>APP.state.src),'zyk');assert.equal(await page.evaluate(()=>APP.state.v),Number(nextVariant));

@@ -1,9 +1,6 @@
 #learning { border:2px solid #5262b8; margin:18px 0; min-width:0; }
 #learning h2,#learning h3 {margin:0 0 8px}
-.learn-top {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.learn-settings {display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:18px}
-.learn-settings label {display:grid;gap:5px;font-size:14px}
-.learn-settings select {width:100%;min-width:0;padding:9px;border:1px solid #b8bfd6;border-radius:8px;background:#fff;color:#18223a}
+.learn-settings {display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:4px}
 .learn-progress {margin:22px 0 16px;display:grid;gap:8px}
 .learn-progress progress {width:100%;height:10px;accent-color:#4b60b5}
 .learn-situation {background:#f6f8fc;border-left:3px solid #687cc1;padding:14px;margin:14px 0;overflow:auto;max-width:100%}
@@ -39,26 +36,22 @@
 #learning .learn-answers .btn {transition:background .16s,border-color .16s,transform .16s}
 #learning .learn-answers .btn:hover {background:#f0f3ff;border-color:#98a5cf}
 #learning .learn-answers .btn:active {transform:scale(.995)}
-#controls select {max-width:100%;min-width:0}
-#controls .ctlrow > label {max-width:100%}
 #learning summary {cursor:pointer;padding:8px 0}
 #learning p {overflow-wrap:anywhere}
 #solution[hidden],#secnav[hidden] {display:none!important}
 #secnav[hidden] + main {grid-column:1 / -1}
 .mobile-fit-table {width:max-content!important;max-width:none!important}
-@media(max-width:650px) {.learn-settings,.learn-compare{grid-template-columns:1fr}.learn-top{align-items:stretch}#learning{padding:14px}.learn-question{font-size:17px}.learn-input input{width:100%}}
+@media(max-width:650px) {.learn-settings,.learn-compare{grid-template-columns:1fr}#learning{padding:14px}.learn-question{font-size:17px}.learn-input input{width:100%}}
 @media(prefers-reduced-motion:reduce) {#learning *,#learning *::before,#learning *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print {#learning{display:none!important}#solution[hidden]{display:block!important}.mobile-fit-table{zoom:1!important;width:auto!important}}
 
 /* Hidden scene elements must win over individual graph opacity styles. */
 .demo .gsvg .dh {opacity:0}
-.learn-presentation {display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;font-weight:600}
-.learn-presentation select {max-width:100%;min-width:0}
 .learn-reading article {border-top:1px solid var(--line);padding:16px 0;overflow-wrap:anywhere}
 .learn-reading h4 {margin:12px 0 6px}
 .static-reading *, .static-reading *::before, .static-reading *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}
 .static-reading .dmctl,.static-reading .dmprog,.static-reading .dmtag,.static-reading .dmdet {display:none!important}
-@media print {body.static-reading #learning {display:block!important} .static-reading .learn-top,.static-reading .learn-presentation {display:none!important}}
+@media print {body.static-reading #learning {display:block!important}}
 
 .static-reading .st-auto,.static-reading .r3spin {display:none!important}
 
