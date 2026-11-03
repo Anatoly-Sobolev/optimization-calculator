@@ -1,6 +1,6 @@
 #learning { border:2px solid #5262b8; margin:18px 0; min-width:0; }
 #learning h2,#learning h3 {margin:0 0 8px}
-.learn-settings {display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:4px}
+.learn-settings {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:4px}
 .learn-progress {margin:22px 0 16px;display:grid;gap:8px}
 .learn-progress progress {width:100%;height:10px;accent-color:#4b60b5}
 .learn-situation {background:#f6f8fc;border-left:3px solid #687cc1;padding:14px;margin:14px 0;overflow:auto;max-width:100%}

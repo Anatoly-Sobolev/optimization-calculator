@@ -14,7 +14,7 @@
     const compact=!print.matches;
     document.querySelectorAll('[data-fit-row]').forEach(row=>{row.style.removeProperty('height');row.removeAttribute('data-fit-row');});
     document.querySelectorAll('[data-fit-heading]').forEach(el=>{el.style.removeProperty('min-height');el.removeAttribute('data-fit-heading');});
-    document.querySelectorAll('#solution table, #learning table').forEach(table=>{
+    document.querySelectorAll('#solution table, #learning table:not(.flow-in)').forEach(table=>{
       if(!watched.has(table)){watched.add(table);resize.observe(table);}
       const parent=table.parentElement;
       if(!watched.has(parent)){watched.add(parent);resize.observe(parent);}

@@ -1,0 +1,138 @@
+/* Стили интерактивных учебных сцен. Состояния не передаются только цветом: у выбора есть знак ✓/✗,
+ * у выбранных элементов — рамка и атрибуты aria. Анимации отключаются при prefers-reduced-motion. */
+.scene{margin:12px 0;min-width:0}
+.scene-goal,.scene-action{margin:4px 0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.scene-action{color:#415499}
+.scene-body{margin:12px 0;min-width:0}
+.scene-out{min-height:1.4em;margin:8px 0;padding:0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.scene-out.ok,.scene-out.bad{padding:9px 12px;border-radius:10px;border-left:4px solid}
+.scene-out.ok{background:#e6f4ec;border-color:#287452}
+.scene-out.bad{background:#fdeeee;border-color:#b24a4a}
+.scene-takeaway{margin:10px 0;padding:10px 14px;border-radius:10px;background:#eef0ff;border-left:4px solid #5262b8;line-height:1.5}
+.scene-deep{display:block;margin-top:6px;color:#415499;font-size:14px}
+.sc-analogy{margin:6px 0 10px;padding:10px 12px;background:#f6f8fc;border-left:3px solid #687cc1;border-radius:0 8px 8px 0;line-height:1.5}
+.sc-q{font-size:17px;font-weight:600;line-height:1.45;margin:12px 0 8px;overflow-wrap:anywhere}
+.sc-opts,.sc-bk{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.sc-opts{flex-direction:column}
+.sc-opt{display:flex;align-items:flex-start;gap:8px;min-height:44px;padding:9px 14px;font:inherit;font-size:15px;line-height:1.4;text-align:left;background:#fff;border:1px solid #a4b2da;border-radius:10px;color:inherit;cursor:pointer;max-width:100%;transition:background .15s,border-color .15s,transform .12s}
+.sc-bk .sc-opt{min-width:0;flex:0 1 auto}
+.sc-opt:hover:not(:disabled){background:#f0f3ff;border-color:#7686cd}
+.sc-opt:active:not(:disabled){transform:scale(.99)}
+.sc-opt:disabled{opacity:.6;cursor:default}
+.sc-opt:focus-visible,.sc-chip:focus-visible,.sc-node:focus-visible,.heat-cell:focus-visible,.heat-head:focus-visible,.sc-cand:focus-visible{outline:3px solid #b05d0c;outline-offset:2px}
+.sc-opt[aria-checked="true"]{border-color:#5262b8;box-shadow:inset 0 0 0 1px #5262b8;background:#eef0ff}
+.sc-mark{flex:none;width:1.2em;text-align:center;font-weight:700}
+.sc-opt.right .sc-mark::before{content:"✓"}
+.sc-opt.wrong .sc-mark::before{content:"✗"}
+.sc-opt.right{border-color:#287452;background:#e6f4ec}
+.sc-opt.wrong{border-color:#b24a4a;background:#fdeeee}
+.sc-reveal{margin:10px 0;padding:10px 12px;border:1px solid #b5d2c7;border-radius:10px;overflow:auto}
+.sc-assign,.sc-points{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.sc-row,.sc-point,.sc-state{padding:10px 12px;border:1px solid #d7ddeb;border-radius:10px;display:grid;gap:8px;min-width:0}
+.sc-row.done{border-color:#287452;background:#f4fbf7}
+.sc-txt,.sc-pt{overflow-wrap:anywhere;line-height:1.5}
+.sc-fb{font-size:14px;color:#415499;min-height:1.2em;overflow-wrap:anywhere}
+.sc-count{font-size:14px;color:#415499;margin:8px 0}
+.sc-chips{list-style:none;margin:8px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.sc-chip{width:100%;min-height:44px;padding:9px 12px;font:inherit;font-weight:600;text-align:left;background:#fff;border:1px solid #a4b2da;border-radius:10px;cursor:pointer}
+.sc-chip[aria-expanded="true"]{background:#eef0ff;border-color:#5262b8}
+.sc-chip::after{content:" ▸";float:right}
+.sc-chip[aria-expanded="true"]::after{content:" ▾"}
+.sc-chip-text{padding:8px 12px;font-size:15px;line-height:1.5}
+.sc-map{list-style:none;margin:8px 0;padding:0;display:flex;flex-wrap:wrap;gap:8px;counter-reset:n}
+.sc-map li{display:flex;align-items:center;gap:6px;min-width:0}
+.sc-map li:not(:last-child)::after{content:"→";color:#687cc1}
+.sc-node{display:flex;align-items:center;gap:6px;min-height:44px;padding:8px 12px;font:inherit;font-size:14px;text-align:left;background:#fff;border:1px solid #a4b2da;border-radius:10px;cursor:pointer;max-width:100%}
+.sc-node.seen{background:#f0f3ff}
+.sc-node[aria-current="step"]{border-width:2px;border-color:#5262b8;font-weight:600}
+.sc-node.final{border-style:double;border-width:3px}
+.sc-num{flex:none;width:1.6em;height:1.6em;border-radius:50%;background:#e4eaf8;display:inline-grid;place-items:center;font-size:12px;font-weight:700}
+.sc-map-text{margin:8px 0;padding:10px 12px;background:#f6f8fc;border-radius:10px;min-height:3em;line-height:1.5}
+.sc-at{font-size:14px;color:#415499}
+.sc-model{font-size:16px;margin:8px 0;overflow-wrap:anywhere}
+.sc-model-rows{margin:4px 0 10px;padding-left:20px;line-height:1.7;overflow-wrap:anywhere}
+.sc-sliders{display:grid;gap:8px;margin:8px 0}
+.sc-slider{display:grid;grid-template-columns:auto minmax(0,1fr) 3em;gap:10px;align-items:center;font-weight:600}
+.sc-slider input[type=range]{width:100%;min-height:32px;accent-color:#4b60b5}
+.sc-slider output{text-align:right;font-variant-numeric:tabular-nums}
+.sc-bars{display:grid;gap:8px;margin:10px 0}
+.sc-bar-t{display:block;font-size:14px;margin-bottom:3px;overflow-wrap:anywhere}
+.sc-bar-track{position:relative;height:14px;border-radius:7px;background:#e4eaf8;overflow:hidden;border:1px solid #b8bfd6}
+.sc-bar-fill{height:100%;width:0;background:#6f84cf;transition:width .15s}
+.sc-bar.over .sc-bar-fill{background:repeating-linear-gradient(45deg,#c25b5b,#c25b5b 6px,#e0a0a0 6px,#e0a0a0 12px)}
+.sc-bar-limit{position:absolute;top:0;bottom:0;width:3px;background:#18223a}
+.sc-obj{font-size:16px}
+.sc-cands{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.sc-cand{min-height:44px}
+.sc-cand.seen{border-color:#5262b8;box-shadow:inset 0 0 0 1px #5262b8}
+.sc-legend{font-size:13px;color:#415499;margin:4px 0}
+.sc-state h4{margin:0 0 4px}
+.sc-shadow{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px}
+.sc-shadow li{display:grid;grid-template-columns:7em minmax(40px,1fr) auto;gap:8px;align-items:center;font-size:14px}
+.sc-shadow-bar{display:block;height:10px;width:var(--w);min-width:2px;background:#6f84cf;border-radius:5px}
+.sc-cut-track{position:relative;height:36px;margin:10px 0;border-bottom:3px solid #18223a}
+.sc-cut-track span{position:absolute;top:0;padding:2px 6px;background:#fff;border:1px solid #5262b8;border-radius:6px;font-size:14px;transform:translateX(-0%)}
+.sc-cut-need{border-style:dashed!important}
+.sc-next{margin-top:10px}
+/* Геометрия и сети */
+svg.geo{display:block;width:100%;max-width:520px;height:auto;margin:8px auto;background:#fcfbf7;border:1px solid #d7ddeb;border-radius:10px;touch-action:pan-y}
+.geo-grid{stroke:#e3ddd0;stroke-width:1}
+.geo-axis{stroke:#18223a;stroke-width:1.4}
+.geo-arrow{fill:#18223a}
+.geo-tick{font-size:10px;fill:#6b6f7c}
+.geo-lab{font-size:12px;fill:#18223a;font-weight:600}
+.geo-line{stroke:#415499;stroke-width:1.6;stroke-dasharray:6 3}
+.geo-area{opacity:.55}
+.geo-hatch-line{stroke:#7686cd;stroke-width:1.4}
+.geo-area-edge{fill:none;stroke:#283c92;stroke-width:2.2}
+.geo-level{stroke:#b05d0c;stroke-width:3}
+.geo-pt{cursor:grab}
+.geo-pt.drag{cursor:grabbing}
+.geo-pt-hit{fill:transparent;touch-action:none}
+.geo-pt-dot{fill:#fff;stroke:#18223a;stroke-width:3}
+.geo-pt:focus-visible .geo-pt-dot{stroke:#b05d0c;stroke-width:4}
+.geo-int{fill:#283c92}
+.geo-opt{fill:#b05d0c;stroke:#18223a;stroke-width:1.4}
+.geo-sel{fill:none;stroke:#18223a;stroke-width:2.5}
+.geo-read{min-height:2.8em;font-size:15px;line-height:1.5}
+.flow-line{stroke:#415499;fill:none;stroke-linecap:round}
+.flow-val{font-size:11px;fill:#18223a;font-weight:700;paint-order:stroke;stroke:#fcfbf7;stroke-width:3px}
+.flow-node rect{fill:#fff;stroke:#5262b8;stroke-width:1.6}
+.flow-node text{font-size:11px;fill:#18223a}
+.flow-in input{width:4.2em;min-height:40px;padding:4px 6px;font:inherit;text-align:center;border:1px solid #8998c4;border-radius:6px}
+.flow-in label{display:grid;gap:2px;justify-items:center}
+.sc-tariff{font-size:11px;color:#6b6f7c}
+.flow-rs,.flow-cs,.flow-cost{white-space:nowrap;font-size:14px}
+.net-line{stroke:#415499;stroke-width:2;fill:none}
+.net-hit{stroke:transparent;stroke-width:14}
+.net-arc,.net-ev{cursor:pointer}
+.net-d{font-size:12px;fill:#18223a;font-weight:700;paint-order:stroke;stroke:#fcfbf7;stroke-width:3px}
+.net-ev circle{fill:#fff;stroke:#18223a;stroke-width:2}
+.net-ev text{font-size:13px;font-weight:700;fill:#18223a}
+.net-ev .net-times{font-size:11px;font-weight:600}
+.net-arc.sel .net-line{stroke:#b05d0c;stroke-width:4}
+.net-ev.sel circle{stroke:#b05d0c;stroke-width:4}
+.net-arc.crit .net-line{stroke:#b24a4a;stroke-width:5}
+.net-arc:focus-visible .net-line,.net-ev:focus-visible circle{stroke:#b05d0c;stroke-width:4}
+.net-info{min-height:2.6em;font-size:15px;line-height:1.5;margin:6px 0}
+table.heat{border-collapse:separate;border-spacing:3px}
+.heat-cell,.heat-head{min-width:44px;min-height:44px;padding:4px 8px;font:inherit;font-size:15px;border:1px solid #b8bfd6;border-radius:6px;color:inherit;cursor:pointer;position:relative}
+.heat-head{background:#fff;font-weight:700}
+.heat-cell{background:rgba(75,96,181,calc(.07 + var(--h,0) * .32))}
+.heat-cell.pick{outline:3px solid #b05d0c;outline-offset:1px}
+.heat-cell.reply{border:2px dashed #18223a}
+.heat-mark{position:absolute;right:2px;top:-1px;font-size:11px}
+.heat-min,.heat-max{text-align:center;font-weight:700;color:#415499}
+/* Панель режима обучения */
+.learn-goal{margin:10px 0 4px;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.learn-contract{margin:6px 0 10px;border:1px solid #d7ddeb;border-radius:10px;padding:2px 12px;background:#fbfbfe}
+.learn-contract summary{cursor:pointer;padding:9px 0;font-weight:600}
+.learn-contract dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:6px 0 10px;font-size:14.5px;line-height:1.5}
+.learn-contract dt{font-weight:700;color:#415499}
+.learn-contract dd{margin:0;overflow-wrap:anywhere}
+.learn-skills{list-style:none;margin:8px 0;padding:0;display:grid;gap:10px}
+.learn-changed{outline:3px solid #b05d0c;outline-offset:-3px;font-weight:700}
+@media(max-width:650px){.learn-contract dl{grid-template-columns:1fr}.sc-slider{grid-template-columns:auto minmax(0,1fr) 2.4em}.sc-q{font-size:16px}.sc-shadow li{grid-template-columns:5.5em minmax(30px,1fr) auto}.sc-map li:not(:last-child)::after{display:none}}
+@media(prefers-reduced-motion:reduce){.scene *,.scene *::before,.scene *::after{transition:none!important;animation:none!important}}
+.static-reading .scene *{transition:none!important;animation:none!important}
+@media print{#learning .scene{display:none}}

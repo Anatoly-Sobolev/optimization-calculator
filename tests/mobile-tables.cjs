@@ -36,7 +36,7 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
     }
     await page.setViewportSize({width:390,height:844});
     await page.evaluate(()=>{Object.assign(APP.state,{src:'rgr',type:'simplex',v:1});APP.render();});
-    await page.locator('#learn-presentation').selectOption('learning');await page.locator('#learn-hint').selectOption('request');
+    await page.locator('#learn-presentation').selectOption('learning');await page.locator('#learn-mode').selectOption('guided');await page.locator('#learn-hint').selectOption('request');
     await page.evaluate(()=>{while(LEARN.stages[LEARN.session.index].interaction?.kind!=='column'){const s=LEARN.stages[LEARN.session.index];[...document.querySelectorAll('[data-answer]')].find(b=>b.dataset.answer===s.answer).click();document.querySelector('[data-learn="next"]').click();}});
     await page.waitForTimeout(150);
     const expected=await page.evaluate(()=>LEARN.stages[LEARN.session.index].answer);

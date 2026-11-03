@@ -12,7 +12,7 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
     await page.goto(pathToFileURL(path.join(root,'index.html')).href+'#s=rgr&t=simplex&v=1');
     assert.equal(await page.locator('#trmode').count(),0);
     assert.doesNotMatch(await page.locator('#learning').textContent(),/старый|классический тренажёр/i);
-    await page.locator('#learn-presentation').selectOption('learning');
+    await page.locator('#learn-presentation').selectOption('learning');await page.locator('#learn-mode').selectOption('guided');
     await page.locator('#learn-hint').selectOption('request');
     const answer=async()=>{
       const value=await page.evaluate(()=>LEARN.stages[LEARN.session.index].answer);
@@ -67,7 +67,7 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
     assert.equal(await page.locator('.learn-success').count(),1);
     assert.equal(await page.locator('#learning').evaluate(e=>e.getAnimations({subtree:true}).length),0);
     await page.locator('[data-view="compare"]').click();assert.equal(await page.locator('#learning').evaluate(e=>e.getAnimations({subtree:true}).length),0);
-    await page.locator('#learn-mode').selectOption('understand');await page.locator('[data-learn="reveal"]').click();
+    await page.locator('#learn-depth').selectOption('deep');await page.locator('[data-learn="reveal"]').click();
     assert.equal(await page.locator('.learn-success').count(),0,'Reading/revealing is not a correct answer');
     await page.locator('[data-view="compare"]').click();assert.equal(await page.locator('.learn-compare > div').count(),2);
     assert.deepEqual(errors,[]);

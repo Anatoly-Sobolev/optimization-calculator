@@ -52,28 +52,24 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     await page.locator('#learn-presentation').selectOption('learning');
     for(const t of (finishOnly?[]:registry)){
       const variant=t.variants.find(v=>!v.broken).v;
-      for(const mode of ['understand','next','error','self','quiz','exam']){
+      for(const mode of ['meaning','model','strategy','guided','solo','check']){
         await render(page,t,variant);
         await page.locator('#learn-mode').selectOption(mode);
-        await page.locator('#learn-depth').selectOption('brief');
-        await page.locator('#learn-hint').selectOption('request');
+        if(await page.locator('#learn-depth').count())await page.locator('#learn-depth').selectOption('brief');
+        if(await page.locator('#learn-hint').count())await page.locator('#learn-hint').selectOption('request');
         await page.locator('[data-learn="restart"]').click();
         let count=0;
         while(await page.locator('#learn-progress').count()){
           if(++count>100)throw new Error('Unbounded flow');
           const state=await page.evaluate(()=>({s:LEARN.stages[LEARN.session.index],i:LEARN.session.index}));
-          if(mode==='understand')await page.locator('[data-learn="reveal"]').click();
-          else if(mode==='error'){
-            const candidate=await page.locator('[data-assess]').first().getAttribute('data-candidate');
-            const isCorrect=await page.evaluate(v=>LEARN.accept(LEARN.stages[LEARN.session.index],v),candidate);
-            await page.locator(`[data-assess="${isCorrect}"]`).click();
-          }else if(await page.locator('#learn-answer').count()){
+          if(state.s.kind==='scene')await page.locator('.sc-opt[data-v="r"]').count()&&['solo','check'].includes(mode)?await page.locator('.sc-opt[data-v="r"]').click():await page.locator('[data-learn="reveal"]').click();
+          else if(await page.locator('#learn-answer').count()){
             await page.locator('#learn-answer').fill(state.s.answer);await page.locator('#learn-answer-form button').click();
           }else await page.locator('[data-answer]').filter({hasText:/./}).evaluateAll((els,answer)=>els.find(el=>el.dataset.answer===answer).click(),state.s.answer);
-          assert.equal(await page.locator('[data-learn="next"]').count(),1,'Correct answer did not unlock');
+          assert.equal(await page.locator('[data-learn="next"]:not([hidden])').count(),1,'Correct answer did not unlock');
           await page.locator('[data-learn="next"]').click();
         }
-        assert.match(await page.locator('#learning').textContent(),/Прохождение завершено/);
+        assert.match(await page.locator('#learning').textContent(),/Режим пройден/);
         report.flows++;
       }
       console.log(`Flows ${t.src}/${t.type}/${t.base||''}: 6 modes`);
@@ -85,7 +81,8 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
         if(++count>2000)throw new Error('Flow did not terminate');
         const s=LEARN.stages[LEARN.session.index];
         const input=document.querySelector('#learn-answer');
-        if(input){const q=Q.parse(s.answer);input.value=String(q.n*2n)+'/'+String(q.d*2n);document.querySelector('#learn-answer-form').requestSubmit();numeric++;}
+        if(s.kind==='scene')document.querySelector('.sc-opt[data-v="r"]').click();
+        else if(input){const q=Q.parse(s.answer);input.value=String(q.n*2n)+'/'+String(q.d*2n);document.querySelector('#learn-answer-form').requestSubmit();numeric++;}
         else {const b=[...document.querySelectorAll('[data-answer]')].find(b=>b.dataset.answer===s.answer);if(b)b.click();else if(!document.querySelector('[data-learn="next"]'))throw new Error('No answer control');}
         const next=document.querySelector('[data-learn="next"]');if(!next)throw new Error('Correct answer blocked');next.click();
       }
@@ -93,7 +90,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     };
     for(const t of (finishOnly?[]:registry)){
       await render(page,t,t.variants.find(v=>!v.broken).v);
-      await page.locator('#learn-mode').selectOption('self');await page.locator('#learn-depth').selectOption('deep');await page.locator('#learn-hint').selectOption('request');await page.locator('[data-learn="restart"]').click();
+      await page.locator('#learn-mode').selectOption('solo');await page.locator('#learn-depth').selectOption('deep');await page.locator('[data-learn="restart"]').click();
       await page.evaluate(fastComplete);report.flows++;
       await page.evaluate(()=>{APP.state.custom={};APP.state.lastCustom=null;});
       await page.locator('#cvar').selectOption('custom');await page.locator('#fsolve').click();
@@ -101,16 +98,16 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
       assert.equal(await page.locator('#ferr .bad').count(),0,`Custom input ${t.type}`);
     }
     if(!finishOnly)report.checks.push('Deep independent flows for all 20 representatives; equivalent fractions accepted; custom inputs solve in all sections');
-    await page.locator('#learn-mode').selectOption('exam');await page.locator('#learn-depth').selectOption('brief');await page.locator('[data-learn="exam"]').click();
+    await page.locator('#learn-mode').selectOption('check');await page.locator('#learn-format').selectOption('exam');await page.locator('[data-learn="exam"]').click();
     for(let i=0;i<6;i++){
       await page.evaluate(fastComplete);
       assert.equal(await page.locator('[data-learn="exam-next"]').count(),1);
       await page.locator('[data-learn="exam-next"]').click();
     }
-    assert.ok(await page.evaluate(()=>!JSON.parse(localStorage.getItem('optimization.learning.v1')).exam));
-    report.checks.push('Full six-task mixed exam completes and reduces automatic hints');
+    assert.ok(await page.evaluate(()=>!JSON.parse(localStorage.getItem('optimization.learning.v2')).exam));
+    report.checks.push('Full six-task mixed exam (check mode) completes');
     await render(page,registry[0],registry[0].variants[0].v);
-    await page.locator('#learn-mode').selectOption('next');await page.locator('#learn-hint').selectOption('request');await page.locator('[data-learn="restart"]').click();
+    await page.locator('#learn-mode').selectOption('guided');await page.locator('#learn-hint').selectOption('request');await page.locator('[data-learn="restart"]').click();
     const before=await page.evaluate(()=>LEARN.session.index);
     await page.locator('[data-answer]').evaluateAll((els,answer)=>els.find(el=>el.dataset.answer!==answer).click(),await page.evaluate(()=>LEARN.stages[LEARN.session.index].answer));
     assert.equal(await page.evaluate(()=>LEARN.session.index),before);assert.equal(await page.locator('[data-learn="next"]').count(),0);
@@ -146,7 +143,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
     assert.equal(await page.locator('#learn-transformation').count(),0);
     report.checks.push('Desktop width, keyboard focus, topic switch clears old question and animations');
     await page.locator('.learn-history summary').click();await page.locator('[data-learn="reset"]').click();
-    assert.ok(await page.evaluate(()=>!localStorage.getItem('optimization.learning.v1')));
+    assert.ok(await page.evaluate(()=>!localStorage.getItem('optimization.learning.v2')));
     report.checks.push('Local progress reset');
     assert.equal(report.errors.length,0);
     report.completed=true;

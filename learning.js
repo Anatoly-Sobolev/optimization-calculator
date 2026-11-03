@@ -4,25 +4,18 @@
  * All persistence is browser-local. No requests or telemetry. */
 const LEARN = (() => {
   'use strict';
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const txt = q => q == null ? '—' : typeof q.toText === 'function' ? q.toText() : String(q);
-  const f = q => esc(txt(q));
+  const { esc, txt, f, equation } = LU;
   const sum = xs => xs.reduce((a,b) => a.add(Q.of(b)), Z());
-  const KEY = 'optimization.learning.v1';
-  const fresh = () => ({version:1, settings:{mode:'next',depth:'detail',hint:'error',presentation:'animated'}, topics:{}, sessions:{}, streak:0, best:0});
-  let data = fresh(), storageOK = true;
-  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d?.version === 1 && d.settings && d.topics && d.sessions) data = {...fresh(),...d}; } catch (_) { storageOK = false; }
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (_) { storageOK = false; } };
+  let data, storageOK = true;
+  try { const loaded = LPROG.load(localStorage); data = loaded.data; storageOK = loaded.ok; } catch (_) { data = LPROG.fresh(); storageOK = false; }
+  const save = () => { if (!LPROG.save(localStorage, data)) storageOK = false; };
   let records = [], recording = false, active = false, context, root, stages = [], allStages = [], session, signature, animations = [], animationEpoch = 0;
-  const modes = {understand:'Понять решение',next:'Следующий логический этап',error:'Разобрать ошибку или выбор',self:'Решить самостоятельно',quiz:'Викторина по теме',exam:'Подготовка к экзамену'};
-  const descriptions = {understand:'Читайте цель этапа, затем открывайте настоящее преобразование.',next:'Выберите следующее действие. Ошибка оставляет вас на том же этапе.',error:'Проверьте предложенное рассуждение и объясните выбор.',self:'Вычисляйте ключевые величины: принимаются целые, десятичные и дроби.',quiz:'До пяти вопросов по текущей задаче, от подготовки до результата.',exam:'Шесть задач из разных разделов обоих источников. Подсказок постепенно меньше.'};
   const wrap = (object, name, key) => { const original = object[name]; object[name] = function(...args) { const result = original.apply(this,args); if(recording) records.push({key,args,result}); return result; }; };
   [[ALG,'twoPhase','lp'],[ALG,'graph','graph'],[ALG,'dual','dual'],[ALGZ,'dualOf','dualOf'],[ALGZ,'reduce2','reduce'],[ALGD,'solve','dsx'],[ALGT,'solve','transp'],[ALGN,'solve','netw'],[ALGG,'solve','game'],[ALGK,'convert','canon'],[ALGI,'solve','gomory'],[ALGI,'bnb','bnb'],[ALGX,'check','optcheck'],[ALGX,'duality','duality']].forEach(a=>wrap(...a));
   function stop() { animationEpoch++; animations.forEach(a=>a.cancel()); animations=[]; }
   function begin() { stop(); records=[]; recording=true; }
   const get = k => records.find(r=>r.key===k);
   const matrix = (rows, headers) => `<div class="learn-scroll"><table class="sx"><thead><tr>${headers.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  const equation = (r, variable='x') => `${r.a.map((a,j)=>`${f(a)}·${variable}<sub>${j+1}</sub>`).join(' + ')} ${esc(r.s)} ${f(r.b)}`;
   const problem = p => `<p>${p.c.map((c,j)=>`${f(c)}·x<sub>${j+1}</sub>`).join(' + ')} → ${esc(p.sense)}</p>${p.rows.map((r,i)=>`<p>(${i+1}) ${equation(r)}</p>`).join('')}`;
   const tableau = (s, mark) => R.table({...s,p:null,q:null},{mark});
   function choice(title,before,prompt,answer,alternatives,reason,extra={}) {
@@ -210,9 +203,7 @@ const LEARN = (() => {
   function accept(step,value) { if(step.numeric) {try{return Q.parse(value).eq(Q.parse(step.answer));}catch(_){return false;}} return String(value)===step.answer; }
   function selectStages(all,settings=data.settings) {
     const threshold={brief:0,detail:1,deep:2}[settings.depth]??1;
-    let picked=all.filter(s=>s.tier<=threshold);
-    if(settings.mode==='quiz' && picked.length>5) picked=Array.from({length:5},(_,i)=>picked[Math.round(i*(picked.length-1)/4)]);
-    return picked;
+    return all.filter(s=>s.tier<=threshold);
   }
   function digest(s) { let h=2166136261; for(const c of s) h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0).toString(36); }
   function options(step) {
@@ -225,12 +216,26 @@ const LEARN = (() => {
     // Stable permutation: no answer-position cue, stable across retries/reload.
     return unique.map(o=>({...o,sort:digest(step.id+o.value)})).sort((a,b)=>a.sort.localeCompare(b.sort));
   }
+  const presentations=[['animated','Обычный разбор'],['learning','Обучение'],['text','Решение без анимаций']];
+  const notes={learning:'Выберите режим обучения: от знакомства со смыслом задачи до проверки знаний.',text:'Все этапы открыты сразу; текст можно выделить и скопировать.'};
+  const fieldHtml=(id,label,list,cur)=>`<div class="cfield"><span class="clab" id="lbl-${id}">${label}</span><select id="${id}" data-dd>${list.map(([k,v])=>`<option value="${k}"${k===cur?' selected':''}>${v}</option>`).join('')}</select></div>`;
+  /* Поле «Режим работы» входит в общую панель управления (controls() в index.html). */
+  const modeField=()=>fieldHtml('learn-presentation','Режим работы',presentations,data.settings.presentation||'animated');
+  const modeNote=()=>notes[data.settings.presentation]||'';
+  /* ---------- Монтирование и построение сценария режима ---------- */
+  let sdata = null, sceneApi = null;
+  const topicKey = () => context.state.src + ':' + context.state.type;
+  function scenario(mode = data.settings.mode, format = data.settings.format, depth = data.settings.depth) {
+    const base = mode === 'check' ? allStages : selectStages(allStages, { depth });
+    return LSCEN.build(mode, sdata, { depth, stages: base, format });
+  }
   function mount(state,structure) {
     active=data.settings.presentation==='learning';
     recording=false; context={state:{...state},structure,variant:structure.variants.find(v=>v.v===state.v)};
     document.getElementById('learning')?.remove();
     root=document.createElement('section'); root.id='learning';root.className='card';root.setAttribute('aria-label','Обучение');
     document.getElementById('solution').before(root);
+    bindPresentation();
     if(state.trainer) active=false;
     let all;
     try { all=build(state,state.mode==='db'?context.variant:null); }
@@ -240,9 +245,12 @@ const LEARN = (() => {
       const visual=document.querySelector('#solution #plot svg, #solution #graph svg');
       if(visual) { const clone=visual.cloneNode(true); clone.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));clone.removeAttribute('id');all[all.length-1].after+=`<div class="learn-scroll">${clone.outerHTML}</div>`; }
     }
-    bindPresentation();
-    allStages=all;stages=selectStages(all);
-    signature=digest(JSON.stringify([state.src,state.type,state.base,state.mode,state.v,state.tinit,all.map(s=>[s.id,s.before,s.answer]),data.settings]));
+    allStages=all;
+    try { sdata=LSCEN.dataFrom(get,state,structure,context.variant); }
+    catch(error) { console.error('Данные сцен:',error); sdata={type:state.type,rec:{}}; }
+    try { stages=scenario(); } catch(error) { console.error('Сценарий режима:',error); stages=[]; }
+    const {presentation,...cfg}=data.settings;
+    signature=digest(JSON.stringify([state.src,state.type,state.base,state.mode,state.v,state.tinit,all.map(s=>[s.id,s.before,s.answer]),cfg]));
     session=data.sessions[signature]||{index:0,answers:{},done:false};
     if(session.index>stages.length) session={index:0,answers:{},done:false};
     data.sessions[signature]=session;
@@ -250,15 +258,26 @@ const LEARN = (() => {
     const keys=Object.keys(data.sessions); if(keys.length>80) keys.slice(0,keys.length-80).forEach(k=>{if(k!==signature)delete data.sessions[k];});
     draw();
   }
-  const presentations=[['animated','Обычный разбор'],['learning','Обучение'],['text','Решение без анимаций']];
-  const notes={learning:'Выбирайте действия сами: ошибка оставляет вас на том же этапе, полное решение откроется после прохождения.',text:'Все этапы открыты сразу; текст можно выделить и скопировать.'};
-  const fieldHtml=(id,label,list,cur)=>`<div class="cfield"><span class="clab" id="lbl-${id}">${label}</span><select id="${id}" data-dd>${list.map(([k,v])=>`<option value="${k}"${k===cur?' selected':''}>${v}</option>`).join('')}</select></div>`;
-  /* Поле «Режим работы» входит в общую панель управления (controls() в index.html). */
-  const modeField=()=>fieldHtml('learn-presentation','Режим работы',presentations,data.settings.presentation||'animated');
-  const modeNote=()=>notes[data.settings.presentation]||'';
-  const button=(label,action,cls='')=>`<button type="button" class="btn ${cls}" data-learn="${action}">${label}</button>`;
+  const button=(label,action,cls='',extra='')=>`<button type="button" class="btn ${cls}" data-learn="${action}"${extra}>${label}</button>`;
+  const isScene=s=>s&&s.kind==='scene';
+  const modeInfo=()=>LMODES.byId[data.settings.mode]||LMODES.byId[LMODES.default];
+  const field=(id,label,inner)=>`<div class="cfield"><span class="clab" id="lbl-${id}">${label}</span><select id="${id}" data-dd>${inner}</select></div>`;
+  const opts=(list,cur)=>list.map(([k,v])=>`<option value="${k}"${k===cur?' selected':''}>${v}</option>`).join('');
+  function settingsHtml() {
+    const mi=modeInfo(), groups={understand:'Понимание',practice:'Практика',assessment:'Проверка'};
+    const modeOpts=Object.entries(groups).map(([g,label])=>`<optgroup label="${label}">${LMODES.list.filter(m=>m.group===g).map(m=>`<option value="${m.id}"${m.id===mi.id?' selected':''}>${m.label}</option>`).join('')}</optgroup>`).join('');
+    let h=field('learn-mode','Режим обучения',modeOpts);
+    if(mi.settings.includes('depth')) h+=field('learn-depth','Глубина',opts([['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']],data.settings.depth));
+    if(mi.settings.includes('hint')) h+=field('learn-hint','Подсказки',opts([['now','Сразу'],['error','После ошибки'],['request','По запросу']],data.settings.hint));
+    if(mi.id==='check') h+=field('learn-format','Формат',opts([['topic','Тест по теме'],['exam','Экзамен: шесть тем']],data.settings.format));
+    return `<div class="learn-settings">${h}</div>`;
+  }
+  function contractHtml(fresh) {
+    const mi=modeInfo();
+    return `<p class="learn-goal"><strong>Цель.</strong> ${esc(mi.goal)}</p><details class="learn-contract"${fresh?' open':''}><summary>Что вы будете делать и когда режим пройден</summary><dl><dt>Вы будете</dt><dd>${esc(mi.interactionKinds.join('; '))}</dd><dt>Пройдено, когда</dt><dd>${esc(mi.completionRule)}</dd><dt>Чем отличается</dt><dd>${esc(mi.difference)}</dd>${mi.settings.includes('depth')?`<dt>Глубина</dt><dd>${esc(LMODES.depthRoles[data.settings.depth])}</dd>`:''}</dl></details>`;
+  }
   function draw() {
-    stop();
+    stop(); sceneApi=null;
     const staticMode=data.settings.presentation==='text';
     document.body.classList.toggle('static-reading',staticMode);
     const hidden=!staticMode && active && stages.length>0 && session.index<stages.length;
@@ -272,70 +291,138 @@ const LEARN = (() => {
       bindUI();return;
     }
     if(!active) {bindUI();return;}
-    root.innerHTML+=`<div class="learn-settings">${fieldHtml('learn-mode','Учебный режим',Object.entries(modes),data.settings.mode)}${fieldHtml('learn-depth','Глубина',[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']],data.settings.depth)}${fieldHtml('learn-hint','Подсказки',[['now','Сразу'],['error','После ошибки'],['request','По запросу']],data.settings.hint)}</div><p>${descriptions[data.settings.mode]}</p>`;
+    const mode=data.settings.mode, fresh=false;
+    root.innerHTML+=settingsHtml()+contractHtml(fresh);
     if(!storageOK) root.innerHTML+='<p class="note warn">Браузер не разрешил сохранение: прогресс доступен только до закрытия страницы.</p>';
     const note=context.variant?.note;
-    if(context.state.mode==='db'&&(note||context.variant?.warn))root.innerHTML+=`<div class="note warn">Примечание источника: ${note||esc(context.variant.warn)}</div>`;
-    if(data.settings.mode==='exam')root.innerHTML+=`<p class="kbd">${data.exam?`Экзаменационная подборка: задача ${data.exam.at+1} из ${data.exam.queue.length}.`:'Начните подборку из шести разделов.'}</p>${button(data.exam?'Новая подборка':'Начать смешанную подборку','exam')}`;
-    if(!stages.length)root.innerHTML+='<p class="note warn">Учебные этапы не получены. Введите корректное условие и нажмите «Решить»; полный разбор остаётся доступным.</p>';
-    else if(session.index>=stages.length) drawEnd();
-    else drawStep();
-    root.innerHTML+=`<details class="learn-history"><summary>Освоение тем и локальный прогресс</summary><p>Сохраняются ответы по этапам, ошибки, использование помощи и завершённые прохождения. Данные остаются в этом браузере.</p><p>Лучшая серия: ${data.best}.</p>${Object.entries(data.topics).map(([k,t])=>`<p>${esc(t.title)}: ${t.mastered?'✓ освоено самостоятельно':'в работе'}, завершено ${t.completed}.</p>`).join('')||'<p>Завершённых тем пока нет.</p>'}${button('Сбросить учебный прогресс','reset')}</details>`;
+    if(context.state.mode==='db'&&['guided','solo','check'].includes(mode)&&(note||context.variant?.warn))root.innerHTML+=`<div class="note warn">Примечание источника: ${note||esc(context.variant.warn)}</div>`;
+    if(mode==='check'&&data.settings.format==='exam'&&!data.exam) root.innerHTML+=`<p class="kbd">Начните подборку из шести тем двух источников: в каждой — вопросы на понимание и вычисления, без подсказок.</p>${button('Начать экзамен','exam')}`;
+    else if(!stages.length)root.innerHTML+='<p class="note warn">Для этих данных сцены и этапы не получены. Введите корректное условие и нажмите «Решить»; полный разбор остаётся доступным.</p>';
+    else {
+      if(mode==='check'&&data.settings.format==='exam'&&data.exam)root.innerHTML+=`<p class="kbd">Экзамен: тема ${data.exam.at+1} из ${data.exam.queue.length}.</p>`;
+      if(session.index>=stages.length) drawEnd(); else drawStep();
+    }
+    root.innerHTML+=`<details class="learn-history"><summary>Освоение тем и локальный прогресс</summary>${historyHtml()}${button('Сбросить учебный прогресс','reset')}</details>`;
     bindUI();
   }
+  const LEVEL_NAMES={understanding:'Понимание',practice:'Практика',proof:'Проверка'};
+  function historyHtml() {
+    const rows=Object.entries(data.skills).filter(([k,sk])=>LPROG.MODES.some(m=>sk[m]&&sk[m].done)).map(([k,sk])=>{
+      const lv=LPROG.levels(sk), c=sk.check||{}, pct=r=>r&&r.total?Math.round(100*r.right/r.total)+'%':'—';
+      const parts=LMODES.list.map(m=>`${m.label}: ${sk[m.id]&&sk[m.id].done?'пройден':'нет'}`).join('; ');
+      return `<li><strong>${esc(sk.title||k)}</strong>: ${LPROG.mastered(sk)?'✓ освоена полностью':'освоена частично'} · ${Object.entries(LEVEL_NAMES).map(([id,l])=>`${l} ${lv[id]?'✓':'·'}`).join(' · ')}<br><span class="kbd">Проверка: понимание ${pct(c.concept)}, вычисления ${pct(c.compute)}. ${esc(parts)}.</span></li>`;
+    });
+    return `<p>Сохраняются ответы, ошибки, подсказки и пройденные режимы. Тема считается освоенной только при понимании, практике и проверке одновременно. Данные остаются в этом браузере.</p><p>Лучшая серия: ${data.best}.</p>${rows.length?`<ul class="learn-skills">${rows.join('')}</ul>`:'<p>Пройденных режимов пока нет.</p>'}`;
+  }
+  const answerOf=s=>session.answers[s.id]||{};
+  function progressHtml(a) { return `<div class="learn-progress"><label for="learn-progress">Этап ${session.index+1} из ${stages.length} · серия ${data.streak}</label><progress id="learn-progress" max="${stages.length}" value="${session.index+(a.solved?1:0)}"></progress></div>`; }
   function drawStep() {
-    const s=stages[session.index],a=session.answers[s.id]||{},mode=data.settings.mode;
+    const s=stages[session.index],a=answerOf(s),mode=data.settings.mode;
     const condition=document.querySelector('#solution #cond');
-    const direct=s.interaction && ['next','quiz','self','exam'].includes(mode) && !(s.numeric&&['self','exam'].includes(mode));
-    root.innerHTML+=`<div class="learn-progress"><label for="learn-progress">Этап ${session.index+1} из ${stages.length} · серия ${data.streak}</label><progress id="learn-progress" max="${stages.length}" value="${session.index+(a.solved?1:0)}"></progress></div>${condition?`<details><summary>Условие выбранной задачи</summary>${condition.innerHTML}</details>`:''}<h3 tabindex="-1" id="learn-heading">${esc(s.title)}</h3><p class="learn-question" id="learn-question">${esc(s.prompt)}</p>${direct&&!a.solved?`<p class="learn-instruction">${{column:'Выберите заголовок столбца прямо в таблице.',row:'Выберите строку нажатием на её базисную переменную.',cell:'Нажмите на ведущий элемент в таблице.'}[s.interaction.kind]} Можно пользоваться Tab и Enter.</p>`:''}<div class="learn-situation">${s.before}</div>`;
+    if(isScene(s)) {
+      root.innerHTML+=`${progressHtml(a)}<h3 tabindex="-1" id="learn-heading">${esc(s.title)}</h3><div class="scene-host"></div><div class="btnrow scene-nav">${mode!=='check'?button('Подсказка','hint'):''}${mode!=='check'?button('Пропустить сцену','reveal'):''}${button(session.index===stages.length-1?'Завершить':'Следующий этап','next','primary',a.solved?'':' hidden')}</div><div class="btnrow">${session.index?button('Предыдущий этап','previous'):''}${button('Начать прохождение заново','restart')}</div>`;
+      return;
+    }
+    const single=mode==='check', hard=mode==='solo'||single;
+    const direct=s.interaction && ['guided','solo','check'].includes(mode) && !(s.numeric&&hard);
+    root.innerHTML+=`${progressHtml(a)}${condition&&mode!=='check'?`<details><summary>Условие выбранной задачи</summary>${condition.innerHTML}</details>`:''}<h3 tabindex="-1" id="learn-heading">${esc(s.title)}</h3><p class="learn-question" id="learn-question">${esc(s.prompt)}</p>${direct&&!a.solved?`<p class="learn-instruction">${{column:'Выберите заголовок столбца прямо в таблице.',row:'Выберите строку нажатием на её базисную переменную.',cell:'Нажмите на ведущий элемент в таблице.'}[s.interaction.kind]} Можно пользоваться Tab и Enter.</p>`:''}<div class="learn-situation">${s.before}</div>`;
     if(!a.solved) {
-      if(mode==='understand')root.innerHTML+=`<p>${esc(s.reason)}</p>${button('Показать преобразование','reveal','primary')}`;
-      else if(mode==='error') {
-        const opts=options(s),candidate=opts[session.index%opts.length];
-        root.innerHTML+=`<p>Студент предлагает: <strong>${esc(candidate.label)}</strong>. Оцените этот выбор.</p><div class="learn-answers">${[true,false].map(v=>`<button class="btn" type="button" data-assess="${v}" data-candidate="${esc(candidate.value)}">${v?'Верно':'Ошибка'}</button>`).join('')}</div>`;
-      } else if(s.numeric && (mode==='self'||mode==='exam'))root.innerHTML+='<form id="learn-answer-form"><label for="learn-answer">Ваш ответ (например, −3/7 или 1,25)</label><div class="learn-input"><input id="learn-answer" autocomplete="off" inputmode="text" required><button class="btn primary" type="submit">Проверить</button></div></form>';
+      if(s.numeric && hard)root.innerHTML+='<form id="learn-answer-form"><label for="learn-answer">Ваш ответ (например, −3/7 или 1,25)</label><div class="learn-input"><input id="learn-answer" autocomplete="off" inputmode="text" required><button class="btn primary" type="submit">Проверить</button></div></form>';
       else root.innerHTML+=`${direct?'<details class="learn-alternative"><summary>Ответить списком вариантов</summary>':''}<div class="learn-answers">${options(s).map(o=>`<button class="btn" type="button" data-answer="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>${direct?'</details>':''}`;
-      const autoHint=data.settings.hint==='now'||data.settings.hint==='error'&&a.errors>0;
-      if(mode!=='understand')root.innerHTML+=`<div class="btnrow">${button('Подсказка','hint')}${button('Показать объяснение / сдаться','reveal')}</div>`;
+      const autoHint=mode==='guided'&&(data.settings.hint==='now'||data.settings.hint==='error'&&a.errors>0);
+      if(!single)root.innerHTML+=`<div class="btnrow">${button('Подсказка','hint')}${button('Показать ответ и объяснение (считается помощью)','reveal')}</div>`;
       if(a.hint || autoHint) {if(!a.hint){a.hint=true;session.answers[s.id]=a;save();}root.innerHTML+=`<p class="note">${esc(s.hint)}</p>`;}
     }
-    root.innerHTML+=`<div id="learn-feedback" tabindex="-1" role="status" aria-live="polite">${a.solved&&!a.revealed?'<span class="learn-success"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14"/><path d="M9 16l5 5 10-11"/></svg><strong>Верно, можно двигаться дальше</strong></span>':''}${a.feedback?`<p class="note ${a.solved?'ok':'bad'}">${esc(a.feedback)}</p>`:''}</div>`;
-    if(a.solved)root.innerHTML+=`${data.settings.depth==='deep'?`<p class="note">${esc(s.deep)}</p>`:''}<div class="learn-view-controls" role="group" aria-label="Просмотр преобразования">${[['before','До шага'],['after','После шага'],['compare','Сравнить рядом']].map(([k,label])=>`<button class="btn" type="button" data-view="${k}" aria-pressed="${k==='after'}">${label}</button>`).join('')}</div><div id="learn-transformation" class="learn-transformation"><h4>После шага</h4>${s.after}</div><div class="btnrow">${button('Повторить преобразование','replay')}${button('Остановить анимацию','stop')}${button(session.index===stages.length-1?'Завершить':'Следующий этап','next','primary')}</div>`;
-    root.innerHTML+=`<div class="btnrow">${session.index?button('Предыдущий этап','previous'):''}${button('Начать прохождение заново','restart')}</div>`;
+    root.innerHTML+=`<div id="learn-feedback" tabindex="-1" role="status" aria-live="polite">${a.solved&&!a.revealed&&!a.wrong?'<span class="learn-success"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14"/><path d="M9 16l5 5 10-11"/></svg><strong>Верно, можно двигаться дальше</strong></span>':''}${a.feedback?`<p class="note ${a.solved&&!a.wrong?'ok':'bad'}">${esc(a.feedback)}</p>`:''}</div>`;
+    if(a.solved&&!single)root.innerHTML+=`${data.settings.depth==='deep'?`<p class="note">${esc(s.deep)}</p>`:''}<div class="learn-view-controls" role="group" aria-label="Просмотр преобразования">${[['before','До шага'],['after','После шага'],['compare','Сравнить рядом']].map(([k,label])=>`<button class="btn" type="button" data-view="${k}" aria-pressed="${k==='after'}">${label}</button>`).join('')}</div><div id="learn-transformation" class="learn-transformation"><h4>После шага</h4>${s.after}</div><div class="btnrow">${button('Повторить преобразование','replay')}${button('Остановить анимацию','stop')}${button(session.index===stages.length-1?'Завершить':'Следующий этап','next','primary')}</div>`;
+    else if(a.solved)root.innerHTML+=`<div class="btnrow">${button(session.index===stages.length-1?'Завершить':'Следующий вопрос','next','primary')}</div>`;
+    if(!single||!a.solved)root.innerHTML+=`<div class="btnrow">${session.index&&!single?button('Предыдущий этап','previous'):''}${button('Начать прохождение заново','restart')}</div>`;
   }
+  const KIND_NAMES={sign:'знак',reciprocal:'деление наоборот',arithmetic:'арифметика',zero:'нулевой результат',calc:'формула',format:'запись числа',plan:'выбор подхода',concept:'понимание',feasibility:'допустимость',strategy:'стратегия',stop:'критерий остановки',misconception:'типичное заблуждение',error:'типичное заблуждение'};
+  const kindName=k=>KIND_NAMES[String(k).split(':')[0]]||String(k);
+  function summarize() {
+    const items=stages.map(s=>({s,a:answerOf(s)})), total=items.length;
+    const firstTry=items.filter(({a})=>a.solved&&!a.errors&&!a.hint&&!a.revealed).length;
+    const part=t=>{const xs=items.filter(({s})=>(s.assess||'compute')===t);return {right:xs.filter(({a})=>a.correct).length,total:xs.length};};
+    return {total,firstTry,errors:items.reduce((n,{a})=>n+(a.errors||0),0),hints:items.filter(({a})=>a.hint).length,revealed:items.filter(({a})=>a.revealed).length,concept:part('concept'),compute:part('compute'),errorKinds:items.flatMap(({a})=>a.kinds||[]),title:context.structure.short};
+  }
+  const NEXT_MODE={meaning:'model',model:'strategy',strategy:'guided',guided:'solo',solo:'check'};
+  const gotoBtn=(id,primary)=>button('Перейти: '+LMODES.byId[id].label,'goto',primary?'primary':'',` data-mode="${id}"`);
   function drawEnd() {
+    const mode=data.settings.mode, r=summarize();
     if(!session.done) {
-      session.done=true; const answers=Object.values(session.answers), errors=answers.reduce((n,a)=>n+(a.errors||0),0),help=answers.some(a=>a.hint||a.revealed);
-      const k=context.state.src+':'+context.state.type, old=data.topics[k]||{title:context.structure.short,completed:0,mastered:false};
-      old.completed++;old.mastered ||= !errors&&!help&&['self','next','exam'].includes(data.settings.mode); data.topics[k]=old; save();
+      session.done=true; LPROG.record(data,topicKey(),mode,r); save();
     }
-    const answers=Object.values(session.answers),errors=answers.reduce((n,a)=>n+(a.errors||0),0),help=answers.filter(a=>a.hint||a.revealed).length;
-    const weak=[...new Set(stages.filter(s=>{const a=session.answers[s.id];return a&&(a.errors||a.hint||a.revealed);}).map(s=>s.skill))];
-    root.innerHTML+=`<h3 tabindex="-1" id="learn-heading">Прохождение завершено</h3><p>${stages.length} этапов · ошибок ${errors} · этапов с помощью ${help}.</p><p>${!errors&&!help&&data.settings.mode!=='understand'?'✓ Самостоятельное прохождение без подсказок.':'Вы разобрали метод; повторите трудные этапы самостоятельно.'}</p><p>${weak.length?'Повторить: '+weak.map(esc).join(', '):'Сильная сторона: последовательное применение правил выбранного метода.'}</p><p>Полное решение, итоговый ответ, графики и исходные анимации открыты ниже.</p><div class="btnrow">${button('Повторить задачу','restart')}${data.settings.mode==='exam'&&data.exam?button(data.exam.at+1<data.exam.queue.length?'Следующая тема экзамена':'Завершить подборку','exam-next','primary'):''}</div>`;
+    const pct=x=>x.total?Math.round(100*x.right/x.total):0;
+    let body='';
+    if(mode==='check') {
+      const c=pct(r.concept),k=pct(r.compute),th=LPROG.THRESHOLD*100;
+      body=`<p>Понимание: <strong>${r.concept.right} из ${r.concept.total}</strong> (${c}%) ${r.concept.total&&c>=th?'— порог пройден':'— ниже порога'}.</p><p>Вычисления: <strong>${r.compute.right} из ${r.compute.total}</strong> (${k}%) ${r.compute.total&&k>=th?'— порог пройден':'— ниже порога'}.</p><p>${r.concept.total&&c<th?'Повторите понимание: ':''}${r.concept.total&&c<th?'«Чтение модели» и «Стратегия метода». ':''}${r.compute.total&&k<th?'Повторите вычисления: «Практика с поддержкой». ':''}${c>=th&&k>=th?'Оба результата выше порога: тема подтверждена в этой проверке.':''}</p>`;
+      const next=c<th?(['strategy','model'][r.errorKinds.some(e=>/^(stop|strategy|misconception)/.test(e))?0:1]):k<th?'guided':null;
+      body+=`<div class="btnrow">${next?gotoBtn(next,true):''}${data.exam?'':''}</div>`;
+    } else if(mode==='solo') {
+      const kinds=[...new Set(r.errorKinds.map(kindName))];
+      body=`<p>С первой попытки: <strong>${r.firstTry} из ${r.total}</strong>. Ошибок: ${r.errors}; подсказок: ${r.hints}; показано ответов: ${r.revealed}.</p><p>${kinds.length?'Типы ошибок: '+kinds.map(esc).join(', ')+'.':'Ошибок не было.'}</p><p>${!r.hints&&!r.revealed&&r.firstTry/r.total>=LPROG.THRESHOLD?'✓ Самостоятельное решение засчитано.':'Для зачёта самостоятельного решения нужно не менее 70% этапов с первой попытки и без подсказок.'}</p><div class="btnrow">${gotoBtn('check',true)}</div>`;
+    } else if(mode==='guided') {
+      body=`<p>${r.total} этапов · ошибок ${r.errors} · подсказок ${r.hints}.</p><p>Полное решение, итоговый ответ, графики и исходные анимации открыты ниже. Дальше попробуйте то же самостоятельно.</p><div class="btnrow">${gotoBtn('solo',true)}</div>`;
+    } else {
+      body=`<p>${r.total} сцен · ошибок ${r.errors} · подсказок ${r.hints}${r.revealed?` · пропущено ${r.revealed}`:''}.</p><p>${modeInfo().completionRule}</p><div class="btnrow">${gotoBtn(NEXT_MODE[mode],true)}</div>`;
+    }
+    root.innerHTML+=`<h3 tabindex="-1" id="learn-heading">Режим пройден</h3>${body}<div class="btnrow">${button('Повторить режим','restart')}${mode==='check'&&data.settings.format==='exam'&&data.exam?button(data.exam.at+1<data.exam.queue.length?'Следующая тема экзамена':'Завершить экзамен','exam-next','primary'):''}</div>`;
+  }
+  function diagnose(s,value) {
+    let v; try{v=Q.parse(value);}catch(_){return {text:'Не удалось прочитать число: введите целое, десятичную дробь или a/b.',kind:'format'};}
+    const ans=Q.parse(s.answer);
+    if(!ans.isZero()&&v.eq(ans.neg())) return {text:'Похоже на ошибку знака: по модулю значение верное.',kind:'sign'};
+    if(!ans.isZero()&&!v.isZero()&&v.eq(Q.of(1).div(ans))&&!ans.abs().eq(Q.of(1))) return {text:'Похоже, вы разделили наоборот: получилось обратное число.',kind:'reciprocal'};
+    if(v.eq(ans.add(Q.of(1)))||v.eq(ans.sub(Q.of(1)))) return {text:'Расхождение ровно на единицу: проверьте арифметику.',kind:'arithmetic'};
+    if(v.isZero()) return {text:'Нулевой результат: проверьте, нет ли пропущенного слагаемого или деления.',kind:'zero'};
+    return {text:'Проверьте формулу и порядок действий.',kind:'calc'};
   }
   function respond(value,assessment,cell) {
-    const s=stages[session.index],a=session.answers[s.id]||{errors:0}; if(a.solved)return;
+    const s=stages[session.index],a=session.answers[s.id]||{errors:0},mode=data.settings.mode; if(a.solved)return;
     const correct=(assessment===undefined?accept(s,value):assessment===accept(s,value))&&(!cell||(cell.row===s.interaction.row&&cell.col===s.interaction.col));
+    if(mode==='check') {
+      a.solved=true;a.correct=correct;a.errors=correct?0:1;a.wrong=!correct;if(!correct)(a.kinds||=[]).push('calc');
+      a.feedback=correct?'Верно.':`Неверно. Правильный ответ: ${s.answer}. ${s.reason}`;
+      session.answers[s.id]=a;save();draw();root.querySelector('#learn-feedback')?.focus({preventScroll:true});return;
+    }
     if(correct) {a.solved=true;a.feedback='Верно. '+s.reason; if(!a.errors&&!a.hint){data.streak++;data.best=Math.max(data.best,data.streak);}else data.streak=0;}
-    else {a.errors=(a.errors||0)+1;data.streak=0;a.feedback=(cell?'Выбран другой элемент таблицы. Нужна ячейка на пересечении ведущей строки и столбца.':assessment!==undefined?'Проверьте оценку предложенного рассуждения. '+s.reason:(s.options?.find(o=>o.value===value)?.why||'Проверьте вычисление. '+s.reason))+' Попробуйте ещё раз.';}
+    else {
+      a.errors=(a.errors||0)+1;data.streak=0;
+      let msg;
+      if(cell) msg='Выбран другой элемент таблицы. Нужна ячейка на пересечении ведущей строки и столбца.';
+      else if(assessment!==undefined) msg='Проверьте оценку предложенного рассуждения. '+s.reason;
+      else if(mode==='solo'&&s.numeric){const d=diagnose(s,value);(a.kinds||=[]).push(d.kind);msg=d.text;}
+      else {msg=s.options?.find(o=>o.value===value)?.why||'Проверьте вычисление. '+s.reason;(a.kinds||=[]).push('calc');}
+      a.feedback=msg+' Попробуйте ещё раз.';
+    }
     session.answers[s.id]=a;save();draw();root.querySelector('#learn-feedback')?.focus({preventScroll:true});if(correct){animate();celebrate();}
   }
   function celebrate() {
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    if(LU.reduced())return;
     const badge=root.querySelector('.learn-success'),path=badge?.querySelector('path');
     if(badge)animations.push(badge.animate([{opacity:0,transform:'translateY(5px) scale(.98)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'}));
     if(path)animations.push(path.animate([{strokeDasharray:'32',strokeDashoffset:32},{strokeDasharray:'32',strokeDashoffset:0}],{duration:450,easing:'ease-out'}));
     const progress=root.querySelector('progress');if(progress)animations.push(progress.animate([{opacity:.45},{opacity:1}],{duration:500}));
   }
+  /* Рамкой отмечаются значения, изменившиеся после шага (режим практики с поддержкой). */
+  function markChanged(target,s) {
+    if(data.settings.mode!=='guided')return;
+    const before=document.createElement('div'); before.innerHTML=s.before; let n=0;
+    target.querySelectorAll('td[data-i][data-j]').forEach(c=>{const old=before.querySelector(`td[data-i="${c.dataset.i}"][data-j="${c.dataset.j}"]`);if(old&&old.textContent!==c.textContent){c.classList.add('learn-changed');n++;}});
+    if(n)target.insertAdjacentHTML('beforeend',`<p class="kbd learn-changed-note">Рамкой отмечены изменившиеся значения: ${n}.</p>`);
+  }
   function inspect(view) {
     stop();const s=stages[session.index],target=root.querySelector('#learn-transformation');if(!target)return;
     root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
     target.innerHTML=view==='compare'?`<div class="learn-compare"><div><h4>До шага</h4>${s.before}</div><div><h4>После шага</h4>${s.after}</div></div>`:view==='before'?'<h4>До шага</h4>'+s.before:'<h4>После шага</h4>'+s.after;
-    if(!matchMedia('(prefers-reduced-motion: reduce)').matches)animations.push(target.animate([{opacity:.6,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:220}));
+    if(view==='after')markChanged(target,s);
+    if(!LU.reduced())animations.push(target.animate([{opacity:.6,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:220}));
   }
   function bindTable() {
-    const s=stages[session.index],a=s&&session.answers[s.id];
-    if(!s?.interaction||a?.solved||!['next','quiz','self','exam'].includes(data.settings.mode)||(s.numeric&&['self','exam'].includes(data.settings.mode)))return;
+    const s=stages[session.index],a=s&&session.answers[s.id],mode=data.settings.mode;
+    if(!s||isScene(s)||!s.interaction||a?.solved||!['guided','solo','check'].includes(mode)||(s.numeric&&['solo','check'].includes(mode)))return;
     const table=root.querySelector('.learn-situation table'),pick=s.interaction;if(!table)return;
     const add=(cell,value,label,position)=>{
       if(!cell)return;const b=document.createElement('button');b.type='button';b.className='learn-pick';b.innerHTML=cell.innerHTML;b.setAttribute('aria-label',label);b.setAttribute('aria-describedby','learn-question');b.dataset.pick=value;
@@ -353,7 +440,7 @@ const LEARN = (() => {
     root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='after')));
     const s=stages[session.index],epoch=animationEpoch;
     target.innerHTML='<h4>После шага</h4>'+s.after;
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    if(LU.reduced()){markChanged(target,s);return;}
     target.innerHTML='<h4>До преобразования</h4>'+s.before;
     const transition=target.animate([{opacity:1},{opacity:.35}],{duration:450});animations.push(transition);
     try {await transition.finished;}catch(_){return;}
@@ -363,36 +450,59 @@ const LEARN = (() => {
     const before=document.createElement('div'); before.innerHTML=s.before;
     const cells=target.querySelectorAll('td[data-i][data-j]');
     cells.forEach(c=>{const old=before.querySelector(`td[data-i="${c.dataset.i}"][data-j="${c.dataset.j}"]`);if(!old||old.textContent!==c.textContent)animations.push(c.animate([{background:'#c7e8dd'},{background:'transparent'}],{duration:1000}));});
+    markChanged(target,s);
     if(!cells.length){const pieces=[...target.children].filter(el=>el.tagName!=='H4');pieces.forEach((el,i)=>animations.push(el.animate([{opacity:.25,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:350,delay:Math.min(i,5)*65,easing:'ease-out',fill:'backwards'})));}
   }
-  function goExam(item) { data.settings.presentation='learning';save();Object.assign(APP.state,{src:item.src,type:item.type,base:item.base||'graph',v:item.v,mode:'db',trainer:false,tinit:null,lastCustom:null});active=true;APP.render();root.scrollIntoView({block:'start'}); }
+  function goExam(item) { Object.assign(data.settings,{presentation:'learning',mode:'check',format:'exam'});save();Object.assign(APP.state,{src:item.src,type:item.type,base:item.base||'graph',v:item.v,mode:'db',trainer:false,tinit:null,lastCustom:null});active=true;APP.render();root.scrollIntoView({block:'start'}); }
   function newExam() {
     const pool=registry().filter(t=>!t.base),chosen=[];
     for(let i=0;i<6;i++){const eligible=pool.filter(t=>t.src===(i%2?'zyk':'rgr')&&!chosen.some(c=>c.type===t.type));const t=eligible[Math.floor(Math.random()*eligible.length)];if(!t)continue;const variants=t.variants.filter(v=>!v.broken);const v=variants[Math.floor(Math.random()*variants.length)];if(v)chosen.push({src:t.src,type:t.type,v:v.v});}
-    data.exam={at:0,queue:chosen};data.settings.mode='exam';data.settings.hint='error';save();goExam(chosen[0]);
+    data.exam={at:0,queue:chosen};goExam(chosen[0]);
+  }
+  /* Сцена текущего шага монтируется после окончательной сборки разметки (innerHTML пересоздаёт DOM). */
+  function mountScene() {
+    const host=root.querySelector('.scene-host'),s=stages[session.index];
+    if(!host||!isScene(s))return;
+    const a=answerOf(s),mode=data.settings.mode;
+    const reveal=()=>{const n=root.querySelector('.scene-nav [data-learn="next"]');if(n)n.hidden=false;const p=root.querySelector('progress');if(p)p.value=session.index+1;};
+    const hooks={solved:!!a.solved,single:mode==='check',
+      onPass(){const x=answerOf(s);x.solved=true;if(!x.errors&&!x.hint){data.streak++;data.best=Math.max(data.best,data.streak);}else data.streak=0;session.answers[s.id]=x;save();reveal();},
+      onFail(kind){const x=answerOf(s);x.errors=(x.errors||0)+1;if(kind)(x.kinds||=[]).push(kind);data.streak=0;session.answers[s.id]=x;save();},
+      onFinish(correct,kind){const x=answerOf(s);x.solved=true;x.correct=correct;x.errors=correct?0:1;x.wrong=!correct;if(!correct)(x.kinds||=[]).push(kind||'concept');session.answers[s.id]=x;save();reveal();}};
+    sceneApi=LSCENE.mount(host,{...s,depth:data.settings.depth},hooks).api;
+    if(a.solved)reveal();
   }
   function bindUI() {
     root.querySelectorAll('[data-learn]').forEach(b=>b.onclick=()=>{
       const action=b.dataset.learn,s=stages[session.index];
-      if(action==='hint'){const a=session.answers[s.id]||{errors:0};a.hint=true;session.answers[s.id]=a;data.streak=0;save();draw();}
-      if(action==='reveal'){const a=session.answers[s.id]||{errors:0};Object.assign(a,{solved:true,revealed:true,feedback:`Ответ: ${s.answer}. ${s.reason}`});session.answers[s.id]=a;data.streak=0;save();draw();animate();}
+      if(action==='hint'){
+        const a=session.answers[s.id]||{errors:0};a.hint=true;session.answers[s.id]=a;data.streak=0;save();
+        if(isScene(s)){sceneApi&&sceneApi.say(`<strong>Подсказка.</strong> ${esc(s.hint||'Прочитайте цель сцены и действуйте по шагам.')}`);return;}
+        draw();
+      }
+      if(action==='reveal'){
+        const a=session.answers[s.id]||{errors:0};
+        if(isScene(s)){Object.assign(a,{solved:true,revealed:true});session.answers[s.id]=a;data.streak=0;save();draw();return;}
+        Object.assign(a,{solved:true,revealed:true,feedback:`Ответ: ${s.answer}. ${s.reason}`});session.answers[s.id]=a;data.streak=0;save();draw();animate();
+      }
       if(action==='next'&&session.answers[s.id]?.solved){session.index++;save();draw();root.querySelector('#learn-heading')?.focus();}
       if(action==='previous'){session.index=Math.max(0,session.index-1);save();draw();}
       if(action==='restart'){session={index:0,answers:{},done:false};data.sessions[signature]=session;save();draw();}
       if(action==='replay')animate();
       if(action==='stop'){stop();root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='after')));const target=root.querySelector('#learn-transformation');if(target)target.innerHTML='<h4>После шага</h4>'+s.after;}
-      if(action==='reset'){data=fresh();session={index:0,answers:{},done:false};try{localStorage.removeItem(KEY);}catch(_){} APP.render();}
+      if(action==='reset'){LPROG.clear(localStorage);data=LPROG.fresh();session={index:0,answers:{},done:false};APP.render();}
+      if(action==='goto'){data.settings.mode=b.dataset.mode;save();APP.render();root.querySelector('#learn-heading')?.focus();}
       if(action==='exam')newExam();
-      if(action==='exam-next') {if(data.exam.at+1<data.exam.queue.length){data.exam.at++;data.settings.hint=data.exam.at>=2?'request':'error';save();goExam(data.exam.queue[data.exam.at]);}else {delete data.exam;save();draw();}}
+      if(action==='exam-next') {if(data.exam.at+1<data.exam.queue.length){data.exam.at++;save();goExam(data.exam.queue[data.exam.at]);}else {delete data.exam;save();draw();}}
     });
     root.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>respond(b.dataset.answer));
-    root.querySelectorAll('[data-assess]').forEach(b=>b.onclick=()=>respond(b.dataset.candidate,b.dataset.assess==='true'));
     root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>inspect(b.dataset.view));
     bindTable();
     const form=root.querySelector('#learn-answer-form');if(form)form.onsubmit=e=>{e.preventDefault();respond(root.querySelector('#learn-answer').value);};
-    ['mode','depth','hint'].forEach(k=>{const el=root.querySelector('#learn-'+k);if(el)el.onchange=()=>{data.settings[k]=el.value;save();APP.render();};});
+    ['mode','depth','hint','format'].forEach(k=>{const el=root.querySelector('#learn-'+k);if(el)el.onchange=()=>{data.settings[k]=el.value;save();APP.render();};});
     // Cloned condition is informational, so strip duplicate IDs from the original solution.
     root.querySelectorAll('details [id]').forEach(el=>el.removeAttribute('id'));
+    mountScene();
     DD.enhance(root);
   }
   /* «Режим работы» живёт в общей панели, поэтому обработчик вешается при каждом render() приложения. */
@@ -400,5 +510,7 @@ const LEARN = (() => {
     const presentation=document.getElementById('learn-presentation');
     if(presentation)presentation.onchange=()=>{stop();data.settings.presentation=presentation.value;save();APP.render();};
   }
-  return {begin,mount,modeField,modeNote,registry,build,selectStages,accept,options,get staticMode(){return data.settings.presentation==='text';},get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;}};
+  const go=i=>{session.index=Math.max(0,Math.min(stages.length,i));save();draw();};
+  return {begin,mount,modeField,modeNote,registry,build,selectStages,accept,options,scenario,go,
+    get staticMode(){return data.settings.presentation==='text';},get active(){return active;},get allStages(){return allStages;},get stages(){return stages;},get session(){return session;},get progress(){return data;},get sceneData(){return sdata;},get sceneApi(){return sceneApi;}};
 })();
