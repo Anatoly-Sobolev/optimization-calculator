@@ -61,3 +61,6 @@
 @media print {body.static-reading #learning {display:block!important} .static-reading .learn-top,.static-reading .learn-presentation {display:none!important}}
 
 .static-reading .st-auto,.static-reading .r3spin {display:none!important}
+
+/* Grid children must be allowed to shrink to their allocated column. */
+.pvwrap > *, .dmcols > *, .grid2 > *, .learn-compare > * {min-width:0}

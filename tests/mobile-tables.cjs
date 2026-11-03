@@ -13,7 +13,7 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
     let tables=0;
     for(const t of registry){
       await page.evaluate(t=>{Object.assign(APP.state,{...t,base:t.base||'graph',mode:'db',trainer:false});APP.render();document.querySelectorAll('#solution details').forEach(d=>d.open=true);},t);
-      for(const width of [320,390,650]){
+      for(const width of [320,390,650,768,1024,1366]){
         await page.setViewportSize({width,height:844});await page.waitForTimeout(120);
         const check=await page.evaluate(()=>{
           const visible=[...document.querySelectorAll('#solution table')].filter(t=>t.getClientRects().length&&t.getBoundingClientRect().width);
@@ -21,6 +21,15 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
         });
         assert.deepEqual(check.bad,[],`${t.src}/${t.type} at ${width}px: full table must fit`);
         assert.deepEqual(check.overflow,[],`${t.src}/${t.type} at ${width}px: table scrollbar`);
+        const alignment=await page.evaluate(()=>[...document.querySelectorAll('.pvwrap,.learn-compare')].flatMap(group=>{
+          const panels=[...group.children],ts=panels.map(p=>p.querySelector('table'));
+          if(ts.length!==2||ts.some(t=>!t||!t.getClientRects().length)||Math.abs(panels[0].getBoundingClientRect().top-panels[1].getBoundingClientRect().top)>2)return [];
+          const problems=[];
+          if(Math.abs(ts[0].getBoundingClientRect().top-ts[1].getBoundingClientRect().top)>2)problems.push('table tops');
+          if(ts[0].rows.length===ts[1].rows.length)[...ts[0].rows].forEach((r,i)=>{if(Math.abs(r.getBoundingClientRect().top-ts[1].rows[i].getBoundingClientRect().top)>2)problems.push('row '+i);});
+          return problems;
+        }));
+        assert.deepEqual(alignment,[],`${t.src}/${t.type} at ${width}px: paired table alignment`);
         tables+=check.count;
       }
       console.log('Fits: '+t.src+'/'+t.type+'/'+(t.base||''));
@@ -36,10 +45,10 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
     assert.ok(await page.locator('#learning table').evaluateAll(ts=>ts.every(t=>t.getBoundingClientRect().width<=t.parentElement.clientWidth+1)));
     await page.locator('#learn-feedback').scrollIntoViewIfNeeded();await page.screenshot({path:'test-results/mobile-fit.png'});
     await page.setViewportSize({width:1366,height:1000});await page.waitForTimeout(120);
-    assert.equal(await page.locator('.mobile-fit-table').count(),0);
+    assert.ok(await page.locator('#learning table').evaluateAll(ts=>ts.filter(t=>t.getClientRects().length).every(t=>t.getBoundingClientRect().width<=t.parentElement.clientWidth+1)));
     await page.setViewportSize({width:390,height:844});await page.emulateMedia({media:'print'});await page.waitForTimeout(120);
     assert.equal(await page.locator('.mobile-fit-table').count(),0);
     assert.deepEqual(errors,[]);
-    console.log(`PASS: ${tables} visible table checks, all 20 routes at 320/390/650px; mobile table click, comparison, desktop reset, print reset.`);
+    console.log(`PASS: ${tables} visible table checks, all 20 routes at 320/390/650/768/1024/1366px; mobile table click, comparison, desktop fitting, print reset.`);
   }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
