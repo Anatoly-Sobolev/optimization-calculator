@@ -7129,8 +7129,7 @@ const APP = (() => {
       : `<select id="cvar"${state.mode !== 'db' ? ' disabled' : ''}>${structOf().variants.map(v => `<option value="${v.v}"${v.v === state.v ? ' selected' : ''}>${isZ() ? 'задача' : 'вариант'} ${v.v}${v.page ? ` (с. ${v.page})` : ''}${v.note && (isZ() || state.type !== 'dual') ? ' ⚠' : ''}</option>`).join('')}</select>`;
     if (state.type === 'transp') { const vv = structOf().variants.find(x => x.v === state.v) || {}; const ti = state.tinit || vv.init || 'nw'; h += `<label>Начальный план: <select id="tinit"><option value="nw"${ti === 'nw' ? ' selected' : ''}>северо-западный угол</option><option value="mc"${ti === 'mc' ? ' selected' : ''}>минимальная стоимость</option></select></label>`; }
     h += `<label class="rad"><input type="radio" name="mode" value="custom"${state.mode === 'custom' ? ' checked' : ''}> свои коэффициенты</label>`;
-    h += `<label class="trsw${state.trainer && !noTr() ? ' on' : ''}" title="${noTr() ? 'Для двойственного симплекс-метода тренажёра нет — смотрите пошаговые анимации' : 'Решать задачу по шагам, выбирая ответы'}"><input type="checkbox" id="trmode"${state.trainer && !noTr() ? ' checked' : ''}${noTr() ? ' disabled' : ''}> Тренажёр</label><button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
-    if (state.trainer && !noTr()) h += `<div class="kbd" style="margin-top:6px">Режим тренажёра: задача решается по шагам — на каждом шаге выберите решение по готовым вычислениям. Таблицы и график строятся по мере ответов.</div>`;
+    h += `<button class="btn" id="printbtn" title="Чистая версия решения: условие, преобразования, все таблицы, графики и ответ">Печать / PDF</button></div>`;
     if (state.mode === 'custom') h += customForm();
     h += '</div>';
     return h;
@@ -7210,7 +7209,6 @@ const APP = (() => {
       window.addEventListener('afterprint', back);
       window.print();
     };
-    const tm = $('#trmode'); if (tm) tm.onchange = () => { state.trainer = tm.checked; render(); };
     const cb = $('#cbase'); if (cb) cb.onchange = () => { state.base = cb.value; state.lastCustom = null; render(); };
     const cv = $('#cvar'); if (cv) cv.onchange = () => { state.v = +cv.value; state.tinit = null; state.xbar = null; render(); };
     document.querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { state.mode = r.value; state.lastCustom = null; render(); });
@@ -7245,7 +7243,8 @@ const APP = (() => {
 document.addEventListener('DOMContentLoaded', APP.init);
 
 </script>
-<link rel="stylesheet" href="learning.css">
-<script src="learning.js"></script>
+<link rel="stylesheet" href="learning.css?v=2">
+<script src="learning.js?v=2"></script>
+<script src="table-fit.js?v=2"></script>
 </body>
 </html>

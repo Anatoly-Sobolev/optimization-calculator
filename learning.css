@@ -20,12 +20,32 @@
 .learn-network {display:flex;gap:8px;flex-wrap:wrap}
 .learn-network span {background:#e4eaf8;padding:8px;border-radius:6px}
 .learn-history {margin-top:22px;border-top:1px solid #d7ddeb;padding-top:12px}
+.learn-instruction {color:#415499;font-size:14px;margin:6px 0}
+.learn-alternative {margin:10px 0}
+.learn-pick {font:inherit;color:inherit;background:#fff;border:1px solid #a4b2da;border-radius:7px;min-width:44px;min-height:40px;padding:6px 9px;cursor:pointer;transition:background .18s,box-shadow .18s,transform .18s}
+.learn-pick:hover,.learn-pick:focus-visible {background:#e9efff;box-shadow:0 2px 7px #354a791f}
+.learn-pick:active {transform:scale(.97)}
+.learn-pick .vtag {display:block}
+#learning .learn-hover,#learning .learn-hover td {background:#e8eefc!important}
+.learn-success {display:flex;align-items:center;gap:10px;width:fit-content;max-width:100%;margin:16px 0 6px;padding:10px 14px;border-radius:12px;background:#e6f4ec;color:#22634b;transform-origin:left center}
+.learn-success svg {width:32px;height:32px;flex:none}
+.learn-success circle {fill:#cee9da}
+.learn-success path {fill:none;stroke:#287452;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round}
+.learn-view-controls {display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 0}
+.learn-view-controls [aria-pressed="true"] {background:#e6e9ff;border-color:#7686cd;color:#283c92}
+.learn-compare {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.learn-compare > div {min-width:0;overflow:auto;padding:8px;border-radius:8px;background:#f8fafc}
+.learn-compare > div:last-child {background:#f0f8f3}
+#learning .learn-answers .btn {transition:background .16s,border-color .16s,transform .16s}
+#learning .learn-answers .btn:hover {background:#f0f3ff;border-color:#98a5cf}
+#learning .learn-answers .btn:active {transform:scale(.995)}
 #controls select {max-width:100%;min-width:0}
 #controls .ctlrow > label {max-width:100%}
 #learning summary {cursor:pointer;padding:8px 0}
 #learning p {overflow-wrap:anywhere}
 #solution[hidden],#secnav[hidden] {display:none!important}
 #secnav[hidden] + main {grid-column:1 / -1}
-@media(max-width:650px) {.learn-settings{grid-template-columns:1fr}.learn-top{align-items:stretch}#learning{padding:14px}.learn-question{font-size:17px}.learn-input input{width:100%}}
+.mobile-fit-table {width:max-content!important;max-width:none!important}
+@media(max-width:650px) {.learn-settings,.learn-compare{grid-template-columns:1fr}.learn-top{align-items:stretch}#learning{padding:14px}.learn-question{font-size:17px}.learn-input input{width:100%}}
 @media(prefers-reduced-motion:reduce) {#learning *,#learning *::before,#learning *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media print {#learning{display:none!important}#solution[hidden]{display:block!important}}
+@media print {#learning{display:none!important}#solution[hidden]{display:block!important}.mobile-fit-table{zoom:1!important;width:auto!important}}

@@ -55,9 +55,11 @@ const LEARN = (() => {
         const entry=choice(`${prefix} ${k+1}: входящая переменная`,tableau(s,(i,j)=>d?(i===s.p?'learn-relevant':''):(i===s.rows.length?'learn-relevant':'')),enteringRule,vn(s.q),s.cols.filter(j=>j!==s.q).map(j=>[vn(j),'Этот столбец не удовлетворяет указанному правилу выбора. '+enteringRule]),enteringRule,{after:tableau(s,(i,j)=>j===s.q?'learn-relevant':''),tier:1});
         const leavingRule=d?(s.bland?'Среди отрицательных b выберите строку с наименьшим индексом базисной переменной.':'Выберите самое отрицательное b; при равенстве — наименьший индекс базисной переменной.'):'Для выделенного столбца сравните b/a только при a > 0. Выберите минимум; при равенстве — наименьший индекс базисной переменной.';
         const leave=choice(`${prefix} ${k+1}: выходящая строка`,tableau(s,(i,j)=>j===(d?-1:s.q)?'learn-relevant':''),leavingRule,`Строка ${s.p+1}`,s.rows.map((_,i)=>[`Строка ${i+1}`,'Этот выбор нарушает правило минимального допустимого шага или правило разрешения равенств. '+leavingRule]),leavingRule,{after:tableau(s,(i,j)=>i===s.p||j===s.q?'learn-relevant':''),tier:1});
+        entry.interaction={kind:'column',values:s.cols.map(j=>vn(j))};
+        leave.interaction={kind:'row',values:s.rows.map((_,i)=>`Строка ${i+1}`)};
         out.push(...(d?[leave,entry]:[entry,leave]).filter(stage=>stage.options.length>1));
       }
-      out.push(number(`${prefix} ${k+1}: поворот`,tableau(s,(i,j)=>i===s.p||j===s.q?'learn-relevant':''),`Строка ${s.p+1}, столбец ${s.q+1} выделены. На какое число делим ведущую строку?`,s.rows[s.p].a[s.q],'Разделите ведущую строку на элемент пересечения. Затем вычтите её кратные из остальных строк, чтобы столбец стал единичным.',{after,tier:1}));
+      out.push(number(`${prefix} ${k+1}: поворот`,tableau(s,(i,j)=>i===s.p||j===s.q?'learn-relevant':''),`Строка ${s.p+1}, столбец ${s.q+1} выделены. На какое число делим ведущую строку?`,s.rows[s.p].a[s.q],'Разделите ведущую строку на элемент пересечения. Затем вычтите её кратные из остальных строк, чтобы столбец стал единичным.',{after,tier:1,interaction:{kind:'cell',row:s.p,col:s.q,values:s.rows.map(row=>Object.fromEntries(s.cols.map(j=>[j,txt(row.a[j])])))} }));
       if(next && next.rows.length===s.rows.length) {
         const b=s.rows[s.p].b, a=s.rows[s.p].a[s.q];
         if(!(b instanceof QM) || b.m.isZero()) out.push(number(`${prefix} ${k+1}: правая часть`,tableau(s,(i,j)=>i===s.p?'learn-relevant':''),'Чему станет равно b ведущей строки после нормировки?',(b instanceof QM?b.a:b).div(a),'Новое b равно прежнему b, делённому на ведущий элемент. Все элементы строки делятся на одно число.',{after,tier:2}));
@@ -253,7 +255,7 @@ const LEARN = (() => {
     document.getElementById('solution').hidden=hidden;
     document.getElementById('secnav').hidden=hidden;
     root.innerHTML=`<div class="learn-top"><div><h2>Обучение</h2><p class="kbd">От понимания метода к самостоятельному решению</p></div>${button(active?'Закрыть обучение':'Начать обучение','toggle','primary')}</div>`;
-    if(!active) {root.innerHTML+=`<p>Шесть режимов для выбранной задачи. Старый тренажёр и полный анимированный разбор доступны в калькуляторе.</p>`;bindUI();return;}
+    if(!active) {root.innerHTML+=`<p>Разбирайте решение по шагам, выбирайте действия в таблицах и проверяйте себя. Шесть режимов — от знакомства с методом до подготовки к экзамену.</p>`;bindUI();return;}
     root.innerHTML+=`<div class="learn-settings"><label>Режим<select id="learn-mode">${Object.entries(modes).map(([k,v])=>`<option value="${k}"${k===data.settings.mode?' selected':''}>${v}</option>`).join('')}</select></label><label>Глубина<select id="learn-depth">${[['brief','Кратко'],['detail','Подробно'],['deep','Глубоко']].map(([k,v])=>`<option value="${k}"${k===data.settings.depth?' selected':''}>${v}</option>`).join('')}</select></label><label>Подсказки<select id="learn-hint">${[['now','Сразу'],['error','После ошибки'],['request','По запросу']].map(([k,v])=>`<option value="${k}"${k===data.settings.hint?' selected':''}>${v}</option>`).join('')}</select></label></div><p>${descriptions[data.settings.mode]}</p>`;
     if(!storageOK) root.innerHTML+='<p class="note warn">Браузер не разрешил сохранение: прогресс доступен только до закрытия страницы.</p>';
     const note=context.variant?.note;
@@ -268,20 +270,21 @@ const LEARN = (() => {
   function drawStep() {
     const s=stages[session.index],a=session.answers[s.id]||{},mode=data.settings.mode;
     const condition=document.querySelector('#solution #cond');
-    root.innerHTML+=`<div class="learn-progress"><label for="learn-progress">Этап ${session.index+1} из ${stages.length} · серия ${data.streak}</label><progress id="learn-progress" max="${stages.length}" value="${session.index}"></progress></div>${condition?`<details><summary>Условие выбранной задачи</summary>${condition.innerHTML}</details>`:''}<h3 tabindex="-1" id="learn-heading">${esc(s.title)}</h3><div class="learn-situation">${s.before}</div><p class="learn-question">${esc(s.prompt)}</p>`;
+    const direct=s.interaction && ['next','quiz','self','exam'].includes(mode) && !(s.numeric&&['self','exam'].includes(mode));
+    root.innerHTML+=`<div class="learn-progress"><label for="learn-progress">Этап ${session.index+1} из ${stages.length} · серия ${data.streak}</label><progress id="learn-progress" max="${stages.length}" value="${session.index+(a.solved?1:0)}"></progress></div>${condition?`<details><summary>Условие выбранной задачи</summary>${condition.innerHTML}</details>`:''}<h3 tabindex="-1" id="learn-heading">${esc(s.title)}</h3><p class="learn-question" id="learn-question">${esc(s.prompt)}</p>${direct&&!a.solved?`<p class="learn-instruction">${{column:'Выберите заголовок столбца прямо в таблице.',row:'Выберите строку нажатием на её базисную переменную.',cell:'Нажмите на ведущий элемент в таблице.'}[s.interaction.kind]} Можно пользоваться Tab и Enter.</p>`:''}<div class="learn-situation">${s.before}</div>`;
     if(!a.solved) {
       if(mode==='understand')root.innerHTML+=`<p>${esc(s.reason)}</p>${button('Показать преобразование','reveal','primary')}`;
       else if(mode==='error') {
         const opts=options(s),candidate=opts[session.index%opts.length];
         root.innerHTML+=`<p>Студент предлагает: <strong>${esc(candidate.label)}</strong>. Оцените этот выбор.</p><div class="learn-answers">${[true,false].map(v=>`<button class="btn" type="button" data-assess="${v}" data-candidate="${esc(candidate.value)}">${v?'Верно':'Ошибка'}</button>`).join('')}</div>`;
       } else if(s.numeric && (mode==='self'||mode==='exam'))root.innerHTML+='<form id="learn-answer-form"><label for="learn-answer">Ваш ответ (например, −3/7 или 1,25)</label><div class="learn-input"><input id="learn-answer" autocomplete="off" inputmode="text" required><button class="btn primary" type="submit">Проверить</button></div></form>';
-      else root.innerHTML+=`<div class="learn-answers">${options(s).map(o=>`<button class="btn" type="button" data-answer="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>`;
+      else root.innerHTML+=`${direct?'<details class="learn-alternative"><summary>Ответить списком вариантов</summary>':''}<div class="learn-answers">${options(s).map(o=>`<button class="btn" type="button" data-answer="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>${direct?'</details>':''}`;
       const autoHint=data.settings.hint==='now'||data.settings.hint==='error'&&a.errors>0;
       if(mode!=='understand')root.innerHTML+=`<div class="btnrow">${button('Подсказка','hint')}${button('Показать объяснение / сдаться','reveal')}</div>`;
       if(a.hint || autoHint) {if(!a.hint){a.hint=true;session.answers[s.id]=a;save();}root.innerHTML+=`<p class="note">${esc(s.hint)}</p>`;}
     }
-    root.innerHTML+=`<div id="learn-feedback" role="status" aria-live="polite">${a.feedback?`<p class="note ${a.solved?'ok':'bad'}">${esc(a.feedback)}</p>`:''}</div>`;
-    if(a.solved)root.innerHTML+=`<p>${esc(s.reason)}</p>${data.settings.depth==='deep'?`<p class="note">${esc(s.deep)}</p>`:''}<div id="learn-transformation" class="learn-transformation"><h4>После шага</h4>${s.after}</div><div class="btnrow">${button('Повторить преобразование','replay')}${button('Остановить анимацию','stop')}${button(session.index===stages.length-1?'Завершить':'Следующий этап','next','primary')}</div>`;
+    root.innerHTML+=`<div id="learn-feedback" tabindex="-1" role="status" aria-live="polite">${a.solved&&!a.revealed?'<span class="learn-success"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14"/><path d="M9 16l5 5 10-11"/></svg><strong>Верно, можно двигаться дальше</strong></span>':''}${a.feedback?`<p class="note ${a.solved?'ok':'bad'}">${esc(a.feedback)}</p>`:''}</div>`;
+    if(a.solved)root.innerHTML+=`${data.settings.depth==='deep'?`<p class="note">${esc(s.deep)}</p>`:''}<div class="learn-view-controls" role="group" aria-label="Просмотр преобразования">${[['before','До шага'],['after','После шага'],['compare','Сравнить рядом']].map(([k,label])=>`<button class="btn" type="button" data-view="${k}" aria-pressed="${k==='after'}">${label}</button>`).join('')}</div><div id="learn-transformation" class="learn-transformation"><h4>После шага</h4>${s.after}</div><div class="btnrow">${button('Повторить преобразование','replay')}${button('Остановить анимацию','stop')}${button(session.index===stages.length-1?'Завершить':'Следующий этап','next','primary')}</div>`;
     root.innerHTML+=`<div class="btnrow">${session.index?button('Предыдущий этап','previous'):''}${button('Начать прохождение заново','restart')}</div>`;
   }
   function drawEnd() {
@@ -294,15 +297,44 @@ const LEARN = (() => {
     const weak=[...new Set(stages.filter(s=>{const a=session.answers[s.id];return a&&(a.errors||a.hint||a.revealed);}).map(s=>s.skill))];
     root.innerHTML+=`<h3 tabindex="-1" id="learn-heading">Прохождение завершено</h3><p>${stages.length} этапов · ошибок ${errors} · этапов с помощью ${help}.</p><p>${!errors&&!help&&data.settings.mode!=='understand'?'✓ Самостоятельное прохождение без подсказок.':'Вы разобрали метод; повторите трудные этапы самостоятельно.'}</p><p>${weak.length?'Повторить: '+weak.map(esc).join(', '):'Сильная сторона: последовательное применение правил выбранного метода.'}</p><p>Полное решение, итоговый ответ, графики и исходные анимации открыты ниже.</p><div class="btnrow">${button('Повторить задачу','restart')}${data.settings.mode==='exam'&&data.exam?button(data.exam.at+1<data.exam.queue.length?'Следующая тема экзамена':'Завершить подборку','exam-next','primary'):''}</div>`;
   }
-  function respond(value,assessment) {
+  function respond(value,assessment,cell) {
     const s=stages[session.index],a=session.answers[s.id]||{errors:0}; if(a.solved)return;
-    const correct=assessment===undefined?accept(s,value):assessment===accept(s,value);
+    const correct=(assessment===undefined?accept(s,value):assessment===accept(s,value))&&(!cell||(cell.row===s.interaction.row&&cell.col===s.interaction.col));
     if(correct) {a.solved=true;a.feedback='Верно. '+s.reason; if(!a.errors&&!a.hint){data.streak++;data.best=Math.max(data.best,data.streak);}else data.streak=0;}
-    else {a.errors=(a.errors||0)+1;data.streak=0;a.feedback=(assessment!==undefined?'Проверьте оценку предложенного рассуждения. '+s.reason:(s.options?.find(o=>o.value===value)?.why||'Проверьте вычисление. '+s.reason))+' Попробуйте ещё раз.';}
-    session.answers[s.id]=a;save();draw();if(correct)animate();
+    else {a.errors=(a.errors||0)+1;data.streak=0;a.feedback=(cell?'Выбран другой элемент таблицы. Нужна ячейка на пересечении ведущей строки и столбца.':assessment!==undefined?'Проверьте оценку предложенного рассуждения. '+s.reason:(s.options?.find(o=>o.value===value)?.why||'Проверьте вычисление. '+s.reason))+' Попробуйте ещё раз.';}
+    session.answers[s.id]=a;save();draw();root.querySelector('#learn-feedback')?.focus({preventScroll:true});if(correct){animate();celebrate();}
+  }
+  function celebrate() {
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const badge=root.querySelector('.learn-success'),path=badge?.querySelector('path');
+    if(badge)animations.push(badge.animate([{opacity:0,transform:'translateY(5px) scale(.98)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'}));
+    if(path)animations.push(path.animate([{strokeDasharray:'32',strokeDashoffset:32},{strokeDasharray:'32',strokeDashoffset:0}],{duration:450,easing:'ease-out'}));
+    const progress=root.querySelector('progress');if(progress)animations.push(progress.animate([{opacity:.45},{opacity:1}],{duration:500}));
+  }
+  function inspect(view) {
+    stop();const s=stages[session.index],target=root.querySelector('#learn-transformation');if(!target)return;
+    root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
+    target.innerHTML=view==='compare'?`<div class="learn-compare"><div><h4>До шага</h4>${s.before}</div><div><h4>После шага</h4>${s.after}</div></div>`:view==='before'?'<h4>До шага</h4>'+s.before:'<h4>После шага</h4>'+s.after;
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches)animations.push(target.animate([{opacity:.6,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:220}));
+  }
+  function bindTable() {
+    const s=stages[session.index],a=s&&session.answers[s.id];
+    if(!s?.interaction||a?.solved||!['next','quiz','self','exam'].includes(data.settings.mode)||(s.numeric&&['self','exam'].includes(data.settings.mode)))return;
+    const table=root.querySelector('.learn-situation table'),pick=s.interaction;if(!table)return;
+    const add=(cell,value,label,position)=>{
+      if(!cell)return;const b=document.createElement('button');b.type='button';b.className='learn-pick';b.innerHTML=cell.innerHTML;b.setAttribute('aria-label',label);b.setAttribute('aria-describedby','learn-question');b.dataset.pick=value;
+      if(position){b.dataset.row=position.row;b.dataset.col=position.col;}
+      b.onclick=()=>respond(value,undefined,position);cell.replaceChildren(b);
+      b.onpointerenter=b.onfocus=()=>{const tr=cell.closest('tr');if(pick.kind==='row')tr.classList.add('learn-hover');else if(pick.kind==='column')table.querySelectorAll('tr').forEach(row=>row.children[cell.cellIndex]?.classList.add('learn-hover'));};
+      b.onpointerleave=b.onblur=()=>table.querySelectorAll('.learn-hover').forEach(el=>el.classList.remove('learn-hover'));
+    };
+    if(pick.kind==='column')pick.values.forEach((v,i)=>add(table.querySelectorAll('thead th')[i+2],v,'Выбрать столбец '+v));
+    if(pick.kind==='row')pick.values.forEach((v,i)=>add(table.querySelectorAll('tbody tr')[i]?.children[0],v,'Выбрать '+v.toLowerCase()));
+    if(pick.kind==='cell')table.querySelectorAll('tbody td[data-i][data-j]').forEach(cell=>{const row=Number(cell.dataset.i),col=Number(cell.dataset.j),v=pick.values[row]?.[col];if(v!==undefined)add(cell,v,`Строка ${row+1}, столбец ${col+1}, значение ${v}`,{row,col});});
   }
   async function animate() {
     stop(); const target=document.getElementById('learn-transformation');if(!target)return;
+    root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='after')));
     const s=stages[session.index],epoch=animationEpoch;
     target.innerHTML='<h4>После шага</h4>'+s.after;
     if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -315,7 +347,7 @@ const LEARN = (() => {
     const before=document.createElement('div'); before.innerHTML=s.before;
     const cells=target.querySelectorAll('td[data-i][data-j]');
     cells.forEach(c=>{const old=before.querySelector(`td[data-i="${c.dataset.i}"][data-j="${c.dataset.j}"]`);if(!old||old.textContent!==c.textContent)animations.push(c.animate([{background:'#c7e8dd'},{background:'transparent'}],{duration:1000}));});
-    if(!cells.length)animations.push(target.animate([{opacity:.35},{opacity:1}],{duration:350}));
+    if(!cells.length){const pieces=[...target.children].filter(el=>el.tagName!=='H4');pieces.forEach((el,i)=>animations.push(el.animate([{opacity:.25,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:350,delay:Math.min(i,5)*65,easing:'ease-out',fill:'backwards'})));}
   }
   function goExam(item) { Object.assign(APP.state,{src:item.src,type:item.type,base:item.base||'graph',v:item.v,mode:'db',trainer:false,tinit:null,lastCustom:null});active=true;APP.render();root.scrollIntoView({block:'start'}); }
   function newExam() {
@@ -333,13 +365,15 @@ const LEARN = (() => {
       if(action==='previous'){session.index=Math.max(0,session.index-1);save();draw();}
       if(action==='restart'){session={index:0,answers:{},done:false};data.sessions[signature]=session;save();draw();}
       if(action==='replay')animate();
-      if(action==='stop'){stop();const target=root.querySelector('#learn-transformation');if(target)target.innerHTML='<h4>После шага</h4>'+s.after;}
+      if(action==='stop'){stop();root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='after')));const target=root.querySelector('#learn-transformation');if(target)target.innerHTML='<h4>После шага</h4>'+s.after;}
       if(action==='reset'){data=fresh();session={index:0,answers:{},done:false};try{localStorage.removeItem(KEY);}catch(_){} APP.render();}
       if(action==='exam')newExam();
       if(action==='exam-next') {if(data.exam.at+1<data.exam.queue.length){data.exam.at++;data.settings.hint=data.exam.at>=2?'request':'error';save();goExam(data.exam.queue[data.exam.at]);}else {delete data.exam;save();draw();}}
     });
     root.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>respond(b.dataset.answer));
     root.querySelectorAll('[data-assess]').forEach(b=>b.onclick=()=>respond(b.dataset.candidate,b.dataset.assess==='true'));
+    root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>inspect(b.dataset.view));
+    bindTable();
     const form=root.querySelector('#learn-answer-form');if(form)form.onsubmit=e=>{e.preventDefault();respond(root.querySelector('#learn-answer').value);};
     ['mode','depth','hint'].forEach(k=>{const el=root.querySelector('#learn-'+k);if(el)el.onchange=()=>{data.settings[k]=el.value;save();APP.render();};});
     // Cloned condition is informational, so strip duplicate IDs from the original solution.

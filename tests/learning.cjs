@@ -24,7 +24,7 @@ const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
   try {
     const page=await browser.newPage(),baseline=await browser.newPage();
     page.on('pageerror',e=>report.errors.push(e.message));
-    await baseline.route('**/learning.js',r=>r.fulfill({contentType:'text/javascript',body:'const LEARN={begin(){},mount(){}};'}));
+    await baseline.route('**/learning.js*',r=>r.fulfill({contentType:'text/javascript',body:'const LEARN={begin(){},mount(){}};'}));
     await Promise.all([page.goto(url),baseline.goto(url)]);
     const registry=await page.evaluate(()=>LEARN.registry().map(t=>({...t,variants:t.variants.map(v=>({v:v.v,broken:!!v.broken}))})));
     report.registry=registry.map(t=>({source:t.src,topic:t.type,base:t.base,title:t.title,count:t.variants.length}));
