@@ -6,6 +6,7 @@ import {Button} from '@heroui/react/button';
 import {Label} from '@heroui/react/label';
 import {Link} from '@heroui/react/link';
 import {SearchField} from '@heroui/react/search-field';
+import {PlanProbe} from './plan-probe.jsx';
 import {TextArea} from '@heroui/react/textarea';
 
 function Mast({lab}) {
@@ -96,12 +97,11 @@ function Gallery({titles,onSelect}) {
   </div>;
 }
 
-function StudyViews({onChange}) {
-  const [view,setView] = useState('demo');
+function StudyViews({onChange,items}) {
+  const [view,setView] = useState(items[0][0]);
   return <div className="study-views" role="group" aria-label="Как посмотреть пример">
-    {[['demo','Смотреть анимацию'],['steps','Разобрать по шагам']].map(([key,title])=><Button key={key} variant="ghost"
-      aria-controls={key==='demo'?'demo-deck':'lesson-body'} aria-pressed={view===key}
-      onPress={()=>{onChange(key);setView(key);}}>{title}</Button>)}
+    {items.map(([key,title,id])=><Button key={key} variant="ghost" aria-controls={id}
+      aria-pressed={view===key} onPress={()=>{onChange(key);setView(key);}}>{title}</Button>)}
   </div>;
 }
 
@@ -187,3 +187,5 @@ export const reflection = (host,props) => mount(host,<Reflection {...props}/>);
 export const views = (host,props) => mount(host,<StudyViews {...props}/>);
 export const answer = (host,props) => mount(host,<Answer {...props}/>);
 export const shipmentExample = host => mount(host,<ShipmentExample/>);
+
+export const planProbe = (host,model) => mount(host,<PlanProbe model={model}/>);

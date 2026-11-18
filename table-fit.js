@@ -14,7 +14,7 @@
     const compact=!print.matches;
     document.querySelectorAll('[data-fit-row]').forEach(row=>{row.style.removeProperty('height');row.removeAttribute('data-fit-row');});
     document.querySelectorAll('[data-fit-heading]').forEach(el=>{el.style.removeProperty('min-height');el.removeAttribute('data-fit-heading');});
-    document.querySelectorAll('#solution table, #learning table:not(.flow-in)').forEach(table=>{
+    document.querySelectorAll('#solution table, #learning table, #book table').forEach(table=>{
       if(!watched.has(table)){watched.add(table);resize.observe(table);}
       const parent=table.parentElement;
       if(!watched.has(parent)){watched.add(parent);resize.observe(parent);}
@@ -55,7 +55,14 @@
       }
     });
   }
-  new MutationObserver(schedule).observe(document.querySelector('main'),{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden','open']});
+  const observer = new MutationObserver(schedule);
+  function watchContent() {
+    for (const root of document.querySelectorAll('main')) {
+      observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden','open']});
+    }
+    schedule();
+  }
+  document.addEventListener('DOMContentLoaded',watchContent);
   document.addEventListener('toggle',schedule,true);
   print.addEventListener('change',schedule);
   window.addEventListener('resize',schedule);

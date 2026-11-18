@@ -23,7 +23,14 @@ const { chromium } = require('playwright');
       for(let phase=0;phase<4;phase++) {
         await page.goto(topic.replace('phase=0','phase='+phase));
         assert.equal(await page.locator('#lesson-body h3, #book-reason').count(),1,topic);
-        if(phase===0) assert.ok(await page.locator('.lesson-context dt').count()>=4,topic);
+        if(phase===0) {
+          assert.ok(await page.locator('.lesson-context dt').count()>=4,topic);
+          await page.getByRole('button',{name:'Исследовать вариант',exact:true}).click();
+          assert.ok(await page.locator('#variant-explorer button,#variant-explorer input,#variant-explorer [tabindex="0"]').count(),topic);
+          const followup = page.locator('#variant-explorer .explorer-followup');
+          await followup.locator('summary').click();
+          await followup.locator('.scene-body button, .scene-body input, .scene-body [tabindex="0"]').first().waitFor({state:'attached'});
+        }
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic+' overflows');
       }
     }
@@ -36,6 +43,10 @@ const { chromium } = require('playwright');
     const originalScene = await deck.locator('.scene-title').innerText();
     await deck.getByRole('button',{name:'Следующая тема'}).click();
     assert.notEqual(await deck.locator('.scene-title').innerText(),originalScene);
+    const initialTable = visibleScene.locator('table').first();
+    await initialTable.waitFor();
+    await page.waitForFunction(()=>{const el=document.querySelector('.demo-view:not([hidden]) .tblwrap');return el && el.clientWidth>0 && el.scrollWidth<=el.clientWidth+1;});
+    assert.ok(await initialTable.evaluate(t=>t.getBoundingClientRect().right<=t.parentElement.getBoundingClientRect().right+1));
     await deck.getByRole('button',{name:'Выбрать тему'}).click();
     const options = deck.locator('#scene-index .scene-item');
     assert.ok(await options.count()>1);

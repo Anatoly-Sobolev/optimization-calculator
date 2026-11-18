@@ -414,3 +414,5 @@ table.tg th.trh{background:#f3f1ec;font-family:"Segoe UI",sans-serif;font-size:1
 .pvfm span.fr{background:none;border:0;padding:0;min-width:0}
 .glp .sys{margin-top:6px}
 .gfa{min-height:0}
+
+.tf-right:has(table) { max-height:none; position:static; }

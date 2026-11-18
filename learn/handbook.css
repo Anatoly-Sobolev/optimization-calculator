@@ -16,7 +16,7 @@
 .book-main h2{font-size:clamp(30px,3.4vw,48px);margin:25px 0}
 .book-cta,.book-primary,#book .book-primary{background:var(--pine);color:white;border:0;text-decoration:none;display:inline-block;border-radius:7px;font-weight:600;padding:11px 16px;font-family:inherit}
 .book-main button:not([data-slot]),.book-option{font:inherit;cursor:pointer;color:inherit;background:white;border:1px solid var(--rule);border-radius:6px;padding:8px 12px}
-#book :focus-visible{outline:3px solid #bd7800;outline-offset:3px}
+#book :focus-visible{outline:2px solid #28785d;outline-offset:3px}
 .book-main .cycle{margin:0;background:#143e36;color:#fff;padding:clamp(16px,2.6vw,36px);border-radius:18px;box-shadow:0 8px 24px #143e3612}
 .cycle figcaption{font:clamp(21px,2vw,30px) Georgia,serif}.cycle-states{display:flex;justify-content:space-between;gap:14px;margin:16px 0}
 .cycle table{border-collapse:separate;border-spacing:3px;flex:1;width:45%;text-align:center;font-variant-numeric:tabular-nums;color:#fff;background:transparent}
@@ -228,3 +228,61 @@
 .shipment-actions button:first-child { background:var(--pine); color:white; }
 .shipment-actions button[disabled] { opacity:.55; }
 .shipment-example .shipment-status { min-height:1.5em; font-size:14px; color:#345d42; margin:6px 0 0; }
+
+.lesson-work { container-type:inline-size; }
+@container (max-width:720px) {
+  :is(.pvwrap,.dmcols,.grid2,.learn-compare){grid-template-columns:minmax(0,1fr);}
+  .tblwrap table.sx :is(th,td) {padding:4px 5px; min-width:0;}
+  .tblwrap .vtag {white-space:normal; overflow-wrap:anywhere; max-width:7ch;}
+}
+#book .scene-head :is(.scene-switch,.scene-travel button) {
+  appearance:none; box-shadow:none; background-image:none; border:1px solid transparent;
+  font:600 14px/1.25 "Segoe UI",system-ui,sans-serif; min-height:40px;
+  padding:9px 15px; border-radius:20px; color:#25523e; background-color:#e6eee6;
+}
+#book .scene-head .scene-switch {background-color:var(--pine);color:white;}
+#book .scene-head .scene-travel button {background-color:transparent;}
+#book .scene-head button:not(:disabled):hover {filter:brightness(.95);}
+#book .scene-head button:disabled {opacity:1;color:#717872;background:#eff1ed;cursor:default;}
+#book button[data-slot=button] {appearance:none;box-shadow:none;}
+#book button[data-focus-visible=true] {outline:2px solid #28785d;outline-offset:3px;}
+#book .lesson-explorer {margin:16px 0;min-width:0;}
+.lesson-explorer .scene {margin:0;}
+.explorer-body {padding:12px 0;}
+.practice-explorer > summary {padding:8px 0;}
+.study-views {flex-wrap:wrap;}
+.probe-layout {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:center;}
+.probe-plane {width:100%;height:auto;background:#f6f8f0;border-radius:12px;cursor:crosshair;touch-action:manipulation;}
+.probe-plane text {fill:#31503e;font:11px system-ui,sans-serif;}
+.probe-plane line {vector-effect:non-scaling-stroke;}
+.probe-values label {display:grid;grid-template-columns:2rem minmax(0,1fr) 3rem;gap:8px;align-items:center;}
+.probe-values input {width:100%;accent-color:var(--pine);}
+.probe-values table {border-collapse:collapse;font-size:14px;}
+.probe-values :is(th,td) {padding:5px;text-align:left;border-bottom:1px solid var(--rule);}
+@container(max-width:510px){.probe-layout{grid-template-columns:minmax(0,1fr);}.probe-plane{max-width:360px;justify-self:center;}}
+
+.demo .lhs .tw {display:inline-block;}
+.demo .drow {overflow-wrap:anywhere;}
+
+@container(max-width:500px) {
+  .demo .tblwrap table.dmsx :is(th,td) {padding:3px 2px;min-width:0;}
+  .demo .tblwrap table .vtag {max-width:4ch;}
+  .dmstage:has(.vleg) table.sx th .vtag {position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;}
+  .dmstage:has(.vleg) th:has(.vtag)::after {display:block;font:8px/1.15 system-ui,sans-serif;}
+  .dmstage:has(.vleg) th.vk-x::after {content:'●';}
+  .dmstage:has(.vleg) th.vk-s::after {content:'■';}
+  .dmstage:has(.vleg) th.vk-e::after {content:'▲';}
+  .dmstage:has(.vleg) th.vk-t::after {content:'◆';}
+}
+#book button.scene-switch {background:var(--pine);color:white;}
+#book .probe-values button,#book .scene-head button.scene-switch {border:0;border-radius:20px;box-shadow:none;
+  background:var(--pine);color:white;font:600 14px/1.25 "Segoe UI",sans-serif;padding:9px 15px;}
+#book .probe-values button {margin-top:10px;}
+
+.explorer-followup {margin-block:16px 4px;border-top:1px solid var(--rule);}
+.explorer-followup > summary {padding:12px 0;color:var(--pine);font-weight:600;cursor:pointer;}
+@container(max-width:500px) {
+  #book .sc-state {padding:8px 4px;}
+  #book .sc-state .tblwrap table.sx :is(th,td) {padding:3px 2px;min-width:0;}
+  #book .sc-state .vtag {white-space:normal;overflow-wrap:anywhere;max-width:5ch;}
+}

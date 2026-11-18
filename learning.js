@@ -259,9 +259,9 @@ const LEARN = (() => {
     }
     allStages=all;
     // The handbook renders the same solver trace with its own lesson sequence.
-    if (Handbook.inLesson) { root.hidden=true; return; }
     try { sdata=LSCEN.dataFrom(get,state,structure,context.variant); }
     catch(error) { console.error('Данные сцен:',error); sdata={type:state.type,rec:{}}; }
+    if (Handbook.inLesson) { root.hidden=true; return; }
     try { stages=scenario(); } catch(error) { console.error('Сценарий режима:',error); stages=[]; }
     const {presentation,...cfg}=data.settings;
     signature=digest(JSON.stringify([state.src,state.type,state.base,state.mode,state.v,state.tinit,all.map(s=>[s.id,s.before,s.answer]),cfg]));

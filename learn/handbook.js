@@ -112,7 +112,16 @@ const Handbook = (() => {
       }
       const demos = [...document.querySelectorAll('#solution .demo, #solution .plotwrap')]
         .filter(node => !node.parentElement.closest('.demo, .plotwrap'));
-      if (demos.length) showDemonstrations(demos);
+      addStudyViews(demos.length ? showDemonstrations(demos) : null);
+    } else {
+      const drawer = document.createElement('details');
+      drawer.className = 'practice-explorer';
+      drawer.innerHTML = '<summary>Исследовать свой вариант</summary><div class="explorer-body"></div>';
+      book.querySelector('#lesson-body').before(drawer);
+      drawer.addEventListener('toggle',()=>{
+        const host=drawer.querySelector('.explorer-body');
+        if (drawer.open && !host.hasChildNodes()) mountExplorer(host);
+      });
     }
   }
 
@@ -158,15 +167,65 @@ const Handbook = (() => {
       active = index;
     }
     BookUI.gallery(toolbar,{titles,onSelect});
-    const body = book.querySelector('#lesson-body');
-    const views = document.createElement('div');
-    body.before(views,section);
-    body.hidden = true;
-    BookUI.views(views,{onChange(view) {
-      if (view === 'steps') section.querySelector('.demo.playing .dm-play')?.click();
-      section.hidden = view !== 'demo';
-      body.hidden = view !== 'steps';
-    }});
+    return section;
+  }
+
+  function mountExplorer(host) {
+    const data = LEARN.sceneData;
+    const main = document.createElement('div');
+    host.append(main);
+    const preferred = {
+      transp:'flows', netw:'network', game:'heat', ilp:'lattice', gomory:'lattice',
+      dual:'dualpair', duality:'shadow', optcheck:'pointcheck', artificial:'stopjudge',
+      dsx:'stopjudge', dsimplex:'stopjudge', canon:'match'
+    };
+    const scenes = ['model','strategy','meaning'].flatMap(mode=>LSCEN.scenes(mode,data,'deep'));
+    const primary = scenes.find(item=>item.scene===preferred[chapter.type]) || scenes.find(item=>item.scene==='map');
+    const plane = ['simplex','graph'].includes(chapter.type) && data.P?.c.length>=2;
+    if (plane) BookUI.planProbe(main,data.P);
+    else LSCENE.mount(main,primary);
+
+    const followups = {
+      graph:['region','Сдвинуть линию цели'], simplex:['stopjudge','Проверить, пора ли закончить решение'],
+      transp:['improve','Выбрать маршрут для снижения затрат'], game:['maximin','Сравнить гарантированные выигрыши'],
+      netw:['critical','Найти критическую работу'], ilp:['cutbar','Проверить отсечение'], gomory:['cutbar','Проверить отсечение'],
+      duality:['dualpair','Сопоставить прямую и двойственную задачи']
+    };
+    const [kind,label] = followups[chapter.type] || [];
+    const next = kind && scenes.find(s=>s!==primary && (s.scene===kind || s.spec.task===kind));
+    const map = scenes.find(s=>s.scene==='map' && (plane || s!==primary));
+    const extra = next || map || scenes.find(s=>s.scene==='match' && s!==primary);
+    if (!extra) return;
+    const details = document.createElement('details');
+    details.className = 'explorer-followup';
+    const summary = document.createElement('summary');
+    summary.textContent = next ? label : extra.scene==='map' ? 'Разобрать схему метода' : 'Проверить обозначения';
+    const content = document.createElement('div');
+    details.append(summary,content);
+    host.append(details);
+    details.addEventListener('toggle',()=>{
+      if (details.open && !content.hasChildNodes()) LSCENE.mount(content,extra);
+    });
+  }
+
+  function addStudyViews(deck) {
+    const body = book.querySelector('#lesson-body'), views = document.createElement('div');
+    const explorer = document.createElement('section');
+    explorer.id='variant-explorer'; explorer.className='lesson-explorer';
+    const panels = {steps:body,explore:explorer};
+    const items = [['steps','Разобрать по шагам',body.id],['explore','Исследовать вариант',explorer.id]];
+    if (deck) {
+      items.unshift(['demo','Смотреть анимацию',deck.id]);
+      panels.demo=deck;
+    }
+    body.before(views,...(deck?[deck]:[]),explorer);
+    function select(key) {
+      if (key!=='demo') deck?.querySelector('.demo.playing .dm-play')?.click();
+      for (const [id,panel] of Object.entries(panels)) panel.hidden=id!==key;
+      if (key==='explore' && !explorer.hasChildNodes()) mountExplorer(explorer);
+    }
+    select(items[0][0]);
+    BookUI.views(views,{items,onChange:select});
   }
   function footer(parent) {
     parent.insertAdjacentHTML('beforeend','<p><a class="book-cta" href="' + (phase < 3 ? url(chapter,phase+1) : 'index.html#contents') + '">' + (phases[phase+1] || 'К оглавлению') + ' →</a></p>');
