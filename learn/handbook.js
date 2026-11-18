@@ -67,7 +67,7 @@ const Handbook = (() => {
   function home(topics) {
     const last=read('last'), recent=topics.find(t=>key(t)===last.topic);
     const first=topics.find(t=>t.type==='transp');
-    book.innerHTML=mast()+'<main class="book-main"><div class="book-intro"><div><div class="book-kicker">ОмГТУ / Интерактивное пособие</div><h1>Методы<br><em>оптимизации</em></h1><p>Начните с доставки: измените один маршрут и посмотрите, как меняется цена всего заказа. Затем разберите этот выбор по шагам.</p><a class="book-cta" href="'+url(first)+'">Начать с доставки →</a><p><a href="#contents">Найти своё задание ↓</a></p>'+(recent?'<a href="'+url(recent,last.phase)+'">Продолжить: '+esc(recent.title)+' →</a>':'')+'</div><div id="featured"></div></div><section id="contents"></section></main>';
+    book.innerHTML=mast()+'<main class="book-main"><div class="book-intro"><div><div class="book-kicker">ОмГТУ / Интерактивное пособие</div><h1>Методы<br><em>оптимизации</em></h1><p>Попробуйте перераспределить ящики между двумя складами и посмотрите, как изменится стоимость доставки. Затем разберите этот выбор по шагам.</p><a class="book-cta" href="'+url(first)+'">Начать с доставки →</a><p><a href="#contents">Найти своё задание ↓</a></p>'+(recent?'<a href="'+url(recent,last.phase)+'">Продолжить: '+esc(recent.title)+' →</a>':'')+'</div><div id="featured"></div></div><section id="contents"></section></main>';
     LessonVisuals.cycleFigure(book.querySelector('#featured'));
     catalogue(book.querySelector('#contents'),topics);
     if(location.hash==='#contents') book.querySelector('#contents').scrollIntoView();
@@ -101,28 +101,88 @@ const Handbook = (() => {
     if (phase === 0) {
       const intro = document.createElement('section');
       intro.className = 'lesson-context';
-      intro.innerHTML = '<h3>О чём эта задача?</h3><p>'+esc(profile.analogy)+'</p><dl>'+
-        profile.roles.map(role=>'<div><dt>'+esc(role.label)+'</dt><dd>'+esc(role.text)+'</dd></div>').join('')+
-        '</dl><details><summary>Как читать обозначения</summary><dl>'+
+      const row = steps[0]?.startingRow;
+      let firstAction = esc(profile.start);
+      if (row) {
+        const expression = R.lin(row.a, j=>R.xv(j+1));
+        const rule = row.s === '<=' ? 'Знак ≤ разрешает расходовать меньше лимита. Прибавьте к левой части неиспользованный остаток.' :
+          row.s === '>=' ? 'Знак ≥ задаёт нижнюю границу. Вычтите из левой части всё, что превышает эту границу.' :
+          'Обе части уже должны быть равны. Эту строку можно сразу перенести в таблицу.';
+        firstAction = 'Посмотрите на первое ограничение своего варианта.<span class="starting-equation">'+expression+' '+R.sg(row.s)+' '+R.fq(row.b)+'</span>'+rule;
+      }
+      intro.innerHTML = '<h3>На простом примере</h3><p>'+esc(profile.analogy.replace(/^Учебная аналогия: /,''))+'</p>'+
+        '<h4>С чего начать в своём варианте</h4><p>'+firstAction+'</p>'+
+        '<details><summary>Обозначения в задаче</summary><dl>'+
         profile.symbols.map(([symbol,meaning])=>'<div><dt>'+esc(symbol)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+
-        '</dl></details><p><strong>К чему прийти.</strong> '+esc(profile.complete)+'</p><a href="#lesson-body">Посмотреть первый разобранный переход ↓</a>';
+        '</dl></details><a href="#lesson-body">Перейти к решению варианта ↓</a>';
       book.querySelector('#lesson-body').before(intro);
       const demos = [...document.querySelectorAll('#solution .demo, #solution .plotwrap')]
         .filter(node => !node.parentElement.closest('.demo, .plotwrap'));
-      if (demos.length) {
-        const section = document.createElement('section');
-        section.className = 'book-demos';
-        section.innerHTML = '<h3>Анимации варианта</h3>';
-        for (const demo of demos) {
-          const panel = document.createElement('details');
-          const title = document.createElement('summary');
-          title.textContent = demo.querySelector('.dmtl')?.textContent || 'Исследовать график варианта';
-          panel.append(title,demo);
-          section.append(panel);
-        }
-        book.querySelector('#lesson-body').before(section);
-      }
+      if (demos.length) showDemonstrations(demos);
     }
+  }
+
+  function showDemonstrations(demos) {
+    const section = document.createElement('section');
+    section.className = 'book-demos';
+    section.setAttribute('aria-labelledby','demo-heading');
+    section.innerHTML = '<div class="demo-toolbar"><h3 id="demo-heading">Разбор в движении</h3><span class="demo-count"></span></div>'+
+      '<div class="demo-picker"><label for="demo-topic">Что разобрать</label><div><select id="demo-topic"></select>'+
+      '<button type="button" aria-label="Предыдущая тема" title="Предыдущая тема">← Тема</button>'+
+      '<button type="button" aria-label="Следующая тема" title="Следующая тема">Тема →</button></div></div>';
+    const picker = section.querySelector('select');
+    const [prev, next] = section.querySelectorAll('.demo-picker button');
+    const counter = section.querySelector('.demo-count');
+    const panels = demos.map((demo, i) => {
+      const title = demo.querySelector('.dmtl')?.textContent || (demo.querySelector('.r3home') ? 'Рассмотреть объёмный график' : 'Рассмотреть график на плоскости');
+      picker.add(new Option(title, i));
+      const panel = document.createElement('div');
+      panel.className = 'demo-view';
+      panel.id = 'demo-view-'+i;
+      panel.hidden = i !== 0;
+      panel.append(demo);
+      section.append(panel);
+      const controls = demo.querySelector('.dmctl');
+      if (controls) {
+        const settings = document.createElement('details');
+        settings.className = 'demo-settings';
+        settings.innerHTML = '<summary>Настройки и обозначения</summary>';
+        const options = document.createElement('div');
+        settings.append(options);
+        for (const selector of ['.dm-re','.dm-end','.dm-speed','.dmdet','.dmleg']) {
+          const item = demo.querySelector(selector);
+          if (item) options.append(item);
+        }
+        controls.after(settings);
+        demo.querySelector('.dm-prev').textContent = '← Кадр';
+        demo.querySelector('.dm-next').textContent = 'Кадр →';
+      }
+      return panel;
+    });
+    let active = 0;
+    function select(index) {
+      if (active !== index) {
+        panels[active].querySelector('.demo.playing .dm-play')?.click();
+        panels[active].hidden = true;
+      }
+      active = index;
+      panels[active].hidden = false;
+      picker.selectedIndex = active;
+      picker.setAttribute('aria-controls',panels[active].id);
+      counter.textContent = 'Тема '+(active+1)+' из '+panels.length;
+      prev.disabled = active === 0;
+      next.disabled = active === panels.length-1;
+    }
+    picker.onchange = () => select(picker.selectedIndex);
+    prev.onclick = () => select(active-1);
+    next.onclick = () => select(active+1);
+    select(0);
+    if (panels.length === 1) {
+      prev.hidden = next.hidden = picker.hidden = true;
+      section.querySelector('label').textContent = picker.options[0].text;
+      counter.hidden = true;
+    }
+    book.querySelector('#lesson-body').before(section);
   }
   function footer(parent) {
     parent.insertAdjacentHTML('beforeend','<p><a class="book-cta" href="' + (phase < 3 ? url(chapter,phase+1) : 'index.html#contents') + '">' + (phases[phase+1] || 'К оглавлению') + ' →</a></p>');

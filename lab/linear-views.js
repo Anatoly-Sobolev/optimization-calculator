@@ -669,7 +669,7 @@ const VIEWS = (() => {
     return { html, script, opts: { detail: o.drive ? '' : 'разобрать всю таблицу (каждая ячейка)' } };
   }
 
-  const demoDrive = d => { const sp = pivotSpec({ ...d.before, q: d.q, p: d.p }, d.after, { drive: true }); return demo('вывод искусственной переменной из базиса', sp.html, sp.script, sp.opts); };
+  const demoDrive = d => { const sp = pivotSpec({ ...d.before, q: d.q, p: d.p }, d.after, { drive: true }); return demo('Как убрать временную переменную из таблицы?', sp.html, sp.script, sp.opts); };
   // конечная таблица: проверка критерия оптимальности
   function optSpec(s) {
     const m = s.rows.length, vars = s.vars, cols = s.cols, zl = zlab(s.z.label), ph1 = s.z.label === '−h';
@@ -909,7 +909,7 @@ const VIEWS = (() => {
         if (G.status === 'unbounded') { A.cap('Область уходит за рамку графика — она не ограничена'); await A.pop(S('.ginf')); }
       }
     };
-    return demo('оси → прямые → полуплоскости → допустимая область', html + '<p class="note">Цвет прямой соответствует номеру ограничения. Короткие стрелки показывают допустимую сторону неравенства; они появляются после проверки пробной точки. Общая область — пересечение всех ограничений. Зелёный вектор целевой функции на следующем графике показывает рост F; для минимума движемся против него.</p>', script);
+    return demo('Где на чертеже находятся допустимые планы?', html + '<p class="note">Цвет прямой соответствует номеру ограничения. Короткие стрелки показывают допустимую сторону неравенства; они появляются после проверки пробной точки. Общая область — пересечение всех ограничений. Зелёный вектор целевой функции на следующем графике показывает рост F; для минимума движемся против него.</p>', script);
   }
 
   // --- пересечение двух прямых: система → исключение → подстановка → точка ---
@@ -1005,7 +1005,7 @@ const VIEWS = (() => {
       A.cap(`Все вершины области (${G.verts.length}) найдены`);
       A.cls(A.qa('.gsvg .gvx'), 'k-dim', false); A.cls(A.qa('.gsvg .gvx'), 'k-ok');
     };
-    return demo('вершина = пересечение двух прямых: система → ответ', html, script);
+    return demo('Как найти координаты вершины?', html, script);
   }
 
   // --- значения цели в вершинах и движение линии уровня ---
@@ -1074,7 +1074,7 @@ const VIEWS = (() => {
         await A.pop(go);
       }
     };
-    return demo('значения цели и движение линии уровня', html, script);
+    return demo('Как найти лучший план на чертеже?', html, script);
   }
 
   /* =================== Симплекс-метод и искусственный базис: сцены =================== */
@@ -1093,13 +1093,13 @@ const VIEWS = (() => {
         const R = res.rows[i], sl = res.slackOf[i], ar = res.artOf[i], rw = row(i);
         if (R.flipped) {
           A.cap(`(${i + 1}): правая часть ${plain(fq(pr.rows[i].b))} < 0 — умножаем ограничение на −1`);
-          A.cls(rw, 'on'); A.set(fm, `<span class="fmh">все коэффициенты, знак неравенства и правая часть меняют знак</span>`);
+          A.cls(rw, 'on'); A.set(fm, `<span class="fmh">умножьте обе части на −1 и разверните знак неравенства</span>`);
           await A.seq([rw.querySelector('.lhs'), rw.querySelector('.rs'), rw.querySelector('.rb')], 140, (el, k) => A.swap(el, k === 0 ? eqTerms(R.a, xlab) : k === 1 ? sg(R.s) : fq(R.b), 520));
           A.cls(rw, 'on', false);
         }
         if (sl !== null) {
           const plus = R.s === '<=';
-          A.cap(plus ? `(${i + 1}) «≤»: прибавляем остаточную переменную ${plain(vname(vars, sl))} ≥ 0 — получаем равенство` : `(${i + 1}) «≥»: вычитаем переменную излишка ${plain(vname(vars, sl))} ≥ 0 — получаем равенство`);
+          A.cap(plus ? `Строка ${i + 1}. Прибавьте остаток ${plain(vname(vars, sl))} к левой части. Теперь обе части равны.` : `Строка ${i + 1}. Левая часть может превышать правую. Вычтите излишек ${plain(vname(vars, sl))}, чтобы получить равенство.`);
           A.cls(rw, 'on', true);
           const ex = rw.querySelector('.ex-s'); ex.innerHTML = `&nbsp;${plus ? '+' : '−'}&nbsp;${vK(vars, sl)}`; ex.classList.add(plus ? 'vk-s' : 'vk-e');
           await A.pop(ex); await A.swap(rw.querySelector('.rs'), '=', 520); A.cls(rw, 'on', false);
@@ -1121,7 +1121,7 @@ const VIEWS = (() => {
           await A.pop(ex);
         }
       }
-      A.cap('Стартовый базис: у каждой строки своя переменная с коэффициентом 1 только в этой строке');
+      A.cap('Выделенные переменные образуют начальный базис. У каждой коэффициент 1 в своей строке и 0 в остальных.');
       for (let i = 0; i < m; i++) {
         const b0 = res.artOf[i] !== null ? res.artOf[i] : res.slackOf[i], rw = row(i);
         A.cls(rw.querySelector(res.artOf[i] !== null ? '.ex-t' : '.ex-s'), 'k-sel');
@@ -1136,7 +1136,7 @@ const VIEWS = (() => {
         A.set(fm, '<span class="fmh ok">все b ≥ 0 и в каждой строке есть остаток с коэффициентом 1</span>'); await A.pop(fm);
       }
     };
-    return demo('шаг за шагом: неравенства → равенства → стартовый базис', html, script);
+    return demo('Как записать ограничения для первой таблицы?', html, script);
   }
 
   // --- перенос равенств в начальную симплекс-таблицу ---
@@ -1184,7 +1184,7 @@ const VIEWS = (() => {
         A.cap('Строки готовы; строку −h составим на следующем шаге');
       }
     };
-    return demo('равенства → строки начальной таблицы', html, script);
+    return demo('Откуда берутся числа в первой таблице?', html, script);
   }
 
   // --- строка −h: минус сумма строк с искусственными переменными ---
@@ -1220,7 +1220,7 @@ const VIEWS = (() => {
       A.set(fm, '');
       sum.innerHTML = `Сейчас <i>h</i> = ${fq(st0.z.b.neg())}: столько «не хватает» до допустимого решения. Задача этапа 1 — довести ее до 0.`; await A.show(sum);
     };
-    return demo('строка −h: складываем строки с искусственными', html, script);
+    return demo('Как записать сумму временных переменных h в таблице?', html, script);
   }
 
   // --- итог этапа 1: проверка h = 0 (или h > 0), удаление столбцов t ---
@@ -1257,7 +1257,7 @@ const VIEWS = (() => {
         cells.forEach(c => c && c.classList.add('dh'));
       }
     };
-    return demo('конец этапа 1: проверяем h и убираем искусственные переменные', html, script);
+    return demo('Можно ли выполнить все условия исходной задачи?', html, script);
   }
 
   // --- переход к этапу 2: исходная цель и приведение её строки к базису ---
@@ -1301,7 +1301,7 @@ const VIEWS = (() => {
       A.cls(start2.basis.map(bj => C('tN', m, bj)), 'k-ok');
       sum.innerHTML = `Базис: ${start2.basis.map((bj, i) => `${vK(vars, bj)} = ${fq(start2.rows[i].b)}`).join(', ')}; ${plain(zlab(start2.z.label))}: b = ${fq(start2.z.b)}`; await A.show(sum);
     };
-    return demo('этап 2: исходная цель → строка, приведённая к базису', html, script);
+    return demo('Как вернуться к расчёту исходной цели?', html, script);
   }
 
   // --- подстановка точки в ограничения и цель (проверка ответа) ---
@@ -1361,7 +1361,7 @@ const VIEWS = (() => {
       const mk = ro.querySelector('.okc'); mk.innerHTML = `= ${fq(val)} ✓`; await A.pop(mk); A.cls(ro, 'on', false); A.cls(ro, 'done');
       A.cap('Все ограничения выполнены, значение цели подтверждено — ответ верен');
     };
-    return demo('ответ: чтение таблицы и обратная проверка', html, script);
+    return demo('Как прочитать ответ и проверить его по условию?', html, script);
   }
 
   /* =================== Двойственная задача, Гаусс, сведение к плоскости: дополнительные сцены =================== */
@@ -1393,7 +1393,7 @@ const VIEWS = (() => {
       A.cap(`Цель меняет направление: ${P.sense} → ${D.sense}`);
       const gl = A.q('.mpgoal'); A.cls(gl, 'on'); await A.pop(gl.querySelector('.mpa'), { d: 300 }); await A.pop(gl.querySelector('.mpr')); A.cls(gl, 'on', false); A.cls(gl, 'done');
     };
-    return demo('соответствие: ограничения ↔ y, переменные ↔ ограничения Д, знаки', html, script);
+    return demo('Как каждому ограничению сопоставить оценку ресурса?', html, script);
   }
 
   // --- подстановка x* в ограничения прямой: равенство или запас ⇒ y = 0 ---
@@ -1416,7 +1416,7 @@ const VIEWS = (() => {
         await A.pop(csv); A.cls(row, 'on', false);
       }
     };
-    return demo('подставляем x* в ограничения: запас ⇒ y = 0', xs + rows, script);
+    return demo('Какие ресурсы остались в запасе?', xs + rows, script);
   }
 
   // --- метод Гаусса — Жордана по шагам (расширенная матрица) ---
@@ -1508,7 +1508,7 @@ const VIEWS = (() => {
   // Этап «приведение»: неравенства «≥» умножаются на −1 — коэффициенты и знак переворачиваются
   function demoNorm(pr, norm) {
     const html = `<div>${pr.rows.map((r, i) => `<div class="drow" data-i="${i}"><span class="ch kbd">(${i + 1})</span> <span class="lhs">${TM(r.a, xlab)}</span> <span class="ch rs">${sg(r.s)}</span> <span class="ch rb">${fq(r.b)}</span>${norm[i].flipped ? '<span class="ch bx dh">× (−1)</span>' : '<span class="ch okc dh">✓ уже «≤»</span>'}</div>`).join('')}</div>`;
-    return demo('неравенства «≥» → «≤»', html, async A => {
+    return demo('Как обратить знак неравенства?', html, async A => {
       await A.wait(400);
       for (let i = 0; i < norm.length; i++) {
         const row = A.q(`.drow[data-i="${i}"]`), r = norm[i];
@@ -1537,7 +1537,7 @@ const VIEWS = (() => {
     const rows = D.rows.map((r, j) => `<div class="dl" data-d="${j}">${TM(r.a, ylab, 'dh')} <span class="ch dh rs">${sg(r.s)}</span> <span class="ch dh" data-r="${j}">${fq(r.b)}</span> <span class="kbd">(Д${j + 1})</span></div>`).join('');
     const sl = `<div class="dl">${yS.map((s, i) => `<span class="ch dh ysg">${signTxt(s, yv(i + 1))}${i < m - 1 ? ',' : ''}</span>`).join(' ')}</div>`;
     const html = `<div class="dmcols"><div><div class="dmh">было: прямая задача</div><div class="tblwrap" style="overflow:visible">${t}</div></div><div><div class="dmh">стало: двойственная</div><div class="dual">${gl}${rows}${sl}</div></div></div>`;
-    return demo('столбцы → строки, b → цель, max ↔ min', html, async A => {
+    return demo('Как составить двойственную задачу?', html, async A => {
       await A.wait(500);
       for (let j = 0; j < n; j++) {
         const col = A.qa(`.dmt [data-cj="${j}"]`), drow = A.q(`[data-d="${j}"]`);
@@ -1585,7 +1585,7 @@ const VIEWS = (() => {
     const A2 = res.norm.map((r, i) => `<div class="dmpair" data-pi="${i}"><span class="ch sc">запас (${i + 1}) = ${fq(cs.slack[i])}</span><span class="ch arr dh">⟹</span><span class="ch yc">${yv(i + 1)} ≥ 0</span></div>`).join('');
     const html = `<div class="dmcols"><div><div class="dmh">x* → ограничения Д</div>${A1}</div><div><div class="dmh">запас ресурса → y</div>${A2}</div></div>`;
     const arrow = el => A0 => A0.anim(el, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { d: 380 });
-    return demo('подставляем x* — находим равенства и нули', html, async A => {
+    return demo('Какие ограничения выполнены точно на границе?', html, async A => {
       await A.wait(400);
       for (let j = 0; j < pr.n; j++) {
         const p = A.q(`[data-pj="${j}"]`), pos = cs.eqJ[j];
@@ -1614,7 +1614,7 @@ const VIEWS = (() => {
     const D = res.D, cs = res.cs, J = D.rows.map((_, j) => j).filter(j => cs.eqJ[j]);
     const eqs = J.map((j, k) => `<div class="drow" data-e="${k}"><span class="lhs">${TM(D.rows[j].a, ylab)}</span> = ${fq(D.rows[j].b)}</div>`).join('');
     const html = `<div>${eqs || '<div class="kbd">уравнений из УДН нет</div>'}<div class="dmdown dh">↓ метод Гаусса${res.unique ? '' : ' + симплекс-метод на множестве УДН'}</div><div class="dmbig"><span class="dmres dh">y* = (${res.y.map((_, i) => `<span class="ch v" data-i="${i}">${yv(i + 1)}</span>`).join('; ')})</span></div></div>`;
-    return demo('вычёркиваем y = 0 и решаем систему', html, async A => {
+    return demo('Как найти неизвестные оценки ресурсов?', html, async A => {
       await A.wait(400);
       const zero = A.qa('.lhs .tm').filter(el => cs.zeroY[+el.dataset.j]);
       if (zero.length) {
@@ -1644,7 +1644,7 @@ const VIEWS = (() => {
     const rows = D.rows.map((r, j) => `<div class="drow" data-j="${j}"><span class="lhs">${TM(r.a, ylab)}</span> <span class="ch">≥</span> ${fq(r.b)} <span class="ch okc dh">✓</span></div>`).join('');
     const ysg = `<div class="drow" data-ys="1">${y.map((v, i) => `<span class="ch ysc" data-i="${i}">${yv(i + 1)} = ${fq(v)} ${v.s >= 0 ? '≥ 0' : '&lt; 0'}<span class="okc dh"> ${v.s >= 0 ? '✓' : '✕'}</span></span>`).join('; ')}</div>`;
     const html = `<div>${ysg}${rows}${bars(['g*', res.g], ['f*', res.primal.f])}</div>`;
-    return demo('подставляем y* — ограничения выполнены, g* = f*', html, async A => {
+    return demo('Как проверить, что оба плана оптимальны?', html, async A => {
       await A.wait(400); A.cap('сначала проверяем знаки: все yᵢ ≥ 0');
       await A.seq(A.qa('.ysc'), 150, el => A.pop(el.querySelector('.okc')));
       A.cap(`подставляем y* = ${vec(y)}`);
@@ -2759,7 +2759,7 @@ const VIEWS = (() => {
       return { title: `Таблица ${k}: ${title}`, ...dualEndSpec(pr, res, s) };
     }
     const sp = pivotSpec(s, steps[k + 1], { dual: true, sel: s.kind === 'M' ? mSel(s) : dualSel(s), fq: fqM, par: parM, realZ: dualRz(pr) });
-    return { title: s.kind === 'M' ? `Шаг ${k + 1}: строка M, таблица ${k} → таблица ${k + 1}` : `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, ...sp };
+    return { title: s.kind === 'M' ? `Шаг ${k + 1}: строка M, таблица ${k} → таблица ${k + 1}` : `Как пересчитать таблицу на шаге ${k + 1}?`, ...sp };
   }
 
   /* Пошаговый просмотр: кнопки таблиц + анимация выбранного шага. */
@@ -2888,7 +2888,7 @@ const VIEWS = (() => {
       sum.innerHTML = `Базис: ${st0.basis.map((bj, i) => `${vK(vars, bj)} = ${fqM(st0.rows[i].b)}`).join(', ')}; остальные = 0. &nbsp;${zlab(st0.z.label)}: b = ${fqM(st0.z.b)}`;
       await A.show(sum);
     };
-    return demo('шаг за шагом: условие → рабочая форма → стартовая таблица', html, script);
+    return demo('Как составить первую таблицу по условию?', html, script);
   }
 
   /* Проверка стартовой таблицы: d ≥ 0 и знаки b. */
@@ -2917,7 +2917,7 @@ const VIEWS = (() => {
       }
       await A.show(sum);
     };
-    return demo('проверка стартовой таблицы: d ≥ 0 и знаки b', html, script);
+    return demo('Подходит ли начальная таблица для двойственного метода?', html, script);
   }
 
   /* Добавление искусственного ограничения: Σ небазисных + s = M. */
@@ -2997,7 +2997,7 @@ const VIEWS = (() => {
 
   R.bridge.pivot = (box, steps, k, auto) => {
     const s = steps[k], sp = s.q == null ? optSpec(s) : pivotSpec(s, s.unbounded ? null : steps[k + 1]);
-    return mountInto(box, s.q == null ? `Таблица ${k}: проверка оптимальности` : s.unbounded ? `Таблица ${k}: неограниченность` : `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, sp.html, sp.script, { ...sp.opts, autoplay: auto });
+    return mountInto(box, s.q == null ? `Таблица ${k}: проверка оптимальности` : s.unbounded ? `Таблица ${k}: неограниченность` : `Как пересчитать таблицу на шаге ${k + 1}?`, sp.html, sp.script, { ...sp.opts, autoplay: auto });
   };
   return { KIT: { demo, mountInto, sceneTools, dtb, pivotSpec, vK, plain, eqTerms, xlab, TM, termIn, fqM, parM, dstepper, dAllTables, dualSel, dualRz, dualEndSpec, summaryCard, resMain, bookBadge, checkBadge, compare, statusText, noCheck, checkTitle, system, checkTable, valueLine, varLegend, demoGauss, demoDualMap, growBars, bars }, graph, simplex, artificial, dual, dsimplex, statusText, graphZ, dualZ, verdictZ, quiz, trainerFlow, stopAllDemos };
 })();

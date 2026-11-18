@@ -27,6 +27,25 @@ const { chromium } = require('playwright');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic+' overflows');
       }
     }
+    const artificial = topics.find(topic=>topic.includes('lesson=rgr.artificial'));
+    await page.goto(artificial);
+    assert.ok(await page.locator('.starting-equation').isVisible());
+    const deck = page.locator('.book-demos');
+    const visibleScene = deck.locator('.demo-view:visible');
+    assert.equal(await visibleScene.count(),1);
+    const picker = deck.locator('#demo-topic');
+    const sceneCount = await picker.locator('option').count();
+    assert.ok(sceneCount > 1);
+    await deck.getByRole('button',{name:'Следующая тема'}).click();
+    assert.equal(await picker.evaluate(el=>el.selectedIndex),1);
+    await picker.selectOption({index:sceneCount-1});
+    assert.ok(await deck.getByRole('button',{name:'Следующая тема'}).isDisabled());
+    await picker.selectOption({index:0});
+    await visibleScene.locator('.dm-next').click();
+    const frame = await visibleScene.locator('.dmpos').innerText();
+    await deck.getByRole('button',{name:'Следующая тема'}).click();
+    await deck.getByRole('button',{name:'Предыдущая тема'}).click();
+    assert.equal(await visibleScene.locator('.dmpos').innerText(),frame);
     await page.goto(topics[0].replace('phase=0','phase=1'));
     await page.locator('textarea').fill('Проверяю допустимость.');
     await page.locator('#book-compare').click();

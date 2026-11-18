@@ -720,7 +720,7 @@ const VIEWS2 = (() => {
       return { title: `Таблица ${k}: лимит отсечений`, ...K.dualEndSpec(pr, { status: 'cycle' }, { ...s, terminal: 'cycle' }) };
     }
     const sp = K.pivotSpec(s, steps[k + 1], { dual: true, sel: K.dualSel(s), fq: fqM, par: parM, realZ: K.dualRz(pr) });
-    return { title: `Шаг ${k + 1}: таблица ${k} → таблица ${k + 1}`, ...sp };
+    return { title: `Как пересчитать таблицу на шаге ${k + 1}?`, ...sp };
   }
   const gomStepper = (pr, res) => stepperOf(res.steps.map((s, k) => ({ label: s.kind === 'cut' ? `S<sub>${s.cut.id}</sub>` : s.kind === 'end' ? 'итог' : String(k), title: s.kind, build: () => gomScene(pr, res, k) })));
   const gomHint = s => s.kind === 'cut' ? ` — отсечение ${s.cut.id} по строке ${vname(s.vars, s.basis[s.p])}: {b} = ${fq(s.cut.fb)}` : s.kind === 'D' ? ` — выходит ${vname(s.vars, s.basis[s.p])}, входит ${vname(s.vars, s.q)}, ведущий элемент ${fqM(s.rows[s.p].a[s.q])}` : s.terminal === 'optimal' ? ' — итоговая (целочисленная)' : s.terminal === 'infeasible' ? ' — допустимых решений нет' : ' — лимит';
