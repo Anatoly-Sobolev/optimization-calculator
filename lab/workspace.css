@@ -416,3 +416,13 @@ table.tg th.trh{background:#f3f1ec;font-family:"Segoe UI",sans-serif;font-size:1
 .gfa{min-height:0}
 
 .tf-right:has(table) { max-height:none; position:static; }
+
+/* Frame markers must not add a line or push the values in adjacent columns. */
+.demo table.sx :is(td,th){position:relative;font-variant-numeric:tabular-nums}
+.demo table.sx :is(td.k-ok,td.k-del,td.k-pe,th.k-sel)::after,
+.demo table.sx td.bas.k-sel::before{position:absolute;right:2px;bottom:1px;line-height:1;pointer-events:none}
+.demo table.sx td.bas.k-sel::before{left:2px;right:auto}
+.demo table.sx.frame-matrix{width:var(--matrix-width)!important;table-layout:fixed}
+.demo .frame-matrix th{white-space:normal;overflow-wrap:anywhere}
+.demo .frame-matrix td{height:2.75em;box-sizing:border-box}
+.demo .frame-matrix .tvv{margin:0;padding-top:.85em;line-height:1.3}

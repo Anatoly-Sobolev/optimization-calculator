@@ -3,7 +3,6 @@ import {ArrowLeft,ChevronLeft,ChevronRight,ListVideo} from 'lucide-react';
 import './scene-shipment.jsx';
 import {createRoot} from 'react-dom/client';
 import {flushSync} from 'react-dom';
-import {Accordion} from '@heroui/react/accordion';
 import {Button} from '@heroui/react/button';
 import {Label} from '@heroui/react/label';
 import {Link} from '@heroui/react/link';
@@ -23,29 +22,24 @@ function Mast({lab}) {
 
 function Catalogue({groups}) {
   const [query,setQuery] = useState('');
-  const [expanded,setExpanded] = useState(new Set());
-  const search = query.trim().toLocaleLowerCase('ru');
-  const matches = (group,term) => [group.goal,group.method,...group.routes.map(r=>r.title+' '+r.source)].join(' ').toLocaleLowerCase('ru').includes(term);
-  const visible = groups.filter(group=>matches(group,search));
-  function find(value) {
-    setQuery(value);
-    const term = value.trim().toLocaleLowerCase('ru');
-    setExpanded(new Set(term ? groups.filter(group=>matches(group,term)).map(group=>group.goal) : []));
-  }
+  const search=query.trim().toLocaleLowerCase('ru');
+  const chapters=groups.flatMap(group=>group.routes.map(route=>({...route,goal:group.goal,method:group.method,type:group.type})));
+  const visible=chapters.filter(r=>[r.goal,r.title,r.method,r.source].join(' ').toLocaleLowerCase('ru').includes(search));
   return <section id="contents" className="course-catalog">
     <div className="catalog-intro"><h2>Найти своё задание</h2>
-      <SearchField value={query} onChange={find} className="topic-search">
+      <SearchField value={query} onChange={setQuery} className="topic-search">
         <Label>Поиск по задаче или методу</Label>
         <SearchField.Group><SearchField.SearchIcon/><SearchField.Input placeholder="Груз, симплекс, ресурсы…"/><SearchField.ClearButton aria-label="Очистить поиск"/></SearchField.Group>
       </SearchField>
     </div>
-    <div className="topic-list">
-      {visible.length ? <Accordion allowsMultipleExpanded expandedKeys={expanded} onExpandedChange={setExpanded}>
-        {visible.map(group=><Accordion.Item id={group.goal} key={group.goal}>
-          <Accordion.Heading><Accordion.Trigger><MethodMark type={group.type}/><span className="topic-name"><strong>{group.goal}</strong><small>{group.method}</small></span><Accordion.Indicator/></Accordion.Trigger></Accordion.Heading>
-          <Accordion.Panel><Accordion.Body>{group.routes.map(r=><Link className="chapter-link" key={r.href} href={r.href}><span>{r.source}</span>{group.routes.filter(row=>row.source===r.source).length>1&&<small>{r.title}</small>}<i aria-hidden="true">↗</i></Link>)}</Accordion.Body></Accordion.Panel>
-        </Accordion.Item>)}
-      </Accordion> : <p role="status">Совпадений нет. Попробуйте название метода или другое слово из условия.</p>}
+    <div className="catalog-groups">
+      {[...new Set(visible.map(r=>r.source))].map(source=><section key={source} className="catalog-source">
+        <h3>{source}</h3>
+        {visible.filter(r=>r.source===source).map(r=><Link className="chapter-link direct-chapter" key={r.href} href={r.href}>
+          <MethodMark type={r.type}/><span className="topic-name"><strong>{r.goal}</strong><small>{r.title.replace(' (указание преподавателя)','').replace(' (как в методичке)','')}</small></span>
+          <ChevronRight aria-hidden="true" size={18}/></Link>)}
+      </section>)}
+      {!visible.length&&<p role="status">Совпадений нет. Попробуйте название метода или слово из условия.</p>}
     </div>
   </section>;
 }

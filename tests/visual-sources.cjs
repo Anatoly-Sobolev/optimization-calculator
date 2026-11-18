@@ -23,6 +23,28 @@ const {chromium} = require('playwright');
       await view.locator('.demo-settings summary').click();
       await view.locator('.dm-end').click();
     }
+    // Every freight animation frame must keep all cell boundaries in place.
+    await page.emulateMedia({reducedMotion:'reduce'});
+    for(const width of [360,1250]){
+      await page.setViewportSize({width,height:780});
+      await lesson('transp');
+      const grid=view.locator('table.tg').first(),next=view.locator('.dm-next');
+      const geometry=()=>grid.evaluate(t=>{
+        const origin=t.getBoundingClientRect();
+        return [...t.rows].flatMap(row=>[...row.cells].flatMap(cell=>{
+          const r=cell.getBoundingClientRect();
+          return [r.x-origin.x,r.y-origin.y,r.width,r.height];
+        }));
+      });
+      const start=await geometry();
+      while(await next.isEnabled()){
+        await next.click();
+        await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+        const frame=await geometry();
+        assert.equal(frame.length,start.length);
+        assert.ok(frame.every((v,i)=>Math.abs(v-start[i])<1),'Freight cell moved at '+width+'px');
+      }
+    }
     await lesson('game');
     await choose('стратегии игроков и цена игры');await end();
     const probability=view.locator('.gx[data-i="1"]');

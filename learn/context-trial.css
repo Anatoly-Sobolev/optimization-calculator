@@ -185,17 +185,6 @@
 .opening-example figcaption{font:650 16px/1.3 system-ui,sans-serif}
 .opening-example p{min-height:2.8em;color:#304e41}
 #book .opening-example button{justify-self:start;background:#fffdf7}
-.opening-diagram{display:grid;grid-template-columns:minmax(0,1fr) minmax(38px,.9fr) minmax(0,1fr);align-items:center;gap:6px;min-height:102px}
-.opening-diagram>div:not(.opening-road){display:grid;justify-items:center;gap:6px;text-align:center;font:600 14px/1.25 system-ui,sans-serif}
-.opening-diagram>div>svg{width:40px;height:40px;color:#26624e;stroke-width:1.6}
-.opening-road{position:relative;height:28px}
-.opening-road i{position:absolute;inset:50% 0 auto;border-top:2px dotted #84a394}
-.opening-road span{position:absolute;top:0;left:0%;line-height:0;padding:4px;border-radius:5px;background:#f7dfb4;color:#684526;transform:translateX(-10%)}
-.opening-road span[data-moved=true]{left:100%;transform:translateX(-90%)}
-.opening-road svg{width:20px;height:20px}
-.opening-axes,.opening-pieces svg{width:100%;height:auto;display:block}
-.opening-axes text{font:12px system-ui,sans-serif;fill:#294e3e}
-.opening-pieces{display:grid;justify-items:center;gap:3px;max-width:320px;width:100%;margin:auto}
 .lesson-page .lesson-opening footer{grid-column:1/-1;justify-self:start;width:auto;margin:0;padding:0;border:0}
 .trial-breadcrumb{padding:7px 14px 0}
 #book .trial-breadcrumb button{background:transparent;border-color:transparent;color:#426851;padding-inline:0}
@@ -208,12 +197,7 @@
 .graph-workspace .graph-camera:has(details[open]){align-items:start}
 .graph-workspace .graph-camera details[open]{flex-basis:100%}
 .graph-workspace .graph-camera small{display:block}
-@media(prefers-reduced-motion:no-preference){
- .opening-road span{transition:left .55s ease,transform .55s ease}
- .opening-axes g{transition:transform .5s ease}
- .opening-pieces rect{transition:width .35s ease}
-}
-@media(max-width:720px){.lesson-opening{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}.lesson-page .lesson-opening h2{font-size:26px}.opening-diagram{min-height:72px}.opening-example{gap:6px}.opening-axes{max-height:170px}.lesson-opening footer{padding-top:9px}}
+@media(max-width:720px){.lesson-opening{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}.lesson-page .lesson-opening h2{font-size:26px}.opening-example{gap:6px}}
 /* A quiet frame keeps prices and route labels readable over the town. */
 .book-main .cycle.delivery{background:#fffaf0;color:#243c32;border:1px solid #d4d9ca;padding:clamp(13px,1.6vw,23px)}
 .delivery .freight-map{background:#f7f0dd}
@@ -236,23 +220,63 @@
 .shipment-network .town-stop:not([role=button]){cursor:default}
 .map-note{font:500 13px/1.35 system-ui,sans-serif;color:#4d614f}
 
-.opening-workshop svg{display:block;width:100%;height:auto}
-.opening-workshop text{font:11px system-ui,sans-serif;fill:#284639}
-.opening-workshop rect{transition:width .45s ease}
 #book .trial-stepper{align-items:center}
 #book .trial-stepper button{height:32px}
-@media(prefers-reduced-motion:reduce){.opening-workshop rect{transition:none}}
-
-.opening-payoffs{width:100%;table-layout:fixed;text-align:center;border-collapse:collapse;color:#244a3b;font-variant-numeric:tabular-nums}
-.opening-payoffs th,.opening-payoffs td{padding:8px;border:1px solid #c6d5c4;background:#fffdf7}
-.opening-payoffs th{background:#e5eddf}
-.opening-payoffs td[data-chosen=true]{background:#c5e5d3;color:#164b34;font-weight:700}
 .delivery tbody th{color:#284638}
-@media(prefers-reduced-motion:no-preference){.opening-payoffs td{transition:background-color .35s ease}}
-
 @media(max-width:450px){
  .lesson-opening .opening-story p{line-height:1.38}
  .lesson-page .lesson-opening h2{margin-bottom:8px}
  .lesson-page .lesson-opening h3{margin-top:9px}
  .opening-example p{font-size:14px}
+}
+
+#contents.course-catalog{grid-template-columns:minmax(190px,.55fr) minmax(0,1.45fr)}
+.catalog-groups{display:grid;gap:24px}
+.catalog-source h3{margin:0 0 6px;font:650 17px/1.4 system-ui,sans-serif;color:#35594b}
+#book .catalog-source .direct-chapter{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;background:transparent;border:0;border-bottom:1px solid #d2dccf;border-radius:0;width:100%;max-width:none;margin:0;padding:9px 5px;color:#224b3c;text-decoration:none}
+#book .catalog-source .direct-chapter:hover{background:#edf2e9}
+.direct-chapter .topic-name{display:grid;gap:2px}
+#book .direct-chapter small{font:400 13px/1.3 system-ui,sans-serif;color:#4f655a}
+.lesson-art{display:block;position:relative;overflow:hidden;border-radius:10px;background:#ebe8df;isolation:isolate}
+.art-canvas>img{display:block;width:100%;height:clamp(132px,18vw,238px);object-fit:cover;object-position:center}
+.art-readings{position:absolute;inset:auto 0 0;display:flex;align-items:end;justify-content:space-between;gap:4px;padding:20px 8px 7px;background:linear-gradient(transparent,#30281966)}
+.art-readings>span{color:#143c2e;background:#fffdf4f5;border:1px solid #e9e4d8;border-radius:6px;padding:3px 6px;font:650 clamp(11px,1.15vw,15px)/1.3 system-ui,sans-serif;font-variant-numeric:tabular-nums;text-align:left}
+#book .opening-example button.art-action{display:block;width:100%;padding:0;border-radius:10px;border:1px solid #c9d5c9;overflow:hidden;background:#fffdf8;text-align:left;color:#215540}
+.art-action .lesson-art{border-radius:0}
+.art-command{display:flex;align-items:center;gap:7px;padding:8px 9px;font-weight:650}
+.art-command svg{width:16px;height:16px;flex:none}
+#book .opening-example .art-action:hover .art-command{background:#e2eddf}
+#book .art-action:focus-visible{outline:3px solid #236544;outline-offset:2px}
+.opening-example p{line-height:1.4}
+.number-error,#book input[aria-invalid=true]{color:#903b2d}
+#book input[aria-invalid=true]{border-color:#aa563e}
+.lesson-page .trial-board .mix-receipt{margin:3px 0;color:#224a39}
+@media(prefers-reduced-motion:no-preference){.lesson-art[data-changed=true] .art-readings>span{animation:art-reading .45s ease}@keyframes art-reading{from{background:#f8dbac}to{background:#fffdf4f5}}}
+@media(max-width:720px){#contents.course-catalog{grid-template-columns:minmax(0,1fr);gap:12px}.art-canvas>img{height:auto;aspect-ratio:2.35;object-fit:cover}.opening-example{padding:8px}.art-command{padding:6px 8px}.catalog-groups{gap:16px}}
+
+.art-canvas{display:block;position:relative}
+.lesson-art[data-scene=minimum] .art-canvas{aspect-ratio:2}
+.lesson-art[data-scene=minimum] img,.lesson-page .lesson-art .art-canvas>.liquid-levels{position:absolute;inset:0;display:block;width:100%;height:100%;max-height:none;margin:0}
+.lesson-art[data-scene=minimum] .art-readings{position:relative;inset:auto;padding:4px 8px;background:#f8efdc}
+.art-canvas>.liquid-levels{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+@media(prefers-reduced-motion:no-preference){.liquid-levels path,.liquid-levels ellipse{transition:d .35s,cy .35s}}
+
+.art-capacity{display:block;height:4px;background:#dbdccc;border-radius:3px;overflow:hidden;margin-top:3px}
+.art-capacity>i{display:block;height:100%;background:#34765a}
+.art-payoffs,.art-duration{position:absolute;top:5%;left:50%;transform:translateX(-50%);display:flex;gap:3px;width:max-content;max-width:96%;font:650 13px/1.3 system-ui,sans-serif}
+.art-payoffs>span,.art-duration{background:#fffdf5ed;padding:4px 7px;border-radius:5px;color:#354b40}
+.art-payoffs>[data-selected=true]{background:#245241;color:white}
+.art-route{position:absolute;left:15%;right:17%;top:48%;height:2px;border-top:2px dashed #ecf6d5;filter:drop-shadow(0 1px 1px #2a473c)}
+.art-route>span{position:absolute;left:0;bottom:1px;background:#fff9de;color:#285b46;border-radius:5px;padding:1px 4px;line-height:0}
+.lesson-art[data-changed=true] .art-route>span{left:100%;transform:translateX(-100%)}
+.lesson-art[data-scene=transport] .art-canvas{overflow:hidden;aspect-ratio:3}
+.lesson-art[data-scene=transport] img{height:185%;width:100%;object-fit:cover;object-position:center top}
+@media(prefers-reduced-motion:no-preference){
+ .art-route>span{transition:left .65s ease-in-out,transform .65s ease-in-out}
+ .art-capacity>i{transition:width .4s ease}
+}
+
+@media(max-width:450px){
+ .lesson-opening{padding:10px;gap:7px}
+ .opening-example{gap:4px}
 }

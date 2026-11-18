@@ -374,9 +374,31 @@ const VIEWS = (() => {
       const pl = $b('dm-play'); pl.textContent = playing ? '⏸ Пауза' : (cur >= total && total ? '▶ Повторить' : '▶ Играть');
       root.classList.toggle('playing', playing);
     };
+    // The first fast replay supplies the final values before the student starts.
+    // Keep column widths in em so zooming the page still scales the whole matrix.
+    const matrixWidths=[];
+    const matrices=()=>stage.querySelectorAll('table.tg,table.dmsx,table.dmt,table.gmx');
+    function sizeMatrices(measure=false){
+      matrices().forEach((table,index)=>{
+        const cols=table.rows[0]?.cells.length;
+        if(!cols)return;
+        let stride=table.matches('.tg')?4.2:4.5;
+        if(measure){
+          for(const cell of table.querySelectorAll('td .cv')){
+            const fraction=cell.querySelector('.fr');
+            const digits=fraction?Math.max(...Array.from(fraction.children,n=>n.textContent.length)):cell.textContent.trim().length;
+            stride=Math.max(stride,1.4+.62*digits);
+          }
+          matrixWidths[index]=stride;
+        }
+        table.classList.add('frame-matrix');
+        table.style.setProperty('--matrix-width',cols*(matrixWidths[index]??stride)+'em');
+      });
+    }
     const run = async cfg => {
       const my = ++token; curCfg = cfg; clearPending();
       stage.innerHTML = html; capEl.innerHTML = '';
+      sizeMatrices();
       const plane=stage.querySelector('svg.gsvg');
       if(plane) GraphCamera.attach(plane,cameraState);
       let k = 0; fastNow = true;
@@ -477,6 +499,7 @@ const VIEWS = (() => {
     if (det) det.onchange = () => { detail = det.checked; total = 0; toEnd(); };
     toEnd().then(() => {
       if (disposed) return;
+      sizeMatrices(true);
       if (Handbook.inLesson) { goTo(Math.min(1,total),false); return; }
       if (opts.autoplay && !reduce) playFrom(0);
       else if ('IntersectionObserver' in window && !reduce && !opts.manual) {

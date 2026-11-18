@@ -13,6 +13,8 @@ const { chromium } = require('playwright');
     await page.goto(base);
     const topics = await page.locator('.chapter-link').evaluateAll(links => links.map(link=>link.href));
     assert.equal(topics.length,20);
+    assert.equal(await page.locator('.chapter-link:visible').count(),20);
+
     for(const price of [26,21,16,11]) {
       assert.ok((await page.locator('.delivery-total').innerText()).includes(price+' ₽'));
       await page.locator('.cycle-control button').click();
@@ -28,6 +30,8 @@ const { chromium } = require('playwright');
           assert.ok(await trial.isVisible(),topic);
           const opening=trial.locator('.lesson-opening');
           assert.ok(await opening.isVisible(),topic);
+          await opening.locator('.lesson-art img').evaluate(image=>image.decode());
+
           assert.equal(await trial.locator('input:visible, .trial-challenge:visible').count(),0);
           assert.doesNotMatch(await opening.innerText(),/undefined|NaN|\[object Object\]/,topic);
           const effect=opening.locator('.opening-example p'),original=await effect.innerText();
