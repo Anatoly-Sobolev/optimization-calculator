@@ -1,3 +1,4 @@
+import {Truck,ChartArea,Table2,ListFilter,Layers,ArrowRightLeft,TableCellsMerge,Grid2X2,Waypoints,Dices,ClipboardCheck,BookOpenText,ScanSearch,ListOrdered,Clapperboard} from 'lucide-react';
 import React from 'react';
 
 export function Workshop({count,capacity,rate}) {
@@ -25,17 +26,13 @@ export function PayoffBalance({value,limit}) {
     {[[57,y,'A'],[243,z,'B']].map(([a,b,n])=><g key={n}><circle cx={a} cy={b} r="12" fill={n==='A'?'#2b6651':'#a66d43'}/><text x={a} y={Number(b)+4} textAnchor="middle" style={{fill:'#fff'}}>{n}</text></g>)}
     <path d="M28 71H272" className="art-ground"/></svg>;
 }
+const symbols={
+  transp:Truck,graph:ChartArea,simplex:Table2,canon:ListFilter,artificial:Layers,
+  dual:ArrowRightLeft,duality:ArrowRightLeft,dsx:TableCellsMerge,dsimplex:TableCellsMerge,
+  ilp:Grid2X2,gomory:Grid2X2,netw:Waypoints,game:Dices,optcheck:ClipboardCheck,
+  brief:BookOpenText,explore:ScanSearch,steps:ListOrdered,demo:Clapperboard
+};
 export function MethodMark({type}) {
-  const paths={
-    transp:'M3 19V9l6-4 6 4v10z M18 17h9v-6h-9z M27 14h4v3h-4 M4 23h28',
-    graph:'M4 3v21h28 M7 20l8-13 12 9z M6 12l21 7',
-    simplex:'M4 5h25v17H4z M4 11h25 M4 17h25 M12 5v17 M21 5v17',
-    netw:'M5 15l10-9 14 10-15 5z M5 15l24 1',
-    game:'M5 7h9v9H5z M18 12h10v10H18z M8 10h2 M21 15h2 M24 19h2',
-    dual:'M4 8h18l-4-4 M28 19H10l5 5', ilp:'M3 23h29 M6 20V9h5v11 M16 20V6h5v14 M26 20V3h5v17',
-    canon:'M3 10l9-4 M3 10l9 4 M18 9h13 M18 15h13',
-    artificial:'M5 22h25 M8 21V9h5v12 M18 21V5h6v16',dsx:'M3 14h29 M8 14v8h5v-8 M20 14V5h5v9',
-    optcheck:'M5 14l6 6L27 5'
-  };
-  return <svg className="method-mark" viewBox="0 0 35 28" aria-hidden="true"><path d={paths[type]||paths.dual} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+  const Icon=symbols[type]||BookOpenText;
+  return <span aria-hidden="true" className={'method-mark mark-'+type}><Icon size={28} strokeWidth={1.65}/></span>;
 }

@@ -712,7 +712,6 @@ const VIEWS = (() => {
   /* =================== Графический метод: сцены =================== */
   const GPAL = ['#3b4cca', '#e08a00', '#1f9d6b', '#c0284f', '#7b3fc4', '#0a8aa8', '#a0780a', '#d4508a', '#4f7f2a', '#5b6bd6'];
   const VLET = k => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[k] || ('V' + (k + 1));
-  const niceTick = r => { const raw = r / 5, p = 10 ** Math.floor(Math.log10(raw)); for (const k of [1, 2, 2.5, 5, 10]) if (k * p >= raw - 1e-12) return k * p; return 10 * p; };
   function clipV(poly, a, b, s) {
     if (s === '=') return clipV(clipV(poly, a, b, '<='), a, b, '>=');
     const f = p => { const v = a[0] * p[0] + a[1] * p[1] - b; return s === '<=' ? -v : v; };
@@ -752,53 +751,33 @@ const VIEWS = (() => {
     if (X * u < 220) X = 220 / u;
     if (Y * u < 150) Y = 150 / u;
     const W = ML + X * u + MR, H = MT + Y * u + MB;
-    const sx = x => ML + x * u, sy = y => H - MB - y * u, P = (x, y) => `${sx(x).toFixed(1)},${sy(y).toFixed(1)}`;
+    const sx = x => ML + x * u, sy = y => H - MB - y * u;
     const box = [[0, 0], [X, 0], [X, Y], [0, Y]];
-    const seg = (a, b) => {
-      const pts = [], add = (x, y) => { if (x >= -1e-9 && x <= X + 1e-9 && y >= -1e-9 && y <= Y + 1e-9) pts.push([x, y]); };
-      if (a[1] !== 0) { add(0, b / a[1]); add(X, (b - a[0] * X) / a[1]); }
-      if (a[0] !== 0) { add(b / a[0], 0); add((b - a[1] * Y) / a[0], Y); }
-      if (pts.length < 2) return null;
-      let best = null, bd = -1;
-      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const d = (pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2; if (d > bd) { bd = d; best = [pts[i], pts[j]]; } }
-      return bd < 1e-12 ? null : best;
-    };
     // области: после осей и после каждого ограничения
     const regs = [box];
     Ls.forEach(L => regs.push(clipV(regs[regs.length - 1], L.a, L.b, L.s)));
-    return { N, m, Ls, X, Y, u, W, H, ML, MR, MT, MB, sx, sy, P, box, seg, regs };
+    return { N, m, Ls, X, Y, u, W, H, ML, MR, MT, MB, sx, sy, regs };
   }
   const inBox = (g, p) => p[0] >= -1e-9 && p[0] <= g.X + 1e-9 && p[1] >= -1e-9 && p[1] <= g.Y + 1e-9;
 
   // SVG-график; o.pre — показать готовые линии, область и вершины (для сцен, где они не строятся)
   function gSvg(g, G, o = {}) {
-    const hd = o.pre ? '' : ' dh', { sx, sy, P } = g;
-    const step = niceTick(Math.max(g.X, g.Y * g.X / g.Y)), ys = niceTick(g.Y);
-    let s = `<svg class="gsvg" viewBox="0 0 ${g.W.toFixed(0)} ${g.H.toFixed(0)}" role="img" aria-label="Координатная плоскость x₁, x₂"><defs><clipPath id="gclip${o.uid || ''}"><rect x="${sx(0) - 1}" y="${sy(g.Y) - 1}" width="${g.X * g.u + 2}" height="${g.Y * g.u + 2}"/></clipPath></defs>`;
-    // подписи на осях
-    let ticks = '';
-    for (let v = step; v <= g.X + 1e-9; v += step) ticks += `<line x1="${sx(v)}" y1="${sy(0)}" x2="${sx(v)}" y2="${sy(0) + 5}" class="gtk"/><text x="${sx(v)}" y="${sy(0) + 18}" class="gtx" text-anchor="middle">${+v.toFixed(6)}</text>`;
-    for (let v = ys; v <= g.Y + 1e-9; v += ys) ticks += `<line x1="${sx(0) - 5}" y1="${sy(v)}" x2="${sx(0)}" y2="${sy(v)}" class="gtk"/><text x="${sx(0) - 8}" y="${sy(v) + 4}" class="gtx" text-anchor="end">${+v.toFixed(6)}</text>`;
-    s += `<g class="gaxt${o.pre ? '' : ' dh'}">${ticks}<text x="${sx(g.X) - 4}" y="${sy(0) - 8}" class="gax-l" text-anchor="end">x₁</text><text x="${sx(0) + 8}" y="${sy(g.Y) + 12}" class="gax-l">x₂</text></g>`;
+    const hd = o.pre ? '' : ' dh', { sx, sy } = g;
+    const width=g.X*g.u,height=g.Y*g.u,left=sx(0),top=sy(g.Y);
+    const equations=JSON.stringify(g.Ls.map(r=>[...r.a.slice(0,2),r.b,r.s])).replace(/</g,'&lt;');
+    let s = `<svg class="gsvg" viewBox="0 0 ${g.W} ${g.H}" data-frame="${left} ${top} ${width} ${height}" data-extent="${g.X} ${g.Y}" data-rows='${equations}' role="img" aria-label="Координатная плоскость x₁, x₂">
+      <g class="gaxt${hd}"><path class="field-grid"/><g class="field-ticks"></g><text x="${sx(g.X)}" y="${sy(0)+26}" class="gax-l">x₁</text><text x="${left-19}" y="${top}" class="gax-l">x₂</text></g>
+      <svg class="plot-world" x="${left}" y="${top}" width="${width}" height="${height}" overflow="hidden">`;
     // полуплоскости и области
-    g.Ls.forEach(L => { const pl = clipV(g.box, L.a, L.b, L.s); if (L.s !== '=' && pl.length > 2) s += `<polygon class="gh${hd}" data-i="${L.i}" fill="${GPAL[L.i % GPAL.length]}" points="${pl.map(p => P(p[0], p[1])).join(' ')}"/>`; });
-    g.regs.forEach((pl, k) => { if (pl.length > 1) s += `<polygon class="gr${(o.pre && k === g.m) ? '' : ' dh'}" data-s="${k}" points="${pl.map(p => P(p[0], p[1])).join(' ')}"/>`; });
-    // оси и прямые
-    s += `<line class="gax-x gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(-0.02 * g.X)}" y1="${sy(0)}" x2="${sx(g.X)}" y2="${sy(0)}"/><line class="gax-y gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(0)}" y1="${sy(-0.02 * g.Y)}" x2="${sx(0)}" y2="${sy(g.Y)}"/>`;
-    g.Ls.forEach(L => {
-      const sg2 = g.seg(L.a, L.b), col = GPAL[L.i % GPAL.length];
-      if (sg2) {
-        s += `<line class="gl gdraw${hd}" pathLength="1" data-i="${L.i}" stroke="${col}" x1="${sx(sg2[0][0]).toFixed(1)}" y1="${sy(sg2[0][1]).toFixed(1)}" x2="${sx(sg2[1][0]).toFixed(1)}" y2="${sy(sg2[1][1]).toFixed(1)}"/>`;
-        const mx = (sg2[0][0] + sg2[1][0]) / 2, my = (sg2[0][1] + sg2[1][1]) / 2;
-        s += `<text class="glb${hd}" data-i="${L.i}" fill="${col}" x="${sx(mx) + 6}" y="${sy(my) - 6}">(${L.i + 1})</text>`;
-        // стрелки в сторону допустимой полуплоскости
-        if (L.s !== '=') {
-          const nl = Math.hypot(L.a[0], L.a[1]) || 1, sgnn = L.s === '<=' ? -1 : 1, dx = sgnn * L.a[0] / nl * 15, dy = -sgnn * L.a[1] / nl * 15;
-          let d = '';
-          [0.25, 0.5, 0.75].forEach(t => { const px = sx(sg2[0][0] + (sg2[1][0] - sg2[0][0]) * t), py = sy(sg2[0][1] + (sg2[1][1] - sg2[0][1]) * t); d += `M${px.toFixed(1)} ${py.toFixed(1)}l${dx.toFixed(1)} ${dy.toFixed(1)}m${(-.4 * dx - .3 * dy).toFixed(1)} ${(-.4 * dy + .3 * dx).toFixed(1)}l${(.4 * dx + .3 * dy).toFixed(1)} ${(.4 * dy - .3 * dx).toFixed(1)}l${(-.4 * dx + .3 * dy).toFixed(1)} ${(-.4 * dy - .3 * dx).toFixed(1)}`; });
-          s += `<path class="gside${hd}" data-i="${L.i}" stroke="${col}" d="${d}"/>`;
-        }
-      }
+    g.Ls.forEach(L=>{
+      if(L.s!=='=') s+=`<polygon class="gh${hd}" data-i="${L.i}" fill="${GPAL[L.i % GPAL.length]}"/>`;
+    });
+    for(let k=0;k<=g.m;k++) s+=`<polygon class="gr${o.pre&&k===g.m?'':' dh'}" data-s="${k}"/>`;
+    g.Ls.forEach(L=>{
+      const color=GPAL[L.i % GPAL.length];
+      s+=`<line class="gl gdraw${hd}" pathLength="1" data-i="${L.i}" stroke="${color}"/>
+        <text class="glb${hd}" data-i="${L.i}" fill="${color}">(${L.i+1})</text>`;
+      if(L.s!=='=') s+=`<path class="gside${hd}" data-i="${L.i}" stroke="${color}"/>`;
     });
     // построение: точки на осях, пробные точки
     if (o.build) g.Ls.forEach(L => {
@@ -810,6 +789,9 @@ const VIEWS = (() => {
     G.verts.forEach((w, k) => { const x = g.N(w.p[0]), y = g.N(w.p[1]); s += `<g class="gvx${o.pre ? '' : ' dh'}" data-v="${k}"><circle cx="${sx(x).toFixed(1)}" cy="${sy(y).toFixed(1)}" r="6"/><text x="${(sx(x) + 9).toFixed(1)}" y="${(sy(y) - 9).toFixed(1)}">${VLET(k)}</text></g>`; });
     s += `<text class="gempty dh" x="${sx(g.X / 2)}" y="${sy(g.Y / 2)}" text-anchor="middle">∅ допустимая область пуста</text>`;
     s += `<g class="ginf dh"><text x="${sx(g.X) - 6}" y="${sy(g.Y / 2)}" text-anchor="end">→ ∞</text><text x="${sx(g.X / 2)}" y="${sy(g.Y) + 16}" text-anchor="middle">↑ ∞</text></g>`;
+    if(o.uid==='o') s += '<g class="gov"><g class="glvl dh"></g><g class="ggrad dh"></g><g class="gopt dh"></g></g>';
+    s += '</svg>';
+    s += `<line class="gax-x gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(-0.02 * g.X)}" y1="${sy(0)}" x2="${sx(g.X)}" y2="${sy(0)}"/><line class="gax-y gdraw${o.pre ? '' : ' dh'}" pathLength="1" x1="${sx(0)}" y1="${sy(-0.02 * g.Y)}" x2="${sx(0)}" y2="${sy(g.Y)}"/>`;
     s += '</svg>';
     return s;
   }
@@ -1027,7 +1009,7 @@ const VIEWS = (() => {
     const bestIdx = vals.map((v, k) => v.eq(best) ? k : -1).filter(k => k >= 0);
     const unb = G.status === 'unbounded';
     const rows = G.verts.map((w, k) => `<div class="drow gvr" data-k="${k}"><b>${VLET(k)}</b> <span class="vp">(<span class="vx">${fq(w.p[0])}</span>; <span class="vy">${fq(w.p[1])}</span>)</span> <i>f</i> = ${fq(c[0])}·<span class="px">□</span> ${c[1].s < 0 ? '−' : '+'} ${fq(c[1].abs())}·<span class="py">□</span>${f0.isZero() ? '' : (f0.s < 0 ? ' − ' : ' + ') + fq(f0.abs())} = <b class="fvv dh">${fq(w.f)}</b><span class="fvb"><i style="width:${(8 + 92 * (w.f.sub(lo).toNumber() / span)).toFixed(0)}%"></i></span></div>`).join('');
-    const html = `<div class="gwrap"><div class="gleft"><div class="dmh">значения цели f в вершинах</div>${rows}<div class="pvfm gfm"></div></div><div class="gright gstack">${gSvg(g, G, { pre: true, uid: 'o' })}<svg class="gsvg gov" viewBox="0 0 ${g.W.toFixed(0)} ${g.H.toFixed(0)}" aria-hidden="true"><g clip-path="url(#gclipo)"><g class="glvl dh"></g></g><g class="ggrad dh"></g><g class="gopt dh"></g></svg></div></div>`;
+    const html = `<div class="gwrap"><div class="gleft"><div class="dmh">значения цели f в вершинах</div>${rows}<div class="pvfm gfm"></div></div><div class="gright gstack">${gSvg(g, G, { pre: true, uid: 'o' })}</div></div>`;
     const lvlLine = v => { const d = [-cN[1] / cn, cN[0] / cn], p0 = [cN[0] * v / (cn * cn), cN[1] * v / (cn * cn)], Lk = (g.X + g.Y) * 2; return `<line class="glv" x1="${g.sx(p0[0] - d[0] * Lk).toFixed(1)}" y1="${g.sy(p0[1] - d[1] * Lk).toFixed(1)}" x2="${g.sx(p0[0] + d[0] * Lk).toFixed(1)}" y2="${g.sy(p0[1] + d[1] * Lk).toFixed(1)}"/>`; };
     const script = async A => {
       const fm = A.q('.gfm'), O = A.q('.gov'), lv = O.querySelector('.glvl'), gr = O.querySelector('.ggrad'), go = O.querySelector('.gopt');

@@ -1,5 +1,6 @@
-import React,{useState,useEffect,useRef} from 'react';
-import {Workshop,CutPieces,PayoffBalance} from './teaching-figures.jsx';
+import {CoordinateField} from './coordinate-field.jsx';
+import React,{useState} from 'react';
+import {Workshop,CutPieces,PayoffBalance,MethodMark} from './teaching-figures.jsx';
 import {Button} from '@heroui/react/button';
 
 const show = LU.txt, num = LU.num, vec = LU.vec;
@@ -75,40 +76,23 @@ function transport(d) {
 }
 function PlanMap({d,index,choose}) {
   const vertices=d.rec.graph.verts;
-  const plane=useRef(null);
-  useEffect(()=>GraphCamera.attach(plane.current,{},true),[d]);
   const [picked,setPicked]=useState(null);
   const point=picked||vertices[index].p;
   const maxX=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[0])))),maxY=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[1]))));
-  const sx=v=>35+222*num(v)/maxX,sy=v=>149-120*num(v)/maxY;
-  const cx=vertices.reduce((sum,v)=>sum+num(v.p[0]),0)/vertices.length,cy=vertices.reduce((sum,v)=>sum+num(v.p[1]),0)/vertices.length;
-  const angle=v=>Math.atan2(num(v.p[1])-cy,num(v.p[0])-cx);
-  const polygon=[...vertices].sort((a,b)=>angle(a)-angle(b)).map(v=>sx(v.p[0])+','+sy(v.p[1])).join(' ');
-  const valid=ALG.check(d.P,point).every(row=>row.ok);
-  function place(event) {
-    const svg=event.currentTarget;
-    const local=new DOMPoint(event.clientX,event.clientY).matrixTransform(svg.getScreenCTM().inverse());
-    const coord=(ratio,end)=>Q.of(Math.round(Math.min(1,Math.max(0,ratio))*end*10)/10);
-    setPicked([coord((local.x-35)/222,maxX),coord((149-local.y)/120,maxY)]);
-  }
+  const negative=point.some(v=>num(v)<0), valid=!negative&&ALG.check(d.P,point).every(row=>row.ok);
   function movePoint(e) {
     const delta={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowDown:[0,-1],ArrowUp:[0,1]}[e.key];
     if (!delta) return;
     e.preventDefault();
-    setPicked(point.map((v,i)=>Q.of(Math.max(0,Math.min(i?maxY:maxX,Math.round(num(v)*10+delta[i])/10)))));
+    setPicked(point.map((v,i)=>Q.of(Math.round(num(v)*10+delta[i])/10)));
   }
-  return <><svg ref={plane} className="primer-plot" tabIndex="0" onKeyDown={movePoint} viewBox="0 0 294 180" role="img" aria-label={'Координаты '+vec(point)+'. Стрелки перемещают точку.'}
-      onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);place(e);}} onPointerMove={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId)) place(e);}}>
-    {[.25,.5,.75,1].map(f=><path key={f} d={'M'+sx(f*maxX)+' 29V149 M35 '+sy(f*maxY)+'H257'} fill="none" stroke="#cfdbcc"/>)}
-    <path d="M35 12V149H282" className="primer-axis"/><text x="273" y="162">x₁</text><text x="10" y="18">x₂</text><text x="18" y="166">0</text>
-    <text x="257" y="168" textAnchor="middle">{maxX}</text><text x="27" y="33" textAnchor="end">{maxY}</text>
-    {GraphCamera.halfplanes(d.P.rows,maxX,maxY,sx,sy).map(({i,points,edge})=>{const color=['#657fc3','#ba793a','#4b916f','#c16883'][i%4];return <g key={i}>{points&&<polygon className="gh" data-i={i} points={points} fill={color} opacity=".14"/>}<polyline points={edge} fill="none" stroke={color} strokeWidth="1.2"/></g>;})}
-    <polygon className="primer-region" points={polygon} fill="#b9decc" stroke="#30694f"/>
+  return <><CoordinateField model={d.P} maxX={maxX} maxY={maxY} region label={'Координаты '+vec(point)+'. Стрелки перемещают точку.'}
+      onPlace={xy=>setPicked(xy.map(n=>Q.of(n)))} onKeyDown={movePoint}>{({sx,sy})=><>
     {vertices.map((v,i)=><circle key={i} cx={sx(v.p[0])} cy={sy(v.p[1])} r="4" fill="#295e44"/>)}
-    <path d={'M35 '+sy(point[1])+'H'+sx(point[0])+'V149'} fill="none" stroke="#664b35" strokeDasharray="3 3"/>
-    <circle cx={sx(point[0])} cy={sy(point[1])} r="6" stroke="white" strokeWidth="2" fill={valid?'#235e44':'#a44626'}/>
-    </svg><Choices labels={vertices.map(v=>vec(v.p))} selected={picked?-1:index} change={i=>{setPicked(null);choose(i);}}/>
-    <Formula>{vec(point)} · {valid?'План допустим':'Нарушено условие'}</Formula><small>Значение цели в этой точке · {show(LSCENE.objValue(d.P,point))}</small></>;
+    <path d={'M'+sx(0)+' '+sy(point[1])+'H'+sx(point[0])+'V'+sy(0)} fill="none" stroke="#664b35" strokeDasharray="3 3"/>
+    <circle data-plan-point="" cx={sx(point[0])} cy={sy(point[1])} r="6" stroke="white" strokeWidth="2" fill={valid?'#235e44':'#a44626'}/>
+    </>}</CoordinateField><Choices labels={vertices.map(v=>vec(v.p))} selected={picked?-1:index} change={i=>{setPicked(null);choose(i);}}/>
+    <Formula>{vec(point)} · {valid?'План допустим':negative?'Количество должно быть неотрицательным':'Нарушено условие'}</Formula><small>Значение цели в этой точке · {show(LSCENE.objValue(d.P,point))}</small></>;
 }
 function graph(d) {
   const vs=d.rec.graph.verts,best=vs.findIndex(v=>v.f.eq(d.f));
@@ -214,7 +198,7 @@ export function LessonIntro({data,onOpen}) {
   const [page,setPage]=useState(0),[values,setValues]=useState({});
   const frames=stories[data.type](data), current=frames[page], n=values[page]??current.start??0;
   return <section className="lesson-primer" aria-label="Знакомство с вариантом">
-    <div className="primer-pages" role="group" aria-label="Части наглядного примера">{parts.map((p,i)=><button type="button" key={p} aria-current={page===i?'step':undefined} onClick={()=>setPage(i)}>{i+1}. {p}</button>)}</div>
+    <div className="primer-pages" role="group" aria-label="Части наглядного примера">{parts.map((p,i)=><button type="button" key={p} aria-current={page===i?'step':undefined} onClick={()=>setPage(i)}><MethodMark type={['brief',data.type,'optcheck'][i]}/>{i+1}. {p}</button>)}</div>
     <div className="primer-spread"><div className="primer-copy" aria-live="polite"><h2>{current.title}</h2><p>{current.copy}</p></div>
     <div className="primer-art" key={page}>{current.draw(n,v=>setValues({...values,[page]:v}))}</div></div>
     <div className="primer-nav">{page>0&&<Button variant="ghost" onPress={()=>setPage(page-1)}>← Назад</Button>}

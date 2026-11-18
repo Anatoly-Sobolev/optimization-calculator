@@ -71,7 +71,7 @@ function Lesson({title,summary,source,variant,phases,active,lab,data}) {
   }
   return <><Mast lab={lab}/><main className="book-main">
     <div className="lesson-intro"><Link href="index.html#contents">← Все задания</Link>
-      <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1>{active!==0&&<><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></>}
+      <div className="lesson-identity"><MethodMark type={data.type}/><p className="book-kicker">{source} · Вариант {variant}</p></div><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1>{active!==0&&<><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></>}
     </div>
     {active===0&&<><div hidden={reading}><LessonIntro data={data} onOpen={openReading}/></div>
       {reading&&<Button variant="ghost" onPress={openIntro}>← Вернуться к наглядному примеру</Button>}</>}
@@ -115,7 +115,7 @@ function StudyViews({onChange,items}) {
   const [view,setView] = useState(items[0][0]);
   return <div className="study-views" role="group" aria-label="Как посмотреть пример">
     {items.map(([key,title,id])=><Button key={key} variant="ghost" aria-controls={id}
-      aria-pressed={view===key} onPress={()=>{onChange(key);setView(key);}}>{title}</Button>)}
+      aria-pressed={view===key} onPress={()=>{onChange(key);setView(key);}}><MethodMark type={key}/>{title}</Button>)}
   </div>;
 }
 

@@ -16,6 +16,7 @@
   "dependencies": {
     "@heroui/react": "3.2.7",
     "@heroui/styles": "3.2.7",
+    "lucide-react": "^1.75.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   }

@@ -2,29 +2,28 @@ const LessonVisuals = (() => {
   // A single degree of freedom changes four shipments; the row and column
   // sums are invariant. Both numerical states remain available when paused.
   function cycleFigure(host) {
+    const routes = [
+      ['Склад 1 → Парк', 4, 3, -1], ['Склад 1 → Мир', 2, 1, 1],
+      ['Склад 2 → Парк', 0, 1, 1], ['Склад 2 → Мир', 3, 4, -1]
+    ];
+    const warehouse='<path d="M2 13 22 3l20 10v21H2z" fill="#dcac69"/><path d="M10 33V17h24v16" fill="#fff0cc"/><path d="M13 21h18m-18 4h18m-18 4h18" stroke="#a77942"/>';
+    const shop='<path d="M5 15h34v19H5z" fill="#fbebc6"/><path d="m2 15 5-11h30l5 11z" fill="#91bea6"/><path d="M8 17v8h11v-8m7 17V20h8v14" fill="#96beac"/><path d="m14 5-2 9m12-9v9m9-9 2 9" stroke="#fff4da"/>';
+    function stop(x,y,art,name,stock){
+      return `<g transform="translate(${x} ${y})"><rect x="-37" y="-32" width="74" height="69" rx="10" class="depot-card"/>
+        <g transform="translate(-17 -27) scale(.77)" stroke="#395445" stroke-width="1.7" stroke-linejoin="round">${art}</g>
+        <text y="13" class="stop-name">${name}</text><text y="28" class="stop-stock">${stock}</text></g>`;
+    }
+    const paths=['M78 53H286','M78 63C147 63 207 146 286 146','M78 146C147 146 207 63 286 63','M78 157H286'];
+    const badges=[[135,53],[135,85],[135,124],[135,157]];
     host.innerHTML = `<figure class="cycle delivery">
       <figcaption>Как доставить 9 ящиков дешевле?</figcaption>
-      <svg class="delivery-map" viewBox="0 0 360 156" role="img" aria-label="Груз со складов в магазины. Число на линии показывает количество ящиков.">
-        <text x="3" y="14" class="map-key">ЗАПАС</text><text x="291" y="14" class="map-key">ЗАКАЗ</text>
-        <g class="route-lines" fill="none">
-          <path d="M77 44 H278"/><path d="M77 54 C152 54 201 116 278 116"/>
-          <path d="M77 116 C152 116 201 54 278 54"/><path d="M77 126 H278"/>
-        </g>
-        <g class="route-values" text-anchor="middle">
-          <text x="136" y="39"></text><text x="136" y="76"></text>
-          <text x="136" y="106"></text><text x="136" y="143"></text>
-        </g>
-        <g class="map-node">
-          <rect x="1" y="29" width="76" height="40" rx="7"/><rect x="1" y="101" width="76" height="40" rx="7"/>
-          <rect x="278" y="29" width="81" height="40" rx="7"/><rect x="278" y="101" width="81" height="40" rx="7"/>
-        </g>
-        <g class="map-names" text-anchor="middle">
-          <text x="39" y="46">Склад 1</text><text x="39" y="61">6 ящиков</text>
-          <text x="39" y="118">Склад 2</text><text x="39" y="133">3 ящика</text>
-          <text x="318" y="46">Парк</text><text x="318" y="61">4 ящика</text>
-          <text x="318" y="118">Мир</text><text x="318" y="133">5 ящиков</text>
-        </g>
+      <svg class="delivery-map freight-map" viewBox="0 0 366 192" role="img" aria-label="План перевозок">
+        <g class="freight-label"><text x="41" y="15">СКЛАДЫ</text><text x="325" y="15">МАГАЗИНЫ</text></g>
+        <g class="route-lines" fill="none">${paths.map(d=>'<path d="'+d+'"/>').join('')}</g>
+        <g class="route-values">${badges.map(([x,y],i)=>`<g transform="translate(${x} ${y})"><rect x="-26" y="-9" width="52" height="18" rx="9"/><text y="3.8" text-anchor="middle"><tspan class="route-load"></tspan><tspan> × ${routes[i][2]} ₽</tspan></text></g>`).join('')}</g>
+        <g text-anchor="middle">${stop(41,55,warehouse,'Склад 1','6 ящиков')}${stop(41,149,warehouse,'Склад 2','3 ящика')}${stop(325,55,shop,'Парк','4 ящика')}${stop(325,149,shop,'Мир','5 ящиков')}</g>
       </svg>
+      <p class="freight-legend">На каждом маршруте число ящиков умножено на цену за ящик.</p>
       <p class="delivery-total" aria-live="polite"></p><p class="cycle-caption"></p>
       <div class="cycle-control"><button type="button"></button><label>Обменов <input type="range" min="0" max="4" value="0"></label></div>
       <details><summary>Маршруты, тарифы и таблица</summary><table><caption>Цена за один ящик</caption>
@@ -32,24 +31,20 @@ const LessonVisuals = (() => {
     </figure>`;
     const range = host.querySelector('input');
     const button = host.querySelector('button');
-    const routes = [
-      ['Склад 1 → Парк', 4, 3, -1], ['Склад 1 → Мир', 2, 1, 1],
-      ['Склад 2 → Парк', 0, 1, 1], ['Склад 2 → Мир', 3, 4, -1]
-    ];
     const rows = routes.map(([name, initial, price]) => {
       const row = host.querySelector('tbody').insertRow();
       row.innerHTML = '<th scope="row">'+name+'</th><td>'+price+' ₽</td><td><b></b><i class="box-strip" aria-hidden="true"></i></td>';
       return row;
     });
     const lines = host.querySelectorAll('.route-lines path');
-    const amounts = host.querySelectorAll('.route-values text');
+    const amounts = host.querySelectorAll('.route-load');
     function paint() {
       const t = Number(range.value);
       const loads = routes.map(([,initial,,change]) => initial+t*change);
       rows.forEach((row,i)=>{
         const quantity = loads[i];
         amounts[i].textContent = quantity;
-        lines[i].style.strokeWidth = Math.max(1,quantity+1);
+        lines[i].style.strokeWidth = Math.max(1.4,quantity*.72+1.5);
         lines[i].setAttribute('class',quantity < 0 ? 'invalid' : quantity === 0 ? 'empty' : '');
         row.querySelector('b').textContent = quantity;
         CellOrigin.register(row.cells[1],'Тариф этого маршрута задан в примере: '+routes[i][2]+' ₽ за ящик.');
