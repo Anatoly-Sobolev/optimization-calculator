@@ -113,7 +113,7 @@ const VIEWS2 = (() => {
       sum.innerHTML = `Начальный план (${mc ? 'минимальная стоимость' : 'северо-западный угол'}): базисных клеток ${P.m + P.n - 1}; стоимость <b>C₀ = ${fq(res.cost0)}</b>`;
       await A.show(sum);
     };
-    return demo(`начальный план: ${mc ? 'метод минимальной стоимости' : 'метод северо-западного угла'}`, html, script);
+    return demo(`Как заполнить план: ${mc ? 'начинаем с самого дешёвого маршрута' : 'начинаем с левой верхней клетки'}`, html, script);
   }
 
   /* Одна итерация метода потенциалов. */
@@ -221,7 +221,7 @@ const VIEWS2 = (() => {
       return S;
     }
     S.push(sec('init', 'Начальный опорный план', (P.fict ? note('', `Σa = ${t2(P.sa)} &gt; Σb = ${t2(P.sb)}: вводим фиктивного потребителя B<sub>ф</sub> со спросом ${fq(P.b[P.n - 1])} и нулевыми тарифами.`) : note('ok', 'Задача сбалансирована (Σa = Σb).')) + demoInit(res)));
-    const items = res.iters.map((it, k) => ({ label: k === res.iters.length - 1 ? 'итог' : String(k + 1), title: k === res.iters.length - 1 ? 'Проверка оптимальности' : `Итерация ${k + 1}`, build: () => { const sp = iterSpec(res, k); return { title: k === res.iters.length - 1 ? `План ${k}: проверка оптимальности` : `Итерация ${k + 1}: план ${k} → план ${k + 1}`, ...sp }; } }));
+    const items = res.iters.map((it, k) => ({ label: k === res.iters.length - 1 ? 'итог' : String(k + 1), title: k === res.iters.length - 1 ? 'Проверка оптимальности' : `Итерация ${k + 1}`, build: () => { const sp = iterSpec(res, k); return { title: k === res.iters.length - 1 ? `План ${k}: проверка оптимальности` : `Как перераспределить груз по циклу · шаг ${k + 1}`, ...sp }; } }));
     S.push(sec('iter', 'Метод потенциалов', stepperOf(items)));
     S.push(sec('res', 'Ответ', `<p>Оптимальный план (строки — поставщики, столбцы — потребители):</p>${planTable(inp, res)}<p class="answer"><i>C</i>* = ${costFormulaOrig(inp, res)} = ${fq(res.cost)}</p>` +
       (res.alt.length ? note('', `Оценка Δ = 0 в свободных клетках ${res.alt.map(([i, j]) => `(${i + 1}; ${j + 1})`).join(', ')}: те же затраты достигаются и другими планами.`) : '') + (res.degenerate ? note('', 'В базисе есть нулевая перевозка — план <b>вырожденный</b>.') : '')));

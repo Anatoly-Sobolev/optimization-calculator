@@ -422,7 +422,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ------------
 
-react 19.3.1, react-dom 19.3.1, scheduler 0.28.0, use-sync-external-store 1.7.0
+react 19.3.1, react-dom 19.3.1, scheduler 0.28.0
 
 MIT License
 

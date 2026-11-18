@@ -12,8 +12,5 @@
 @import "@heroui/styles/components/close-button.css" layer(components);
 @import "@heroui/styles/components/accordion.css" layer(components);
 @import "@heroui/styles/components/search-field.css" layer(components);
-@import "@heroui/styles/components/popover.css" layer(components);
-@import "@heroui/styles/components/list-box.css" layer(components);
-@import "@heroui/styles/components/select.css" layer(components);
 
 @import "@heroui/styles/components/textarea.css" layer(components);

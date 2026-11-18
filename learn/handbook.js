@@ -19,6 +19,7 @@ const Handbook = (() => {
   const esc = LU.esc;
   let book, chapter, phase, variants, current, steps, position;
   const saved = {};
+  let unmountAnswer;
   function read(id) {
     try { return JSON.parse(localStorage.getItem('handbook.1.' + id)) || saved[id] || {}; }
     catch { return saved[id] || {}; }
@@ -98,12 +99,17 @@ const Handbook = (() => {
           'Обе части уже должны быть равны. Эту строку можно сразу перенести в таблицу.';
         firstAction = 'Посмотрите на первое ограничение своего варианта.<span class="starting-equation">'+expression+' '+R.sg(row.s)+' '+R.fq(row.b)+'</span>'+rule;
       }
-      intro.innerHTML = '<h3>На простом примере</h3><p>'+esc(profile.analogy.replace(/^Учебная аналогия: /,''))+'</p>'+
-        '<h4>С чего начать в своём варианте</h4><p>'+firstAction+'</p>'+
-        '<details><summary>Обозначения в задаче</summary><dl>'+
+      intro.innerHTML = '<div class="lesson-example"><h3>На простом примере</h3><p>'+esc(profile.analogy.replace(/^Учебная аналогия: /,''))+'</p>'+
+        '</div><div class="lesson-first"><h4>Ваш первый шаг</h4><p>'+firstAction+'</p></div>'+
+        '<details class="lesson-glossary"><summary>Справка по обозначениям</summary><dl>'+
         profile.symbols.map(([symbol,meaning])=>'<div><dt>'+esc(symbol)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+
-        '</dl></details><a href="#lesson-body">Перейти к решению варианта ↓</a>';
+        '</dl></details>';
       book.querySelector('#lesson-body').before(intro);
+      if (chapter.type === 'transp') {
+        const example = document.createElement('div');
+        intro.querySelector('.lesson-example p').replaceWith(example);
+        BookUI.shipmentExample(example);
+      }
       const demos = [...document.querySelectorAll('#solution .demo, #solution .plotwrap')]
         .filter(node => !node.parentElement.closest('.demo, .plotwrap'));
       if (demos.length) showDemonstrations(demos);
@@ -113,6 +119,7 @@ const Handbook = (() => {
   function showDemonstrations(demos) {
     const section = document.createElement('section');
     section.className = 'book-demos';
+    section.id = 'demo-deck';
     section.setAttribute('aria-labelledby','demo-heading');
     const toolbar = document.createElement('div');
     section.append(toolbar);
@@ -151,7 +158,15 @@ const Handbook = (() => {
       active = index;
     }
     BookUI.gallery(toolbar,{titles,onSelect});
-    book.querySelector('#lesson-body').before(section);
+    const body = book.querySelector('#lesson-body');
+    const views = document.createElement('div');
+    body.before(views,section);
+    body.hidden = true;
+    BookUI.views(views,{onChange(view) {
+      if (view === 'steps') section.querySelector('.demo.playing .dm-play')?.click();
+      section.hidden = view !== 'demo';
+      body.hidden = view !== 'steps';
+    }});
   }
   function footer(parent) {
     parent.insertAdjacentHTML('beforeend','<p><a class="book-cta" href="' + (phase < 3 ? url(chapter,phase+1) : 'index.html#contents') + '">' + (phases[phase+1] || 'К оглавлению') + ' →</a></p>');
@@ -162,6 +177,10 @@ const Handbook = (() => {
     history[phase]={...history[phase],...patch,position}; return write(key(chapter),history);
   }
   function draw() {
+    if (unmountAnswer) {
+      unmountAnswer();
+      unmountAnswer = null;
+    }
     const host = book.querySelector('#lesson-body');
     if (!steps.length) {
       host.innerHTML = '<p>Для этого варианта доступен полный визуальный разбор.</p><a href="' + lab() + '">Открыть разбор варианта →</a>'; return;
@@ -174,13 +193,24 @@ const Handbook = (() => {
     const firstMissing = steps.findIndex(step => practiceStart[chapter.type]?.test(step.title));
     const shown = phase === 0 || phase === 2 && position < (firstMissing < 0 ? steps.length-1 : firstMissing);
     const solved=Boolean(progress.answers?.[position]);
-    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><div id="step-foot"></div><h3 tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.prompt) + '</p><div class="book-state">' + s.before + '</div><div id="response"></div><div role="status" id="book-feedback"></div>';
+    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><div id="step-foot"></div><h3 tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.prompt) + '</p><div class="book-state">' + s.before + '</div><div id="answer-controls"></div><div id="response"></div>';
     const response=host.querySelector('#response'), foot=host.querySelector('#step-foot');
+    if (phase >= 2) host.append(foot);
     const next=() => {
       if(position+1===steps.length){footer(foot);return;}
       const b=document.createElement('button');b.className='book-primary';b.textContent='Далее: '+steps[position+1].title;b.onclick=()=>move(1);foot.append(b);
     };
-    function move(amount){position+=amount;remember({});draw();const bar=book.querySelector('#step-foot'); (bar.querySelector('.book-primary') || bar.querySelector('button'))?.focus({preventScroll:true});}
+    function move(amount) {
+      position+=amount;remember({});draw();
+      if (phase >= 2) {
+        const title = host.querySelector('h3');
+        title.focus({preventScroll:true});
+        title.scrollIntoView({block:'nearest'});
+      } else {
+        const bar = book.querySelector('#step-foot');
+        (bar.querySelector('.book-primary') || bar.querySelector('button'))?.focus({preventScroll:true});
+      }
+    }
     if(position>0){const prev=document.createElement('button');prev.textContent='← Предыдущий';prev.onclick=()=>move(-1);foot.append(prev);}
     function reveal(){
       response.innerHTML='<div class="book-rule"><strong>' + esc(s.answer) + '</strong><p>' + esc(s.reason) + '</p></div><details class="book-change"><summary>Сравнить с состоянием после шага</summary><div class="book-state">' + s.after + '</div></details>';
@@ -215,19 +245,19 @@ const Handbook = (() => {
       next();
     }
     if(shown || solved){ reveal();return; }
-    const check=value=>{
-      if(!LEARN.accept(s,value)){
-        const opt=s.options?.find(o=>o.value===value);
-        host.querySelector('#book-feedback').textContent=opt?.why || 'Проверьте исходные данные, знак и порядок вычислений.';return;
+    const numeric = s.numeric && phase===3;
+    unmountAnswer = BookUI.answer(host.querySelector('#answer-controls'),{
+      numeric, options:numeric?[]:LEARN.options(s), hint:phase===2?s.hint:null,
+      assess(value,why) {
+        if (numeric && !String(value).trim()) return {ok:false,message:'Введите число, например 3 или 1/2.'};
+        if (LEARN.accept(s,value)) return {ok:true,message:position+1===steps.length?'Вариант завершён.':'Можно перейти к следующему шагу.'};
+        return {ok:false,message:why || s.hint || s.reason};
+      },
+      onSolved() {
+        remember({answers:{...stepState().answers,[position]:true}});
+        reveal();
       }
-      remember({answers:{...stepState().answers,[position]:true}});
-      host.querySelector('#book-feedback').textContent='Верно.';reveal();
-    };
-    if(s.numeric && phase===3){
-      response.innerHTML='<form><label>Ваш ответ <input required placeholder="Число или дробь"></label><button class="book-primary">Проверить</button></form>';
-      response.firstElementChild.onsubmit=e=>{e.preventDefault();check(response.querySelector('input').value);};
-    }else for(const opt of LEARN.options(s)){const b=document.createElement('button');b.className='book-option';b.textContent=opt.label;b.onclick=()=>check(opt.value);response.append(b);}
-    if(phase===2)response.insertAdjacentHTML('beforeend','<details><summary>Подсказка</summary><p>' + esc(s.hint) + '</p></details>');
+    });
   }
   return {start,get inLesson(){return Boolean(chapter);}};
 })();
