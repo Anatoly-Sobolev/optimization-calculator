@@ -4,12 +4,31 @@ const LessonVisuals = (() => {
   function cycleFigure(host) {
     host.innerHTML = `<figure class="cycle delivery">
       <figcaption>Как доставить 9 ящиков дешевле?</figcaption>
-      <p>На первом складе 6 ящиков, на втором — 3. Магазин «Парк» заказал 4, «Мир» — 5. Каждый магазин должен получить весь заказ.</p>
-      <table><caption>План доставки. Цена указана за один ящик.</caption>
-        <thead><tr><th>Откуда → куда</th><th>Цена</th><th>Ящиков</th></tr></thead><tbody></tbody></table>
+      <svg class="delivery-map" viewBox="0 0 360 156" role="img" aria-label="Груз со складов в магазины. Число на линии показывает количество ящиков.">
+        <text x="3" y="14" class="map-key">ЗАПАС</text><text x="291" y="14" class="map-key">ЗАКАЗ</text>
+        <g class="route-lines" fill="none">
+          <path d="M77 44 H278"/><path d="M77 54 C152 54 201 116 278 116"/>
+          <path d="M77 116 C152 116 201 54 278 54"/><path d="M77 126 H278"/>
+        </g>
+        <g class="route-values" text-anchor="middle">
+          <text x="136" y="39"></text><text x="136" y="76"></text>
+          <text x="136" y="106"></text><text x="136" y="143"></text>
+        </g>
+        <g class="map-node">
+          <rect x="1" y="29" width="76" height="40" rx="7"/><rect x="1" y="101" width="76" height="40" rx="7"/>
+          <rect x="278" y="29" width="81" height="40" rx="7"/><rect x="278" y="101" width="81" height="40" rx="7"/>
+        </g>
+        <g class="map-names" text-anchor="middle">
+          <text x="39" y="46">Склад 1</text><text x="39" y="61">6 ящиков</text>
+          <text x="39" y="118">Склад 2</text><text x="39" y="133">3 ящика</text>
+          <text x="318" y="46">Парк</text><text x="318" y="61">4 ящика</text>
+          <text x="318" y="118">Мир</text><text x="318" y="133">5 ящиков</text>
+        </g>
+      </svg>
       <p class="delivery-total" aria-live="polite"></p><p class="cycle-caption"></p>
       <div class="cycle-control"><button type="button"></button><label>Обменов <input type="range" min="0" max="4" value="0"></label></div>
-      <details><summary>Как это записывается в методичке?</summary><p>Один обмен перенаправляет по одному ящику с каждого склада в другой магазин. Число обменов обозначают θ. В матрице строка означает склад, столбец — магазин, число — объём доставки.</p><div class="delivery-matrix"></div></details>
+      <details><summary>Маршруты, тарифы и таблица</summary><table><caption>Цена за один ящик</caption>
+        <thead><tr><th>Маршрут</th><th>Цена</th><th>Ящиков</th></tr></thead><tbody></tbody></table><p>Один обмен перенаправляет по одному ящику с каждого склада в другой магазин. Число обменов обозначают θ. В матрице строка означает склад, столбец — магазин, число — объём доставки.</p><div class="delivery-matrix"></div></details>
     </figure>`;
     const range = host.querySelector('input');
     const button = host.querySelector('button');
@@ -22,15 +41,22 @@ const LessonVisuals = (() => {
       row.innerHTML = '<th scope="row">'+name+'</th><td>'+price+' ₽</td><td><b></b><i class="box-strip" aria-hidden="true"></i></td>';
       return row;
     });
+    const lines = host.querySelectorAll('.route-lines path');
+    const amounts = host.querySelectorAll('.route-values text');
     function paint() {
       const t = Number(range.value);
       const loads = routes.map(([,initial,,change]) => initial+t*change);
       rows.forEach((row,i)=>{
-        row.querySelector('b').textContent = loads[i];
+        const quantity = loads[i];
+        amounts[i].textContent = quantity;
+        lines[i].style.strokeWidth = Math.max(1,quantity+1);
+        lines[i].setAttribute('class',quantity < 0 ? 'invalid' : quantity === 0 ? 'empty' : '');
+        row.querySelector('b').textContent = quantity;
         row.querySelector('.box-strip').style.width = Math.max(0,loads[i])*12+'px';
         row.classList.toggle('impossible',loads[i]<0);
       });
       const cost = loads.reduce((sum,x,i)=>sum+x*routes[i][2],0);
+      host.querySelector('.delivery-map').setAttribute('aria-label',routes.map(([name],i)=>name+': '+loads[i]).join('; ')+'. Количество указано в ящиках.');
       host.querySelector('.delivery-total').textContent = t===4 ? 'Доставка невозможна' : 'Стоимость доставки: '+cost+' ₽';
       const explanation = [
         'Сейчас склад 1 везёт 4 ящика в «Парк» по 3 ₽, а склад 2 везёт 3 в «Мир» по 4 ₽. Попробуйте обмен: отправьте по ящику с этих двух рейсов по маршрутам за 1 ₽.',

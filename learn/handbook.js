@@ -28,9 +28,6 @@ const Handbook = (() => {
     try { localStorage.setItem('handbook.1.' + id, JSON.stringify(value)); return true; } catch { return false; }
   }
   const lab = () => chapter ? '?lab#' + new URLSearchParams({s:chapter.src,t:chapter.type,v:current.v,b:chapter.base || 'graph'}) : '?lab';
-  function mast() {
-    return '<div class="book-mast"><a href="index.html" class="book-brand"><span aria-hidden="true">∑</span> Методы оптимизации</a><nav aria-label="Навигация пособия"><a href="index.html#contents">Оглавление</a><a href="' + lab() + '">Лаборатория ↗</a></nav></div>';
-  }
   // Start with the student's goal; show the choice of source only after the method.
   const paths = [
     ['transp','Доставить груз с наименьшими затратами','Транспортная задача'],
@@ -45,31 +42,19 @@ const Handbook = (() => {
     ['netw','Определить срок проекта и критические работы','Сетевое планирование'],
     ['game','Выбрать стратегию против соперника','Матричные игры']
   ];
-  function catalogue(section,topics) {
-    section.innerHTML='<h2>Какую задачу хотите решить?</h2><label class="catalog-search">Поиск по задаче или методу<input type="search" placeholder="Например, груз или симплекс"></label><div class="catalog-list"></div><p class="catalog-empty" role="status" hidden>Совпадений нет. Попробуйте другое слово.</p>';
-    const list=section.querySelector('.catalog-list');
-    for(const [types,goal,method] of paths){
-      const routes=topics.filter(t=>types.split(' ').includes(t.type));
-      if(!routes.length)continue;
-      const group=document.createElement('details');
-      group.innerHTML='<summary><span><strong>'+goal+'</strong><small>'+method+'</small></span></summary><div class="catalog-routes">'+routes.map(t=>'<a class="chapter-link" href="'+url(t)+'"><span>'+esc(t.title)+'</span><small>'+sourceName(t.src)+' →</small></a>').join('')+'</div>';
-      list.append(group);
-    }
-    section.querySelector('input').oninput=e=>{
-      const term=e.target.value.trim().toLocaleLowerCase('ru');
-      for(const group of list.children){
-        group.hidden=!group.textContent.toLocaleLowerCase('ru').includes(term);
-        group.open=Boolean(term)&&!group.hidden;
-      }
-      section.querySelector('.catalog-empty').hidden=Boolean(list.querySelector('details:not([hidden])'));
-    };
-  }
   function home(topics) {
-    const last=read('last'), recent=topics.find(t=>key(t)===last.topic);
-    const first=topics.find(t=>t.type==='transp');
-    book.innerHTML=mast()+'<main class="book-main"><div class="book-intro"><div><div class="book-kicker">ОмГТУ / Интерактивное пособие</div><h1>Методы<br><em>оптимизации</em></h1><p>Попробуйте перераспределить ящики между двумя складами и посмотрите, как изменится стоимость доставки. Затем разберите этот выбор по шагам.</p><a class="book-cta" href="'+url(first)+'">Начать с доставки →</a><p><a href="#contents">Найти своё задание ↓</a></p>'+(recent?'<a href="'+url(recent,last.phase)+'">Продолжить: '+esc(recent.title)+' →</a>':'')+'</div><div id="featured"></div></div><section id="contents"></section></main>';
+    const last = read('last');
+    const recent = topics.find(t=>key(t)===last.topic);
+    const groups = paths.map(([types,goal,method])=>({
+      goal, method, routes: topics.filter(t=>types.split(' ').includes(t.type)).map(t=>({
+        title:t.title, source:sourceName(t.src), href:url(t)
+      }))
+    })).filter(group=>group.routes.length);
+    BookUI.home(book, {
+      groups, first:url(topics.find(t=>t.type==='transp')), lab:lab(),
+      recent:recent && {title:recent.title,href:url(recent,last.phase)}
+    });
     LessonVisuals.cycleFigure(book.querySelector('#featured'));
-    catalogue(book.querySelector('#contents'),topics);
     if(location.hash==='#contents') book.querySelector('#contents').scrollIntoView();
   }
   function start() {
@@ -96,7 +81,10 @@ const Handbook = (() => {
     position = Math.max(0, Math.min(position, steps.length - 1));
     write('last',{topic:key(chapter),phase});
     document.title = chapter.title + ' · ' + phases[phase];
-    book.innerHTML = mast() + '<main class="book-main"><p class="book-kicker">' + sourceName(chapter.src) + '</p><h1 class="lesson-title">' + esc(chapter.title) + '</h1><p class="lesson-summary">' + esc(profile.summary) + '</p><div class="book-layout"><aside class="book-outline"><h2>Ход занятия</h2>' + phases.map((s,i) => '<a href="' + url(chapter,i) + '"' + (i===phase?' aria-current="step"':'') + '><span>' + (i+1) + '</span>' + s + '</a>').join('') + '<a class="book-reference" href="' + lab() + '">Все варианты и анимации ↗</a></aside><section class="lesson-work"><div class="book-kicker">Вариант ' + current.v + '</div><h2>' + phases[phase] + '</h2><div id="lesson-body"></div></section></div></main>';
+    BookUI.lesson(book, {
+      title:chapter.title, summary:profile.summary, source:sourceName(chapter.src),
+      variant:current.v, phases:phases.map((name,i)=>({name,href:url(chapter,i)})), active:phase, lab:lab()
+    });
     draw();
     if (phase === 0) {
       const intro = document.createElement('section');
@@ -126,16 +114,11 @@ const Handbook = (() => {
     const section = document.createElement('section');
     section.className = 'book-demos';
     section.setAttribute('aria-labelledby','demo-heading');
-    section.innerHTML = '<div class="demo-toolbar"><h3 id="demo-heading">Разбор в движении</h3><span class="demo-count"></span></div>'+
-      '<div class="demo-picker"><label for="demo-topic">Что разобрать</label><div><select id="demo-topic"></select>'+
-      '<button type="button" aria-label="Предыдущая тема" title="Предыдущая тема">← Тема</button>'+
-      '<button type="button" aria-label="Следующая тема" title="Следующая тема">Тема →</button></div></div>';
-    const picker = section.querySelector('select');
-    const [prev, next] = section.querySelectorAll('.demo-picker button');
-    const counter = section.querySelector('.demo-count');
+    const toolbar = document.createElement('div');
+    section.append(toolbar);
+    const titles = demos.map(demo=>demo.querySelector('.dmtl')?.textContent ||
+      (demo.querySelector('.r3home') ? 'Рассмотреть объёмный график' : 'Рассмотреть график на плоскости'));
     const panels = demos.map((demo, i) => {
-      const title = demo.querySelector('.dmtl')?.textContent || (demo.querySelector('.r3home') ? 'Рассмотреть объёмный график' : 'Рассмотреть график на плоскости');
-      picker.add(new Option(title, i));
       const panel = document.createElement('div');
       panel.className = 'demo-view';
       panel.id = 'demo-view-'+i;
@@ -160,28 +143,14 @@ const Handbook = (() => {
       return panel;
     });
     let active = 0;
-    function select(index) {
-      if (active !== index) {
-        panels[active].querySelector('.demo.playing .dm-play')?.click();
-        panels[active].hidden = true;
-      }
+    function onSelect(index) {
+      if (active === index) return;
+      panels[active].querySelector('.demo.playing .dm-play')?.click();
+      panels[active].hidden = true;
+      panels[index].hidden = false;
       active = index;
-      panels[active].hidden = false;
-      picker.selectedIndex = active;
-      picker.setAttribute('aria-controls',panels[active].id);
-      counter.textContent = 'Тема '+(active+1)+' из '+panels.length;
-      prev.disabled = active === 0;
-      next.disabled = active === panels.length-1;
     }
-    picker.onchange = () => select(picker.selectedIndex);
-    prev.onclick = () => select(active-1);
-    next.onclick = () => select(active+1);
-    select(0);
-    if (panels.length === 1) {
-      prev.hidden = next.hidden = picker.hidden = true;
-      section.querySelector('label').textContent = picker.options[0].text;
-      counter.hidden = true;
-    }
+    BookUI.gallery(toolbar,{titles,onSelect});
     book.querySelector('#lesson-body').before(section);
   }
   function footer(parent) {
@@ -199,18 +168,7 @@ const Handbook = (() => {
     }
     const s=steps[position], progress=stepState();
     if (phase === 1) {
-      const map=LPROFILES.profileFor(chapter.type).map;
-      const q=map.q;
-      host.innerHTML='<div class="book-callout">' + esc(q.q) + '</div><label for="book-reason">Ваша заметка (по желанию)</label><p id="draft-help">Здесь можно сформулировать причину про себя или записать её для самопроверки. Преподавателю текст не отправляется. Заметка сохраняется в этом браузере до удаления данных сайта.</p><textarea aria-describedby="draft-help" id="book-reason" rows="3"></textarea><button class="book-primary" id="book-compare">Посмотреть объяснение и сравнить</button><div id="principle"></div>';
-      host.insertAdjacentHTML('afterbegin','<details class="book-map"><summary>Схема метода</summary><ol>' + map.nodes.map(([name,description])=>'<li><strong>'+esc(name)+'</strong><p>'+esc(description)+'</p></li>').join('') + '</ol></details>');
-      const input=host.querySelector('textarea');
-      input.value=progress.draft || '';
-      input.oninput=()=>{
-        if(!remember({draft:input.value})) host.querySelector('#draft-help').textContent='Браузер блокирует сохранение. Эта заметка доступна до ухода со страницы. Преподавателю она не отправляется.';
-      };
-      const compare=()=>{ remember({draft:input.value,compared:true});const result=host.querySelector('#principle');result.innerHTML='<p class="book-callout">' + esc(q.why) + '</p>';footer(result); };
-      host.querySelector('#book-compare').onclick=compare;
-      if(progress.compared) compare();
+      BookUI.reflection(host,{map:LPROFILES.profileFor(chapter.type).map,progress,save:remember,next:url(chapter,2)});
       return;
     }
     const firstMissing = steps.findIndex(step => practiceStart[chapter.type]?.test(step.title));
