@@ -81,9 +81,11 @@ const Handbook = (() => {
     const history = read(key(chapter)); position = Number(history[phase]?.position) || 0;
     position = Math.max(0, Math.min(position, steps.length - 1));
     write('last',{topic:key(chapter),phase});
-    document.title = chapter.title + ' · ' + phases[phase];
+    const title=chapter.src==='rgr'&&chapter.type==='dual'
+      ? 'Двойственная задача к заданию '+(chapter.base==='graph'?'1':'2') : chapter.title;
+    document.title = title + ' · ' + phases[phase];
     BookUI.lesson(book, {
-      title:chapter.title, summary:profile.summary, source:sourceName(chapter.src),
+      title, summary:profile.summary, source:sourceName(chapter.src),
       variant:current.v, data:LEARN.sceneData, phases:phases.map((name,i)=>({name,href:url(chapter,i)})), active:phase, lab:lab()
     });
     draw();

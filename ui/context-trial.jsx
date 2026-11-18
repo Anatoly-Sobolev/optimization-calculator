@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import {ArrowRight,Flag,Undo2} from 'lucide-react';
 import {TrialChallenge} from './trial-challenge.jsx';
 import {ShippingTrial} from './shipping-trial.jsx';
+import {LessonOpening} from './lesson-opening.jsx';
 import {LinearTrial} from './linear-trial.jsx';
 import {PayoffBalance} from './teaching-figures.jsx';
 
@@ -58,8 +59,19 @@ function GameTrial({game:g}){
     <div className="trial-verdict" role="status"><b>{rounds.length?'Сыграно партий · '+rounds.length:'Пока сыграно 0 партий'}</b><span>Счёт A · {LU.txt(total)}. Счёт B · {LU.txt(total.neg())}.{rounds.length>0&&' Средний выигрыш A · '+LU.txt(total.div(rounds.length))+'.'}</span></div></div></div>;
 }
 export function ContextTrial({data,onOpen}){
-  return <section className="context-trial" aria-label="Постановка задачи и ваш эксперимент">
+  const [started,setStarted]=useState(()=>['example','trial'].includes(new URLSearchParams(location.search).get('view')));
+  const [showLab,setShowLab]=useState(started);
+  function change(open){
+    if(open)setStarted(true);
+    setShowLab(open);
+    requestAnimationFrame(()=>document.querySelector('.lesson-title')?.focus());
+  }
+  return <section className="context-trial" aria-label="Знакомство с задачей">
+    {!showLab&&<LessonOpening data={data} onTry={()=>change(true)}/>}
+    {started&&<div hidden={!showLab}>
+      <div className="trial-breadcrumb"><button onClick={()=>change(false)}>← К постановке задачи</button></div>
     {data.type==='transp'?<ShippingTrial data={data}/>:data.type==='netw'?<NetworkTrial net={data.N}/>:data.type==='game'?<GameTrial game={data.G}/>:<LinearTrial data={data}/>}
     <div className="trial-footer">{data.type!=='transp'&&<span>Можно менять свой вариант и сравнивать результаты.</span>}<button className="trial-primary" onClick={onOpen}>Перейти к методу <ArrowRight/></button></div>
+    </div>}
   </section>;
 }

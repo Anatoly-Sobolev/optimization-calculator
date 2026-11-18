@@ -174,3 +174,85 @@
 }
 
 .town-map .truck-load{fill:#234438;font:700 9px system-ui,sans-serif}
+
+/* The first visit shows one decision and its consequence. */
+.lesson-opening{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px clamp(18px,4vw,64px);max-width:1120px;margin:auto;padding:clamp(16px,2.5vw,36px)}
+.lesson-opening .opening-story{align-self:center}
+.lesson-page .lesson-opening h2{font:normal clamp(26px,3vw,42px)/1.08 Georgia,serif;max-width:22ch;text-wrap:balance;margin:0 0 12px}
+.lesson-opening .opening-story p{max-width:52ch;font-size:clamp(15px,1.15vw,17px);line-height:1.48}
+.lesson-page .lesson-opening h3{margin:14px 0 4px;font-size:15px}
+.opening-example{min-width:0;display:grid;align-content:center;gap:8px;background:#f0f4ea;border:1px solid #d5e1d4;border-radius:14px;padding:clamp(12px,1.5vw,21px)}
+.opening-example figcaption{font:650 16px/1.3 system-ui,sans-serif}
+.opening-example p{min-height:2.8em;color:#304e41}
+#book .opening-example button{justify-self:start;background:#fffdf7}
+.opening-diagram{display:grid;grid-template-columns:minmax(0,1fr) minmax(38px,.9fr) minmax(0,1fr);align-items:center;gap:6px;min-height:102px}
+.opening-diagram>div:not(.opening-road){display:grid;justify-items:center;gap:6px;text-align:center;font:600 14px/1.25 system-ui,sans-serif}
+.opening-diagram>div>svg{width:40px;height:40px;color:#26624e;stroke-width:1.6}
+.opening-road{position:relative;height:28px}
+.opening-road i{position:absolute;inset:50% 0 auto;border-top:2px dotted #84a394}
+.opening-road span{position:absolute;top:0;left:0%;line-height:0;padding:4px;border-radius:5px;background:#f7dfb4;color:#684526;transform:translateX(-10%)}
+.opening-road span[data-moved=true]{left:100%;transform:translateX(-90%)}
+.opening-road svg{width:20px;height:20px}
+.opening-axes,.opening-pieces svg{width:100%;height:auto;display:block}
+.opening-axes text{font:12px system-ui,sans-serif;fill:#294e3e}
+.opening-pieces{display:grid;justify-items:center;gap:3px;max-width:320px;width:100%;margin:auto}
+.lesson-page .lesson-opening footer{grid-column:1/-1;justify-self:start;width:auto;margin:0;padding:0;border:0}
+.trial-breadcrumb{padding:7px 14px 0}
+#book .trial-breadcrumb button{background:transparent;border-color:transparent;color:#426851;padding-inline:0}
+.lesson-page .trial-values{display:flex;gap:8px;flex-wrap:wrap}
+.trial-values label{width:clamp(112px,12vw,138px)}
+.conditions-drawer{margin-top:12px}
+.conditions-drawer summary,.graph-workspace summary{cursor:pointer;color:#315d49;font:600 14px/1.4 system-ui,sans-serif}
+.lesson-page .graph-workspace.primer-art>svg.wide-plot{display:block;width:100%;height:auto;max-height:none;margin:0;background:#fffdf8;border-radius:8px}
+.graph-workspace .graph-camera{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.graph-workspace .graph-camera:has(details[open]){align-items:start}
+.graph-workspace .graph-camera details[open]{flex-basis:100%}
+.graph-workspace .graph-camera small{display:block}
+@media(prefers-reduced-motion:no-preference){
+ .opening-road span{transition:left .55s ease,transform .55s ease}
+ .opening-axes g{transition:transform .5s ease}
+ .opening-pieces rect{transition:width .35s ease}
+}
+@media(max-width:720px){.lesson-opening{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}.lesson-page .lesson-opening h2{font-size:26px}.opening-diagram{min-height:72px}.opening-example{gap:6px}.opening-axes{max-height:170px}.lesson-opening footer{padding-top:9px}}
+/* A quiet frame keeps prices and route labels readable over the town. */
+.book-main .cycle.delivery{background:#fffaf0;color:#243c32;border:1px solid #d4d9ca;padding:clamp(13px,1.6vw,23px)}
+.delivery .freight-map{background:#f7f0dd}
+.freight-map .town-name{font:700 9px system-ui,sans-serif;fill:#183b31}
+.freight-map .town-stock{font:500 7.5px system-ui,sans-serif;fill:#314b3e}
+.freight-map .route-lines path{stroke:#236352}
+.freight-map .route-lines .empty{stroke:#50625b}
+.freight-map .route-lines .invalid{stroke:#a63e2b}
+.delivery .delivery-total{border-color:#d2d9c8;color:#254f3d}
+.delivery .cycle-caption,.delivery .freight-legend,.delivery details,.delivery details p,.delivery summary,.delivery .cycle-control label{color:#344e40}
+.delivery .cycle-control input{accent-color:#25674c}
+.delivery .cycle-control button{color:white;background:#285f4c}
+.delivery table,.delivery th,.delivery caption{color:#284638}
+.delivery tbody td{color:white}
+
+.route-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 6px;color:#234c3c}
+.shipment-network .town-map{margin:0}
+.shipment-network .town-map>svg,.lesson-page .primer-art .shipment-network .town-map>svg{display:block;width:100%;height:auto;max-height:280px;margin:3px 0;background:#e1ebe0;border-radius:8px}
+.shipment-network .town-map figcaption{font:500 12px/1.4 system-ui,sans-serif;margin:0;padding:0}
+.shipment-network .town-stop:not([role=button]){cursor:default}
+.map-note{font:500 13px/1.35 system-ui,sans-serif;color:#4d614f}
+
+.opening-workshop svg{display:block;width:100%;height:auto}
+.opening-workshop text{font:11px system-ui,sans-serif;fill:#284639}
+.opening-workshop rect{transition:width .45s ease}
+#book .trial-stepper{align-items:center}
+#book .trial-stepper button{height:32px}
+@media(prefers-reduced-motion:reduce){.opening-workshop rect{transition:none}}
+
+.opening-payoffs{width:100%;table-layout:fixed;text-align:center;border-collapse:collapse;color:#244a3b;font-variant-numeric:tabular-nums}
+.opening-payoffs th,.opening-payoffs td{padding:8px;border:1px solid #c6d5c4;background:#fffdf7}
+.opening-payoffs th{background:#e5eddf}
+.opening-payoffs td[data-chosen=true]{background:#c5e5d3;color:#164b34;font-weight:700}
+.delivery tbody th{color:#284638}
+@media(prefers-reduced-motion:no-preference){.opening-payoffs td{transition:background-color .35s ease}}
+
+@media(max-width:450px){
+ .lesson-opening .opening-story p{line-height:1.38}
+ .lesson-page .lesson-opening h2{margin-bottom:8px}
+ .lesson-page .lesson-opening h3{margin-top:9px}
+ .opening-example p{font-size:14px}
+}

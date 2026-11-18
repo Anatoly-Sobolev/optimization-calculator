@@ -76,7 +76,7 @@ function Lesson({title,summary,source,variant,phases,active,lab,data}) {
   return <><Mast lab={lab}/><main className="book-main lesson-page">
     <header className="lesson-intro"><MethodMark type={data.type}/><div>
       <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1></div>
-      {active!==0&&<details className="lesson-brief"><summary>О задаче</summary><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Попробовать свой вариант →</Link></details>}
+      {active!==0&&<details className="lesson-brief"><summary>О задаче</summary><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Открыть постановку задачи →</Link></details>}
     </header>
     {active===0&&<><div hidden={view!=='context'}><ContextTrial data={data} onOpen={openReading}/></div>
       {view!=='context'&&<div className="trial-return"><Button className="back-to-primer" variant="ghost" onPress={openIntro}><ArrowLeft size={16} aria-hidden="true"/>К моему эксперименту</Button>

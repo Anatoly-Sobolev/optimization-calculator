@@ -6,23 +6,20 @@ const LessonVisuals = (() => {
       ['Склад 1 → Парк', 4, 3, -1], ['Склад 1 → Мир', 2, 1, 1],
       ['Склад 2 → Парк', 0, 1, 1], ['Склад 2 → Мир', 3, 4, -1]
     ];
-    const warehouse='<path d="M2 13 22 3l20 10v21H2z" fill="#dcac69"/><path d="M10 33V17h24v16" fill="#fff0cc"/><path d="M13 21h18m-18 4h18m-18 4h18" stroke="#a77942"/>';
-    const shop='<path d="M5 15h34v19H5z" fill="#fbebc6"/><path d="m2 15 5-11h30l5 11z" fill="#91bea6"/><path d="M8 17v8h11v-8m7 17V20h8v14" fill="#96beac"/><path d="m14 5-2 9m12-9v9m9-9 2 9" stroke="#fff4da"/>';
-    function stop(x,y,art,name,stock){
-      return `<g transform="translate(${x} ${y})"><rect x="-37" y="-32" width="74" height="69" rx="10" class="depot-card"/>
-        <g transform="translate(-17 -27) scale(.77)" stroke="#395445" stroke-width="1.7" stroke-linejoin="round">${art}</g>
-        <text y="13" class="stop-name">${name}</text><text y="28" class="stop-stock">${stock}</text></g>`;
+    function stop(x,y,name,stock){
+      return `<g transform="translate(${x} ${y})"><rect x="-32" y="-9" width="64" height="22" rx="5" fill="#fffaf0" stroke="#617563" stroke-width=".6"/>
+        <text y=".8" class="town-name">${name}</text><text y="9.6" class="town-stock">${stock}</text></g>`;
     }
     const paths=['M78 53H286','M78 63C147 63 207 146 286 146','M78 146C147 146 207 63 286 63','M78 157H286'];
     const badges=[[135,53],[135,85],[135,124],[135,157]];
     host.innerHTML = `<figure class="cycle delivery">
       <figcaption>Как доставить 9 ящиков дешевле?</figcaption>
       <svg class="delivery-map freight-map" viewBox="0 0 366 192" role="img" aria-label="План перевозок">
-        <g class="freight-label"><text x="41" y="15">СКЛАДЫ</text><text x="325" y="15">МАГАЗИНЫ</text></g>
+        <image href="assets/delivery-town.webp" width="366" height="192" preserveAspectRatio="xMidYMid slice"/><g fill="none" stroke="#fff9e8" stroke-width="5" opacity=".9">${paths.map(d=>'<path d="'+d+'"/>').join('')}</g>
         <g class="route-lines" fill="none">${paths.map(d=>'<path d="'+d+'"/>').join('')}</g>
-        <g fill="none" stroke="#d2edb5" stroke-width="1.8" aria-hidden="true">${[53,146,63,157].map(y=>`<path d="M277 ${y-3.4}l7 3.4-7 3.4"/>`).join('')}</g>
+        <g fill="none" stroke="#244d47" stroke-width="1.8" aria-hidden="true">${[53,146,63,157].map(y=>`<path d="M277 ${y-3.4}l7 3.4-7 3.4"/>`).join('')}</g>
         <g class="route-values">${badges.map(([x,y],i)=>`<g transform="translate(${x} ${y})"><rect x="-26" y="-9" width="52" height="18" rx="9"/><text y="3.8" text-anchor="middle"><tspan class="route-load"></tspan><tspan> × ${routes[i][2]} ₽</tspan></text></g>`).join('')}</g>
-        <g text-anchor="middle">${stop(41,55,warehouse,'Склад 1','6 ящиков')}${stop(41,149,warehouse,'Склад 2','3 ящика')}${stop(325,55,shop,'Парк','4 ящика')}${stop(325,149,shop,'Мир','5 ящиков')}</g>
+        <g text-anchor="middle">${stop(45,68,'Склад 1','6 ящиков')}${stop(45,165,'Склад 2','3 ящика')}${stop(322,68,'Парк','4 ящика')}${stop(322,165,'Мир','5 ящиков')}</g>
       </svg>
       <p class="freight-legend">Стрелки ведут от двух складов к двум магазинам. На каждом рейсе указаны число ящиков и цена за ящик.</p>
       <p class="delivery-total" aria-live="polite"></p><p class="cycle-caption"></p>

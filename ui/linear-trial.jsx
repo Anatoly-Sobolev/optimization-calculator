@@ -4,7 +4,7 @@ import {TrialChallenge} from './trial-challenge.jsx';
 import {CoordinateField} from './coordinate-field.jsx';
 
 const topics={
-  graph:['Какую точку можно выбрать?','Две координаты точки — это два количества в плане. Щёлкните на чертеже или измените числа. Проверьте, какие условия выполняются одновременно.'],
+  graph:['Составьте план выпуска','Нажмите на чертёж: по горизонтали выбираете метры льна, по вертикали — метры шёлка. Зелёная область показывает, какие сочетания разрешены.'],
   simplex:['Сколько единиц каждого вида взять?','Выберите количества. В каждой строке условия они учитываются со своими коэффициентами. Измените одно число и проследите, как изменятся расход и значение цели.'],
   artificial:['Как найти план, с которого можно начать?','Попробуйте подобрать количества, которые подходят сразу ко всем условиям. Знак «=» требует точного совпадения, а «≥» задаёт нижнюю границу.'],
   dsx:['Как выполнить требования к плану?','Меняйте количества и смотрите, в какой строке ещё не достигнут минимум. Допустимым станет план, который удовлетворяет всем строкам.'],
@@ -68,16 +68,16 @@ function LinearDesk({data,model,letter,topic}){
     <h3>{letter==='y'?'Ваши оценки условий':'Ваши количества'}</h3>
     <div className="trial-values">{entries.map((value,j)=>{
       const id=name(letter,j),limits=bounds(j),parsed=plan[j];
-      return <label key={id}><b>{id}</b><span className="trial-stepper"><button type="button" aria-label={'Уменьшить '+id} onClick={()=>write(j,LU.txt((parsed??Q.of(0)).sub(1)))}><Minus/></button>
+      return <label key={id}><b>{topic==='graph'?(j===0?'Лён, м · ':'Шёлк, м · ')+id:id}</b><span className="trial-stepper"><button type="button" aria-label={'Уменьшить '+id} onClick={()=>write(j,LU.txt((parsed??Q.of(0)).sub(1)))}><Minus/></button>
       <input aria-label={id} type="text" maxLength={24} value={value} onChange={e=>write(j,e.target.value)}/><button type="button" aria-label={'Увеличить '+id} onClick={()=>write(j,LU.txt((parsed??Q.of(0)).add(1)))}><Plus/></button></span>
       <small>{limits.length?limits.map(b=>id+' '+R.sg(b.s)+' '+LU.txt(b.b)).join(', '):'Любой знак'}{integer?' · целое':''}</small></label>;
     })}</div>
-    <p className="trial-term">Цель — {large?'увеличить':'уменьшить'} значение выражения {expression(model.c,letter)}. Сравнивать по цели можно планы, которые удовлетворяют всем условиям.</p>
+    {topic==='graph'?<p className="trial-term">Выручка = {LU.txt(model.c[0])} ₽ × метры льна + {LU.txt(model.c[1])} ₽ × метры шёлка. Сравните выручку планов, которые мастерская может выполнить.</p>:<p className="trial-term">Цель — {large?'увеличить':'уменьшить'} значение выражения {expression(model.c,letter)}. Сравнивать по цели можно планы, которые удовлетворяют всем условиям.</p>}
     <div className="trial-actions"><button disabled={!ready} onClick={()=>setSaved({value:objective,valid,entries:[...entries]})}><Bookmark/>Запомнить для сравнения</button>
     {saved&&<button onClick={()=>setEntries([...saved.entries])}>Вернуть этот план</button>}</div>
     {saved&&<p className="trial-term">Запомнен план ({saved.entries.join('; ')}) · {saved.valid?'допустимый':'недопустимый'}. {objective&&<>Цель была {LU.txt(saved.value)}, сейчас {LU.txt(objective)}.</>}</p>}
-    {topic==='graph'&&conditions}</div><div className="trial-board primer-art">
-    {topic==='graph'&&<CoordinateField model={model} maxX={extent} maxY={extent} region label="Выберите точку своего плана" onPlace={coords=>setEntries(coords.map(String))}>{({sx,sy})=>ready&&<circle cx={sx(plan[0])} cy={sy(plan[1])} r="5" fill={valid?'#21634d':'#ad5436'} stroke="white" strokeWidth="2"/>}</CoordinateField>}
+    {topic==='graph'&&<details className="conditions-drawer"><summary>Проверить условия выпуска ({model.rows.length})</summary>{conditions}</details>}</div><div className={'trial-board primer-art'+(topic==='graph'?' graph-workspace':'')}>
+    {topic==='graph'&&<CoordinateField model={model} maxX={extent} maxY={extent} wide region label="Выберите точку своего плана" onPlace={coords=>setEntries(coords.map(String))}>{({sx,sy})=>ready&&<circle cx={sx(plan[0])} cy={sy(plan[1])} r="5" fill={valid?'#21634d':'#ad5436'} stroke="white" strokeWidth="2"/>}</CoordinateField>}
     {topic!=='graph'&&conditions}
     <div className="trial-verdict" role="status"><b>{status}</b>{ready&&<span>Значение цели · {LU.txt(objective)}</span>}</div>
     <TrialChallenge onAttempt={()=>setRun(n=>n+1)} value={objective} valid={valid} enabled={ready} reason={status} optimum={target.f} alternative={target.status} maximize={large} steps={ready?['План ('+entries.join('; ')+')','Выполнено условий: '+checks.filter(c=>c.ok).length+' из '+checks.length,'Цель · '+LU.txt(objective)]:[]}/></div></div>;

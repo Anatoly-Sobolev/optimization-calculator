@@ -9,7 +9,7 @@ const {chromium}=require('playwright');
     const page=await browser.newPage({viewport:{width:1280,height:720},reducedMotion:'reduce'});
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     const base=process.env.BOOK_URL||pathToFileURL(path.resolve(__dirname,'../index.html')).href;
-    const open=id=>page.goto(base+'?lesson='+id+'&phase=0');
+    const open=id=>page.goto(base+'?lesson='+id+'&phase=0&view=trial');
     const click=name=>page.getByRole('button',{name,exact:true}).click();
     const win=async()=>assert.equal(await page.locator('.trial-outcome:visible').getAttribute('data-won'),'true');
     await open('rgr.transp');
@@ -70,7 +70,7 @@ const {chromium}=require('playwright');
     await page.goto(base);
     const paths=await page.locator('.chapter-link').evaluateAll(links=>links.map(a=>a.href));
     for(const url of paths.filter(u=>!/\.transp|\.netw|\.game/.test(u))){
-      await page.goto(url);
+      await page.goto(url+'&view=trial');
       const result=await page.evaluate(()=>{
         const d=LEARN.sceneData;
         let p=d.D??d.P;

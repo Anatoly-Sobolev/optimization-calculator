@@ -11,7 +11,7 @@ const {chromium} = require('playwright');
     page.on('pageerror',error=>errors.push(error.message));
     const base=process.env.BOOK_URL || pathToFileURL(path.resolve(__dirname,'../index.html')).href;
     async function lesson(name) {
-      await page.goto(base+'?lesson=rgr.'+name+'&phase=0');
+      await page.goto(base+'?lesson=rgr.'+name+'&phase=0&view=trial');
       await page.getByRole('button',{name:'Перейти к методу'}).click();
     }
     const view=page.locator('.demo-view:visible');

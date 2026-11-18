@@ -103,8 +103,14 @@ const GraphCamera=(()=>{
       fills.forEach(p=>p.classList.toggle('camera-no-fill',state.off.has(p.dataset.i)));
       regions.forEach(p=>p.classList.toggle('camera-no-fill',state.off.has('region')));
     }
+    const compact=svg.classList.contains('wide-plot');
+    let layers=controls;
+    if(compact&&fills.length){
+      layers=document.createElement('details');
+      const title=document.createElement('summary');title.textContent='Слои графика';layers.append(title);controls.append(layers);
+    }
     if(fills.length){
-      const field=document.createElement('fieldset'), title=document.createElement('legend');title.textContent='Заливка ограничений';field.append(title);controls.append(field);
+      const field=document.createElement('fieldset'), title=document.createElement('legend');title.textContent='Заливка ограничений';field.append(title);layers.append(field);
       function layer(id,name,color) {
         const label=document.createElement('label'),check=document.createElement('input');
         check.type='checkbox';check.checked=!state.off.has(id);
@@ -114,7 +120,7 @@ const GraphCamera=(()=>{
       fills.forEach(p=>layer(p.dataset.i,'№ '+(+p.dataset.i+1),p.getAttribute('fill')));
       if(regions.length)layer('region','Общая область','#698e70');
     }
-    const hint=document.createElement('small');hint.textContent=pointTool?'Тяните поле для сдвига. Нажмите на сетку или перетащите точку, чтобы задать план. Колесо и жест двумя пальцами меняют масштаб.':'Тяните поле, чтобы сдвинуть график. Колесо или два пальца меняют масштаб.';controls.append(hint);
+    const hint=document.createElement('small');hint.textContent=pointTool?'Тяните поле для сдвига. Нажмите на сетку или перетащите точку, чтобы задать план. Колесо и жест двумя пальцами меняют масштаб.':'Тяните поле, чтобы сдвинуть график. Колесо или два пальца меняют масштаб.';(compact?layers:controls).append(hint);
     svg.after(controls);svg.classList.add('camera-surface');sync();paint();
     const ac=new AbortController(),on=(t,fn)=>svg.addEventListener(t,fn,{capture:true,passive:false,signal:ac.signal});
     const intercept=e=>{e.stopPropagation();e.preventDefault();};
