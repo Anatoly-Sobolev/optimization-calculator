@@ -9,6 +9,7 @@ import {Label} from '@heroui/react/label';
 import {Link} from '@heroui/react/link';
 import {SearchField} from '@heroui/react/search-field';
 import {MethodMark} from './teaching-figures.jsx';
+import {ContextTrial} from './context-trial.jsx';
 import {LessonIntro} from './lesson-intro.jsx';
 import {PlanProbe} from './plan-probe.jsx';
 import {TextArea} from '@heroui/react/textarea';
@@ -61,23 +62,26 @@ function Home({groups,first,recent,lab}) {
 }
 
 function Lesson({title,summary,source,variant,phases,active,lab,data}) {
-  const [reading,setReading]=useState(active!==0);
+  const [view,setView]=useState(active!==0?'method':new URLSearchParams(location.search).get('view')==='example'?'example':'context');
+  const reading=view==='method';
   const heading=useRef(null), back=useRef(null);
   function openReading() {
-    setReading(true);
+    setView('method');
     requestAnimationFrame(()=>heading.current?.focus());
   }
   function openIntro() {
-    setReading(false);
+    setView('context');
     requestAnimationFrame(()=>back.current?.focus());
   }
   return <><Mast lab={lab}/><main className="book-main lesson-page">
     <header className="lesson-intro"><MethodMark type={data.type}/><div>
       <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1></div>
-      {active!==0&&<details className="lesson-brief"><summary>О задаче</summary><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></details>}
+      {active!==0&&<details className="lesson-brief"><summary>О задаче</summary><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Попробовать свой вариант →</Link></details>}
     </header>
-    {active===0&&<><div hidden={reading}><LessonIntro data={data} onOpen={openReading}/></div>
-      {reading&&<Button className="back-to-primer" variant="ghost" onPress={openIntro}><ArrowLeft size={16} aria-hidden="true"/>К наглядному примеру</Button>}</>}
+    {active===0&&<><div hidden={view!=='context'}><ContextTrial data={data} onOpen={openReading}/></div>
+      {view!=='context'&&<div className="trial-return"><Button className="back-to-primer" variant="ghost" onPress={openIntro}><ArrowLeft size={16} aria-hidden="true"/>К моему эксперименту</Button>
+        {reading&&<Button className="back-to-primer" variant="ghost" onPress={()=>{setView('example');requestAnimationFrame(()=>back.current?.focus());}}>Разобранный пример</Button>}</div>}
+      {view==='example'&&<LessonIntro data={data} onOpen={openReading}/>}</>}
     <div className="book-layout" hidden={!reading}><aside className="book-outline"><label className="phase-picker">Этап занятия <select value={active} onChange={e=>{location.href=phases[Number(e.target.value)].href;}}>{phases.map(({name},i)=><option key={i} value={i}>{i+1}. {name}</option>)}</select></label><h2>Ход занятия</h2>
       <nav aria-label="Этапы занятия">{phases.map(({name,href},i)=><Link key={href} href={href} aria-current={i===active?'step':undefined}><span>{i+1}</span>{name}</Link>)}</nav>
       <Link className="book-reference" href={lab}>Открыть лабораторию ↗</Link></aside>

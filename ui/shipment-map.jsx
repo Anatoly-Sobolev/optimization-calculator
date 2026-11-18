@@ -9,7 +9,7 @@ export function partialPlan(model,leg,amount){
   return matrix;
 }
 
-function Building({side,reserve}){
+export function Building({side,reserve}){
   if(reserve)return <path d="M1 15h17v-6H1zm3-7h11V3H4z" fill="#d4b784" stroke="#6c674e"/>;
   if(side==='supply')return <g stroke="#625a44" strokeWidth="1.25" strokeLinejoin="round"><path d="M1 8 10 2l9 6v10H1z" fill="#ddc295"/><path d="M5 18V9h10v9" fill="#fff2ce"/><path d="M6 12h8m-8 3h8"/></g>;
   return <g stroke="#3b604f" strokeWidth="1.25" strokeLinejoin="round"><path d="M2 8h16v10H2z" fill="#fff1cc"/><path d="m1 8 2-6h14l2 6z" fill="#86b394"/><path d="M5 11h4v3H5zm8 7v-7h3v7"/></g>;

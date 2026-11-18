@@ -12,7 +12,7 @@ const {chromium} = require('playwright');
     const base=process.env.BOOK_URL || pathToFileURL(path.resolve(__dirname,'../index.html')).href;
     async function lesson(name) {
       await page.goto(base+'?lesson=rgr.'+name+'&phase=0');
-      await page.getByRole('button',{name:'Сразу к решению'}).click();
+      await page.getByRole('button',{name:'Перейти к методу'}).click();
     }
     const view=page.locator('.demo-view:visible');
     async function choose(name) {
@@ -37,13 +37,13 @@ const {chromium} = require('playwright');
     await choose('ранние сроки');await end();
     assert.ok(await view.locator('.ntp').filter({hasText:'Р 0'}).count());
 
-    await page.goto(base+'?lesson=rgr.graph&phase=0');
-    const primer=page.locator('.primer-plot'),rulers=primer.locator('.field-rulers');
+    await page.goto(base+'?lesson=rgr.graph&phase=0&view=example');
+    const primer=page.locator('.primer-plot:visible'),rulers=primer.locator('.field-rulers');
     await primer.scrollIntoViewIfNeeded();
     const fixed=await rulers.boundingBox(),initialWindow=await primer.getAttribute('data-window');
     const firstLine=primer.locator('.gl').first(),edge=()=>firstLine.evaluate(el=>[el.x1.baseVal.value,el.y1.baseVal.value,el.x2.baseVal.value,el.y2.baseVal.value]);
     const originalEdge=await edge();
-    await page.locator('.primer-art').getByRole('button',{name:'Уменьшить масштаб'}).click();
+    await page.locator('.primer-art:visible').getByRole('button',{name:'Уменьшить масштаб'}).click();
     assert.notDeepEqual(await edge(),originalEdge);
     assert.deepEqual(await rulers.boundingBox(),fixed);
     const z=await primer.getAttribute('data-window'),field=await primer.boundingBox();
@@ -52,7 +52,7 @@ const {chromium} = require('playwright');
     await page.mouse.move(field.x+field.width*.35,field.y+field.height*.45,{steps:4});
     await page.mouse.up();
     assert.notEqual(await primer.getAttribute('data-window'),z);
-    await page.locator('.primer-art').getByRole('button',{name:'Исходный вид'}).click();
+    await page.locator('.primer-art:visible').getByRole('button',{name:'Исходный вид'}).click();
     assert.equal(await primer.getAttribute('data-window'),initialWindow);
     await lesson('graph');
     const svg=view.locator('.gsvg'), box=()=>svg.getAttribute('data-window');

@@ -24,6 +24,12 @@ const { chromium } = require('playwright');
         await page.goto(topic.replace('phase=0','phase='+phase));
         assert.equal(await page.locator('#lesson-body h3, #book-reason').count(),1,topic);
         if(phase===0) {
+          const trial=page.locator('.context-trial');
+          assert.ok(await trial.isVisible(),topic);
+          assert.equal(await trial.locator('.trial-challenge:visible').count(),1,topic);
+          assert.doesNotMatch(await trial.innerText(),/undefined|NaN/);
+          await trial.getByRole('button',{name:'Перейти к методу'}).click();
+          await page.getByRole('button',{name:'Разобранный пример',exact:true}).click();
           const primer=page.locator('.lesson-primer');
           assert.ok(await primer.isVisible(),topic);
           assert.ok(await page.locator('.book-layout').isHidden(),topic);
@@ -66,7 +72,7 @@ const { chromium } = require('playwright');
       }
     }
     // Follow a split order across two depots, then account for the surplus locally.
-    await page.goto(topics.find(u=>u.includes('lesson=rgr.transp'))+'&part=scheme');
+    await page.goto(topics.find(u=>u.includes('lesson=rgr.transp'))+'&view=example&part=scheme');
     const map=page.locator('.shipment-network'),sheet=page.locator('.reading-diagram'),volume=page.locator('.primer-art input[type=range]');
     assert.equal(await map.locator('[data-side=supply]').count(),4);
     assert.equal(await map.locator('[data-side=demand]').count(),5);
@@ -86,7 +92,7 @@ const { chromium } = require('playwright');
     await map.getByRole('button',{name:/Выбрать A2 → B1/}).press('Enter');
     assert.match(await map.locator('figcaption').innerText(),/A₂ → B₁/);
 
-    await page.goto(topics.find(u=>u.includes('lesson=zyk.transp'))+'&part=scheme');
+    await page.goto(topics.find(u=>u.includes('lesson=zyk.transp'))+'&view=example&part=scheme');
     const legs=page.locator('.shipment-legs select');
     await legs.selectOption('5');await volume.press('End');
     await legs.selectOption('6');assert.ok(await volume.isDisabled());
@@ -94,7 +100,7 @@ const { chromium } = require('playwright');
     assert.equal(await sheet.locator('[data-flight=to]').innerText(),'14');
 
     const dualSimplex = topics.find(topic=>topic.includes('lesson=rgr.dsx'));
-    await page.goto(dualSimplex);
+    await page.goto(dualSimplex+'&view=example');
     const intro=page.locator('.lesson-primer');
     await intro.getByRole('button',{name:'Включить на час'}).click();
     assert.equal(await intro.locator('.primer-order .filled').count(),10);
@@ -107,7 +113,7 @@ const { chromium } = require('playwright');
 
     const artificial = topics.find(topic=>topic.includes('lesson=rgr.artificial'));
     await page.goto(artificial);
-    await page.getByRole('button',{name:'Сразу к решению'}).click();
+    await page.getByRole('button',{name:'Перейти к методу'}).click();
     await page.locator('details.lesson-context > summary').click();
     assert.ok(await page.locator('.starting-equation').isVisible());
     const deck = page.locator('.book-demos');
@@ -140,7 +146,7 @@ const { chromium } = require('playwright');
 
     const transport = topics.find(topic=>topic.includes('lesson=rgr.transp'));
     await page.goto(transport);
-    await page.getByRole('button',{name:'Сразу к решению'}).click();
+    await page.getByRole('button',{name:'Перейти к методу'}).click();
     await page.locator('details.lesson-context > summary').click();
     const ship = page.getByRole('button',{name:'Отправить 1 ящик'});
     for (let i=0;i<4;i++) await ship.click();
