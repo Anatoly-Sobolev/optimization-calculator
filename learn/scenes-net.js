@@ -27,17 +27,16 @@
   const nameA = (P, i) => i < (P.m0 ?? P.m) ? `A${i + 1}` : 'Недопоставка', nameB = (P, j) => j < (P.n0 ?? P.n) ? `B${j + 1}` : 'Резерв';
   const costOf = (P, X) => X.reduce((s, row, i) => row.reduce((t, v, j) => t.add(P.c[i][j].mul(v)), s), Z());
   const sumRow = (X, i) => X[i].reduce((s, v) => s.add(v), Z()), sumCol = (X, j) => X.reduce((s, row) => s.add(row[j]), Z());
-  function flowSvg(P, X, label, selected) {
+  function flowSvg(P, X, label, selected, audit) {
     const plan = {P:{m:P.m,n:P.n,m0:P.m0??P.m,n0:P.n0??P.n,a:P.a.map(num),b:P.b.map(num)},
-      matrix:X.map(row=>row.map(num)),selected};
+      matrix:X.map(row=>row.map(num)),selected,audit};
     return `<shipment-plan aria-label="${esc(label)}" data-plan="${esc(JSON.stringify(plan))}"></shipment-plan>`;
   }
-  const planTable = (P, X, withSums) => `<div class="learn-scroll"><table class="sx"><thead><tr><th>План</th>${P.b.map((_, j) => `<th>${esc(nameB(P, j))}</th>`).join('')}<th>запас</th></tr></thead><tbody>${X.map((row, i) => `<tr><th scope="row">${esc(nameA(P, i))}</th>${row.map((v,j) => `<td tabindex="0" data-origin="В проверяемом плане задана поставка A${i+1} → B${j+1}: ${txt(v)}. Сумма строки даёт отгрузку склада, сумма столбца — поставку в магазин.">${f(v)}</td>`).join('')}<td tabindex="0" data-origin="Доступный запас склада из условия задачи.">${f(P.a[i])}</td></tr>`).join('')}<tr><th scope="row">спрос</th>${P.b.map(b => `<td tabindex="0" data-origin="Спрос пункта в сбалансированной задаче.">${f(b)}</td>`).join('')}<td></td></tr></tbody></table></div>`;
   const flowReady = inst => { const r = inst.data && inst.data.T; return !!(r && r.P && r.P.status !== 'infeasible' && planOf(r) && r.P.m * r.P.n <= 36); };
 
   S.define('flows', {
-    goal: inst => ({ build: 'Почувствовать транспортную задачу как перевозку груза между пунктами.', violation: 'Научиться видеть, когда план перевозок нарушает запас или спрос.', improve: 'Понять, что метод шаг за шагом снижает стоимость перевозок.' }[inst.spec.task]),
-    action: inst => ({ build: 'Введите, сколько груза везти по каждому маршруту, чтобы не превысить запасы и покрыть спрос.', violation: 'Сравните перевозки с запасами и спросом и найдите пункт, где условие нарушено.', improve: 'Перед каждым шагом предскажите, как изменится стоимость плана.' }[inst.spec.task]),
+    goal: inst => ({ build: 'Почувствовать транспортную задачу как перевозку груза между пунктами.', violation: 'Проверить накладную перед выездом машин. В ней изменили одну поставку.', improve: 'Понять, что метод шаг за шагом снижает стоимость перевозок.' }[inst.spec.task]),
+    action: inst => ({ build: 'Введите, сколько груза везти по каждому маршруту, чтобы не превысить запасы и покрыть спрос.', violation: 'Выберите клетку. Карта покажет её маршрут, а рядом с таблицей появится проверка склада и магазина. Затем ответьте на вопрос под картой.', improve: 'Перед каждым шагом предскажите, как изменится стоимость плана.' }[inst.spec.task]),
     takeaway: inst => ({ build: 'Допустимый план соблюдает запасы поставщиков и спрос потребителей. Цена плана — сумма «тариф × объём»; допустимых планов много, лучший ищет метод.', violation: 'Каждое условие относится к своему пункту: отгрузка не больше запаса, поставка не меньше спроса.', improve: 'Метод потенциалов строит цепочку допустимых планов; стоимость не растёт, пока остаются отрицательные оценки.' }[inst.spec.task]),
     available: flowReady,
     render: (inst, api) => {
@@ -68,10 +67,10 @@
       const stage = body.querySelector('.sc-stage');
       if (task === 'violation') {
         const specs = [];
-        const mk = (kind, i, j, name, N) => {
+        const mk = (kind, i, j) => {
           const Y = X.map(row => row.slice()); Y[i][j] = Y[i][j].add(kind === 'sup' ? ONE() : ONE().neg());
           const names = (kind === 'sup' ? P.a : P.b).map((_, k) => (kind === 'sup' ? nameA : nameB)(P, k)), right = names[kind === 'sup' ? i : j];
-          specs.push(S.choiceSpec(kind === 'sup' ? 'В этом плане одна перевозка изменена. Какой пункт отправления превысил свой запас?' : 'В этом плане одна перевозка изменена. Чей спрос теперь не покрыт?', right, names.filter(x => x !== right), kind === 'sup' ? `Отправлено из ${right}: ${LU.txt(sumRow(Y, i))}, запас ${LU.txt(P.a[i])}: условие «отгрузка ≤ запас» нарушено.` : `Получено в ${right}: ${LU.txt(sumCol(Y, j))}, спрос ${LU.txt(P.b[j])}: условие «поставка ≥ спрос» нарушено.`, { before: planTable(P, Y) + flowSvg(P, Y, 'Изменённый план перевозок'), kind: 'feasibility' }));
+          specs.push(S.choiceSpec(kind === 'sup' ? 'В этом плане одна перевозка изменена. Какой пункт отправления превысил свой запас?' : 'В этом плане одна перевозка изменена. Чей спрос теперь не покрыт?', right, names.filter(x => x !== right), kind === 'sup' ? `Отправлено из ${right}: ${LU.txt(sumRow(Y, i))}, запас ${LU.txt(P.a[i])}: условие «отгрузка ≤ запас» нарушено.` : `Получено в ${right}: ${LU.txt(sumCol(Y, j))}, спрос ${LU.txt(P.b[j])}: условие «поставка ≥ спрос» нарушено.`, { before: flowSvg(P, Y, 'Проверка плана перевозок', [0,0], kind), kind: 'feasibility' }));
         };
         let fi = -1, fj = -1;
         for (let i = 0; i < P.m && fi < 0; i++) if (sumRow(X, i).eq(P.a[i])) { fi = i; fj = 0; }

@@ -79,6 +79,11 @@ const Handbook = (() => {
     const profile = LPROFILES.profileFor(chapter.type);
     steps = LEARN.selectStages(LEARN.allStages,{depth:'detail'});
     const history = read(key(chapter)); position = Number(history[phase]?.position) || 0;
+    if (phase===0 && chapter.type==='transp') {
+      const previous=history[phase]?.freightStep || steps[position]?.id;
+      steps=LEARN.allStages.filter(s=>steps.includes(s)||s.freightLeg!=null);
+      position=Math.max(0,steps.findIndex(s=>s.id===previous));
+    }
     position = Math.max(0, Math.min(position, steps.length - 1));
     write('last',{topic:key(chapter),phase});
     const title=chapter.src==='rgr'&&chapter.type==='dual'
@@ -240,7 +245,7 @@ const Handbook = (() => {
   function stepState() { return read(key(chapter))[phase] || {}; }
   function remember(patch) {
     const history=read(key(chapter));
-    history[phase]={...history[phase],...patch,position}; return write(key(chapter),history);
+    history[phase]={...history[phase],...patch,position,...(phase===0&&chapter.type==='transp'?{freightStep:steps[position]?.id}:{})}; return write(key(chapter),history);
   }
   function draw() {
     if (unmountAnswer) {
@@ -264,7 +269,7 @@ const Handbook = (() => {
     if (phase >= 2) host.append(foot);
     const next=() => {
       if(position+1===steps.length){footer(foot);return;}
-      const b=document.createElement('button');b.className='book-primary';b.textContent='Далее: '+steps[position+1].title;b.onclick=()=>move(1);foot.append(b);
+      const b=document.createElement('button');b.className='book-primary';const following=steps[position+1]; b.textContent=following.freightLeg!=null?'Далее · распределение '+(following.freightLeg+1):'Далее: '+following.title;b.onclick=()=>move(1);foot.append(b);
     };
     function move(amount) {
       position+=amount;remember({});draw();
@@ -278,6 +283,10 @@ const Handbook = (() => {
       }
     }
     if(position>0){const prev=document.createElement('button');prev.textContent='← Предыдущий';prev.onclick=()=>move(-1);foot.append(prev);}
+    if(phase===0 && chapter.type==='transp' && position>1){
+      const restart=document.createElement('button');
+      restart.textContent='К началу разбора';restart.onclick=()=>move(-position);foot.prepend(restart);
+    }
     if(phase===0){
       host.querySelector('.step-line span').textContent='Шаг '+(position+1)+' из '+steps.length;
       host.append(foot);

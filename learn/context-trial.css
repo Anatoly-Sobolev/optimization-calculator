@@ -414,3 +414,53 @@
 .opening-town .town-map{margin:0}.opening-town .town-map>svg{display:block;width:100%;height:auto;border-radius:8px}
 .opening-town .town-map figcaption{font-size:12px;padding:0 0 3px}
 @media(max-width:540px){.editor-quantity{gap:5px}.editor-quantity .take-limit{margin-left:0}#book .route-stepper button{min-height:36px;min-width:36px}}
+
+.freight-walk{position:relative}
+.freight-lesson-board,.freight-audit{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);align-items:start;gap:clamp(.8rem,2vw,1.5rem);margin:.85rem 0}
+.freight-grid-wrap,.freight-audit>div{min-width:0}
+.freight-grid-wrap{position:relative}
+#book table.freight-grid,table.freight-grid{width:100%!important;table-layout:fixed;border-collapse:separate;border-spacing:0;line-height:1.2;font:550 clamp(.77rem,1.1vw,1rem)/1.2 system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#193e36;background:#fff}
+.freight-grid caption{padding:0 0 .6em;text-align:left;font:600 .85em/1.3 system-ui,sans-serif;color:#466057}
+.freight-grid :is(td,th){height:2.5em;padding:.15em;text-align:center;border:0;border-right:1px solid #d9e3db;border-bottom:1px solid #d9e3db;overflow-wrap:anywhere}
+.freight-grid th,.freight-grid tfoot td,.freight-grid tbody td:last-child{background:#edf3ed;color:#284b41}
+.freight-grid [data-cross=true]{background:#f2f7f1}
+.freight-grid [data-axis=true]{background:#cde7d6;font-weight:750}
+.freight-grid [data-selected=true]{box-shadow:inset 0 0 0 2px #186448;background:#dbf0df}
+.freight-grid td[data-sign] small{display:inline;font-weight:800;margin-right:2px}
+.freight-grid td[data-sign="+"]{background:#deefdf}.freight-grid td[data-sign="−"]{background:#fff0d4}
+#book .freight-grid button,.freight-grid button{display:block;width:100%;padding:.4em 0;background:transparent;color:inherit;border:0;border-radius:4px;box-shadow:none;font:inherit}
+.freight-grid button:focus-visible{outline:2px solid #194e67;outline-offset:-2px}
+.freight-explanation,.freight-audit-sums section{border-left:3px solid #52916d;padding:.65rem .85rem;background:#f2f6ef;color:#1a4033}
+.freight-explanation p,.freight-audit p{margin:.35rem 0 .6rem;line-height:1.4}
+.freight-arithmetic{padding-top:.5rem;border-top:1px solid #cddcce;font-weight:630;line-height:1.45}
+.freight-explanation ol{margin:.5rem 0;padding-left:1.4rem}
+.freight-explanation summary{cursor:pointer}
+.freight-moving-number{position:absolute;pointer-events:none;padding:.1rem .4rem;border-radius:.4rem;color:white;background:#175c45;z-index:3}
+.cycle-trail{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cycle-trail path{fill:none;stroke:#8d671c;stroke-width:2;stroke-linejoin:round;opacity:.8}
+.freight-audit h4{font:650 1.05em/1.3 system-ui,sans-serif;margin:0}
+.freight-audit .scene-shipment{width:100%;max-width:none;box-sizing:border-box;margin:0}
+.freight-audit .route-picker{display:flex;align-items:center;gap:.5rem}
+.freight-audit .town-map>svg{aspect-ratio:508/282;height:auto;width:100%}
+.freight-audit-sums{margin-top:.65rem;display:grid;gap:.4rem}
+.freight-audit-sums section{font-size:.88em;padding:.3rem .6rem}
+.freight-audit-sums section[data-issue=true]{background:#fff3e4;border-color:#b56c2e}
+.freight-audit-sums mark{font-weight:750;background:#d7e7c9;color:inherit}
+.freight-audit-sums small{display:block;line-height:1.4}
+.freight-audit .audit-route-note{min-height:3.2em;margin:.5rem 0 0;font-size:.88em}
+@media(prefers-reduced-motion:no-preference){.cycle-trail path{stroke-dasharray:1;animation:trace-freight 1.8s ease both}.freight-arithmetic{animation:trial-step .35s ease-out}}
+@keyframes trace-freight{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@media(max-width:900px){.freight-lesson-board,.freight-audit{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:470px){.freight-grid :is(td,th){height:2.6em}.freight-explanation{padding:.5rem .65rem}.freight-grid caption{font-size:1em}}
+
+.freight-first-rule{margin:.2em 0 .65em;max-width:76ch;color:#395849}
+.freight-grid .old-load{display:block;font-size:.76em;color:#495e50}
+@media(prefers-reduced-motion:no-preference){
+  .freight-grid-wrap[data-locate=true] tbody tr:has([data-axis=true]:first-child)>td{animation:freight-row .75s ease-out}
+  .freight-grid-wrap[data-locate=true] [data-selected=true]{animation:freight-intersection 1.25s ease-out both}
+  @keyframes freight-row{0%,40%{background:#c6e4ce}}
+  @keyframes freight-intersection{0%,35%{outline:0 solid transparent}60%{outline:3px solid #39785a;outline-offset:-3px}100%{outline:2px solid #39785a;outline-offset:-2px}}
+}
+
+.freight-grid td[data-closed=true]{background:#f2f2ed;color:#7c857f}
+.freight-grid td[data-next=true]{outline:2px dashed #a26920;outline-offset:-3px;background:#fff6db}

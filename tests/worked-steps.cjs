@@ -19,7 +19,8 @@ const {chromium}=require('playwright');
       count+=await page.evaluate(async()=>{
         const host=document.querySelector('#lesson-body');
         const wait=()=>new Promise(done=>requestAnimationFrame(done));
-        const steps=LEARN.selectStages(LEARN.allStages,{depth:'detail'});
+        const detail=LEARN.selectStages(LEARN.allStages,{depth:'detail'});
+        const steps=LEARN.allStages.filter(s=>detail.includes(s)||s.freightLeg!=null);
         for(let i=0;i<steps.length;i++){
           for(let k=0;k<3;k++){
             const tab=host.querySelectorAll('.walk-rail button')[k];
@@ -28,6 +29,12 @@ const {chromium}=require('playwright');
             const text=host.querySelector('.walk-current').innerText;
             if(!text.trim()||/undefined|NaN|\[object Object\]/.test(text))throw Error(steps[i].title+' '+text);
             if(document.documentElement.scrollWidth>innerWidth+1)throw Error('Overflow '+steps[i].title+' '+k);
+          }
+          if(steps[i].freightLeg!=null){
+            const e=LEARN.sceneData.T.first.steps[steps[i].freightLeg],grid=host.querySelector('.freight-grid');
+            if(grid.tBodies[0].rows[e.i].cells[e.j+1].textContent!==LU.txt(e.x)
+              ||grid.tBodies[0].rows[e.i].lastElementChild.textContent!==LU.txt(e.a1)
+              ||grid.tFoot.rows[0].cells[e.j+1].textContent!==LU.txt(e.b1))throw Error('Incorrect allocation or balances');
           }
           if(i+1<steps.length){host.querySelector('#step-foot .book-primary').click();await wait();}
         }

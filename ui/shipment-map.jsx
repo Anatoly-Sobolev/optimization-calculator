@@ -10,7 +10,7 @@ export function partialPlan(model,leg,amount){
   return matrix;
 }
 
-export function ShipmentMap({P,matrix,i,j,fraction,onSelect,isolated=false}){
+export function ShipmentMap({P,matrix,i,j,fraction,onSelect,isolated=false,showReceipts=true}){
   const town=useMemo(()=>makeTown(P.m0,P.n0),[P.m0,P.n0]);
   const supply=P.a.slice(0,P.m0).map(num),demand=P.b.slice(0,P.n0).map(num);
   const assigned=matrix.map(row=>row.reduce((sum,q)=>sum+(q??0),0));
@@ -25,9 +25,9 @@ export function ShipmentMap({P,matrix,i,j,fraction,onSelect,isolated=false}){
     <DeliveryTown town={town} stock={stock} need={need} supply={supply} demand={demand} i={i} j={j} trips={routes}
       pickRoute={onSelect} preview={physical&&(fraction!=null||quantity>0)?{i,j,q:quantity,fraction}:null}
       note="Маршрут выбранной клетки"/>
-    <p className="shipment-receipt"><b>{i<P.m0?'Склад A'+sub(i+1):'Недопоставка'}</b>
+    {showReceipts&&<><p className="shipment-receipt"><b>{i<P.m0?'Склад A'+sub(i+1):'Недопоставка'}</b>
       <span>{isolated?`Назначено ${assigned[i]} из ${num(P.a[i])} ящ.`:i<P.m0?`Осталось ${stock[i]} из ${supply[i]} ящ.`:'Условная строка для недостающих ящиков.'}</span></p>
-    <p className="shipment-receipt"><b>{j<P.n0?'Получено магазином B'+sub(j+1):'Учтено в резерве'}</b><span>{incoming.length?incoming.join(' + ')+' = ':''}{received[j]} из {num(P.b[j])} ящ.</span></p>
+    <p className="shipment-receipt"><b>{j<P.n0?'Получено магазином B'+sub(j+1):'Учтено в резерве'}</b><span>{incoming.length?incoming.join(' + ')+' = ':''}{received[j]} из {num(P.b[j])} ящ.</span></p></>}
     {!physical&&<p className="map-note">{j>=P.n0?'Резерв — ящики, которые остаются на складе. Рейса в магазин здесь нет.':'Недопоставка — часть заказа, для которой нет груза. Этой записи не соответствует машина.'}</p>}
   </div>;
 }

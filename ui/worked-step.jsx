@@ -1,5 +1,6 @@
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Play,Pause,RotateCcw} from 'lucide-react';
+import {FreightWalk} from './freight-walk.jsx';
 import {lessonContext} from './lesson-context.jsx';
 
 const t=LU.txt,sub=LU.sub;
@@ -91,12 +92,6 @@ function story(step,data){
       [forward?'К сроку начала прибавьте длительность каждой работы.':'От срока следующего события отнимите длительность работы.',arcs.map(({a,v},i)=><div key={i}>{t(forward?v.sub(a.d):v.add(a.d))} {forward?'+':'−'} {t(a.d)} = {token('time'+i,v)}</div>)],
       [forward?'Дождитесь самой поздней работы. Запишите максимум у события.':'Чтобы успеть по всем ветвям, запишите минимум у события.',<>Событие {e.e} → день {token('time'+arcs.findIndex(o=>o.v.eq(e.val)),e.val)}</>]);
   }
-  if(step.potential){const [c,u,v]=step.potential,rt=step.routeIndex,tag=rt?'A'+sub(rt[0]+1)+' → B'+sub(rt[1]+1):'Выбранный маршрут';
-    const delta=c.sub(u).sub(v);
-    return sequence('Можно ли сэкономить на этом маршруте?',
-      ['Тариф взят из условия. Оценки u склада и v магазина получены по занятым клеткам: в них u + v равно тарифу.',<>{tag}: тариф {token('c',c)} · u = {token('u',u)} · v = {token('v',v)}</>],
-      ['Вычтите обе оценки из тарифа. Разность показывает, как изменится общая стоимость при переносе одного ящика по циклу.',<>Δ = {token('c',c)} − ({token('u',u)}) − ({token('v',v)}) = {token('delta',delta)}</>],
-      [delta.s<0?'Оценка отрицательна. Следующий шаг покажет, сколько ящиков можно перераспределить без нарушения заказов.':'Снижения стоимости по этому циклу нет.',<>{tag} · Δ = {token('delta',delta)} ед. на ящик</>]);}
   if(step.cutFrame){const s=step.cutFrame,b=s.cut.b;return basic('Как отделить неполную единицу?','Посмотрите на значения b в таблице.','Для выбранной строки вычтите из b ближайшее целое снизу.',<>Строка {s.p+1}: {t(b)} − ({t(b.sub(s.cut.fb))}) = {token('frac',s.cut.fb)}</>,'Дробная часть определяет правую сторону отсечения.',<>Строка {s.p+1} · дробная часть {token('frac',s.cut.fb)}</>);}
   if(step.dualColumn){const {row,j,P}=step.dualColumn;return sequence('Куда переходят числа из столбца x'+sub(j+1)+'?',
     ['Читайте исходный столбец сверху вниз.',join(P.rows.map((r,i)=>token('a'+i,r.a[j])),' · ')],
@@ -108,21 +103,8 @@ function story(step,data){
   if(g&&['Нижняя цена игры','Верхняя цена игры'].includes(step.title)){
     const lower=step.title.startsWith('Нижняя'),vals=lower?g.rowMin:g.colMax;
     return basic(lower?'Какой выигрыш A может гарантировать?':'Как B ограничивает свой проигрыш?','В клетках записан выигрыш A для каждой пары ходов.',lower?'В каждой строке выберите минимум — худший ответ B.':'В каждом столбце выберите максимум — худший исход для B.',join(vals.map((v,i)=><span>{lower?'A':'B'}{sub(i+1)} → {token('val'+i,v)}</span>),' · '),lower?'Возьмите наибольшую из гарантий строк.':'Возьмите наименьшую из оценок столбцов.',<>{lower?'α':'β'} = {token('val'+vals.findIndex(v=>t(v)===step.answer),step.answer)}</>);}
-  const T=data.T,N=data.N,P=data.P,lp=data.rec.lp;
+  const N=data.N,P=data.P,lp=data.rec.lp;
   switch(step.title){
-    case 'Баланс перевозок':return sequence('Хватит ли груза для всех магазинов?',
-      ['Сложите запасы складов и отдельно заказы магазинов.',<>Запас {token('stock',T.P.sa)} ящ. · заказ {token('need',T.P.sb)} ящ.</>],
-      ['Из запаса вычтите заказ.',<>{token('stock',T.P.sa)} − {token('need',T.P.sb)} = {token('diff',T.P.sa.sub(T.P.sb))}</>],
-      [step.answer,<>Разница {token('diff',T.P.sa.sub(T.P.sb))} ящ.</>]);
-    case 'Начальный план':{const e=step.allocation?.entries[0];if(!e)break;
-      return sequence('Сколько отправить первым рейсом?',['Найдите склад и магазин в выбранной клетке.',<>Склад A{e.i+1}: {token('stock',e.stock)} ящ. · магазин B{e.j+1}: {token('need',e.need)} ящ.</>],
-        ['Сравните запас и заказ. Можно отправить меньшее из двух чисел.',<>min({token('stock',e.stock)}, {token('need',e.need)}) = {token('load',e.x)}</>],
-        ['Запишите груз в клетку на пересечении склада и магазина.',<>A{e.i+1} → B{e.j+1}: {token('load',e.x)} ящ.</>]);}
-    case 'Цикл перераспределения':{const c=step.cycleTrace,minus=c.path.filter(cell=>cell.sign!=='+' );
-      return sequence('Сколько ящиков можно перенаправить?',
-        ['Чередуйте знаки вдоль замкнутого пути: в каждой затронутой строке и столбце один рейс получает груз, другой отдаёт. Прочитайте объёмы на местах с минусом.',join(minus.map(({i,j},n)=><span>A{i+1}B{j+1}: {token('load'+n,c.plan[i][j]??0)}</span>),' · ')],
-        ['Снять можно столько, сколько есть на самом малом из этих рейсов.',<>min({join(minus.map(({i,j},n)=>token('load'+n,c.plan[i][j]??0)),', ')}) = {token('move',c.amount)}</>],
-        ['Столько же прибавьте на рейсах с плюсом. Пройдите цикл по таблице ниже.',<>Переносим {token('move',c.amount)} ящ.</>]);}
     case 'Резерв работы':{const a=step.arcStep,early=N.tp[N.events.indexOf(a.i)],late=N.tn[N.events.indexOf(a.j)];
       return sequence('На сколько дней можно задержать работу?',
         ['Возьмите ранний старт и предельный срок окончания.',<>Старт {token('early',early)} · окончание {token('late',late)} · длительность {token('d',a.d)} дн.</>],
@@ -137,9 +119,6 @@ function story(step,data){
     case 'Соответствие задач':return basic('Откуда берутся переменные y?','У каждой строки исходной задачи есть своё условие.','Присвойте каждому условию отдельную оценку.',join(P.rows.map((_,i)=>'Строка '+(i+1)+' → y'+sub(i+1)),' · '),'Столько оценок нужно выбрать в двойственной задаче.');
     case 'Двойственная цель':return basic('Как сложить оценки всех ресурсов?','Прочитайте правые части b исходных строк.','Умножьте каждое b на оценку своей строки и сложите.',join(data.D.c.map((v,i)=><span>{token('b'+i,v)}·y{sub(i+1)}</span>),' + '),'Эта сумма входит в цель двойственной задачи.');
     case 'Равенство оптимумов':return basic('Как подтвердить оптимальность обоих планов?','Возьмите допустимые оценки y и величины ресурсов b.','Умножьте оценки на соответствующие объёмы и прибавьте свободный член.',<>{join(data.D.c.map((v,i)=>'('+t(v)+') × ('+t(data.rec.duality.y[i])+')'),' + ')} + {t(data.D.c0||0)} = {ans}</>,'Прямая и двойственная цели совпали. Это подтверждает оптимальность.');
-    case 'Выбор начальной клетки':{const e=T.first.steps[0];return basic('На какой рейс назначить первый груз?','Строки — склады, столбцы — магазины.',T.init==='mc'?'Среди открытых маршрутов найдите самый низкий тариф.':'Начните с верхнего склада и самого левого открытого магазина.',<>Склад A{e.i+1} → магазин B{e.j+1}</>,'На следующем шаге сюда запишем количество ящиков.');}
-    case 'Оптимальность плана':{const free=T.delta.flatMap((r,i)=>r.flatMap((v,j)=>v!=null&&T.X[i][j]==null?[v]:[]));
-      return basic('Остался ли более дешёвый маршрут?','Проверьте допустимый план и оценки свободных клеток.','Для снижения затрат нужна отрицательная оценка.',free.length?'Оценки свободных клеток: '+free.map(t).join(', '):step.answer,'У всех свободных клеток оценки неотрицательны. Можно записать стоимость плана.');}
     case 'Равенства':{const row=data.rec.canon.state0.rows.find(r=>r.s!=='=');if(!row)break;return basic('Что добавить, чтобы обе стороны совпали?','Выберите строку со знаком неравенства.',row.s==='<='?'Прибавьте свободный остаток к использованному ресурсу.':'Вычтите излишек из выпуска.',<>Левая часть {row.s==='<='?'+ остаток':'− излишек'} = {t(row.b)}</>,'В системе справа остаётся то же число.');}
     case 'Замена переменной':return basic('Как считать только добавку к обязательному объёму?','Посмотрите на нижнюю границу переменной.', 'Отделите обязательную часть от добавки. Подставьте новую запись во все строки и цель.',math(step.canonStep.text),'После раскрытия скобок перенесите свободные числа вправо.');
     case 'Направление цели':return basic('Как переписать цель для минимизации?','Прочитайте направление исходной цели.','При переходе от максимума к минимуму меняют знак каждого коэффициента и свободного члена.',step.answer,'В последней строке записи прочитайте новое направление цели.',end);
@@ -165,9 +144,13 @@ function story(step,data){
 
 // Keep the preceding calculation visible while its values move into the next one.
 export function WorkedStep({step,data}){
+  if(data.T && (step.freightLeg!=null || step.freightIteration!=null || ['Баланс перевозок','Выбор начальной клетки','Оптимальность плана'].includes(step.title)))return <FreightWalk model={data.T} step={step}/>;
+  return <GeneralWalk step={step} data={data}/>;
+}
+function GeneralWalk({step,data}){
   const {title,frames}=story(step,data);
   const [frame,setFrame]=useState(0),[playing,setPlaying]=useState(false);
-  const host=useRef(null),extra=useRef(null);
+  const host=useRef(null);
   function select(i){setPlaying(false);setFrame(i);}
   useEffect(()=>{
     if(!playing)return;
@@ -192,9 +175,6 @@ export function WorkedStep({step,data}){
     }
     return ()=>clean.forEach(stop=>stop());
   },[frame]);
-  useEffect(()=>{
-    if(frame===2&&extra.current&&(step.allocation||step.cycleTrace))LessonVisuals.transportTable(extra.current,step);
-  },[frame,step]);
   return <article className="worked-step" ref={host}><h4>{title}</h4>
     <div className="walk-rail" role="group" aria-label="Кадры действия">{['Исходные данные','Действие','Запись результата'].map((s,i)=><button key={s} aria-pressed={frame===i} onClick={()=>select(i)}>{i+1}. {s}</button>)}</div>
     <div className="walk-page" key={frame}>
@@ -203,7 +183,6 @@ export function WorkedStep({step,data}){
     </div>
     <div className="walk-controls">{frame<2?<button className="trial-primary" onClick={()=>select(frame+1)}>{frame===0?'Показать действие':'Показать результат'} →</button>:<button onClick={()=>select(0)}><RotateCcw size={15}/> Повторить</button>}
       <button onClick={()=>{if(playing)setPlaying(false);else{if(frame===2)setFrame(0);setPlaying(true);}}}>{playing?<Pause size={15}/>:<Play size={15}/>} {playing?'Пауза':'Проиграть'}</button></div>
-    {frame===2&&(step.allocation||step.cycleTrace)&&<div ref={extra}/>}
     {(step.pivotFrame||step.startingRow||step.slackRow||step.cutFrame)&&<details><summary>Посмотреть запись в полной системе или таблице</summary><div className="book-state" dangerouslySetInnerHTML={{__html:frame===2&&step.after?step.after:step.before}}/></details>}
   </article>;
 }
