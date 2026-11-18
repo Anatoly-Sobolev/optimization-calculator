@@ -1,3 +1,4 @@
+import {FreightPractice,FreightMethodMap} from './freight-practice.jsx';
 import {FreightReader} from './freight-walk.jsx';
 import {FreightInquiry} from './freight-inquiry.jsx';
 import {WorkedStep} from './worked-step.jsx';
@@ -173,13 +174,13 @@ function Answer({options,numeric,hint,assess,onSolved}) {
   </div>;
 }
 
-function Reflection({map,progress,save,next}) {
+function Reflection({map,freight,progress,save,next}) {
   const [draft,setDraft] = useState(progress.draft || '');
   const [compared,setCompared] = useState(Boolean(progress.compared));
   const [stored,setStored] = useState(true);
   return <div className="reflection">
     <p className="book-callout">{map.q.q}</p>
-    <details className="book-map"><summary>Посмотреть схему метода</summary><ol>{map.nodes.map(([name,description])=><li key={name}><strong>{name}</strong><p>{description}</p></li>)}</ol></details>
+    {freight?<FreightMethodMap {...freight}/>:<details className="book-map"><summary>Посмотреть схему метода</summary><ol>{map.nodes.map(([name,description])=><li key={name}><strong>{name}</strong><p>{description}</p></li>)}</ol></details>}
     <label htmlFor="book-reason">Ваше объяснение <small>по желанию</small></label>
     <TextArea id="book-reason" aria-describedby="draft-help" rows={3} value={draft} onChange={event=>{
       const value = event.target.value;
@@ -212,3 +213,5 @@ export const workedStep = (host,props) => mount(host,<WorkedStep {...props}/>);
 
 export const freightReader=(host,props)=>mount(host,<FreightReader {...props}/>);
 export const freightInquiry=(host,model)=>mount(host,<FreightInquiry model={model}/>);
+
+export const freightPractice=(host,props)=>mount(host,<FreightPractice {...props}/>);

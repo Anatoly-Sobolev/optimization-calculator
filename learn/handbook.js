@@ -120,7 +120,7 @@ const Handbook = (() => {
       const demos = [...document.querySelectorAll('#solution .demo, #solution .plotwrap')]
         .filter(node => !node.parentElement.closest('.demo, .plotwrap'));
       addStudyViews(demos.length ? showDemonstrations(demos) : null);
-    } else {
+    } else if(chapter.type!=='transp'||phase===2) {
       const drawer = document.createElement('details');
       drawer.className = 'practice-explorer';
       drawer.innerHTML = '<summary>Исследовать свой вариант</summary><div class="explorer-body"></div>';
@@ -262,8 +262,12 @@ const Handbook = (() => {
       return;
     }
     const s=steps[position], progress=stepState();
+    if(phase===3 && chapter.type==='transp'){
+      unmountAnswer=BookUI.freightPractice(host,{model:LEARN.sceneData.T,steps:LEARN.allStages,variant:current.v,progress:progress.freightPractice,save:state=>remember({freightPractice:state})});
+      return;
+    }
     if (phase === 1) {
-      BookUI.reflection(host,{map:LPROFILES.profileFor(chapter.type).map,progress,save:remember,next:url(chapter,2)});
+      BookUI.reflection(host,{map:LPROFILES.profileFor(chapter.type).map,freight:chapter.type==='transp'?{model:LEARN.sceneData.T,steps:LEARN.allStages}:null,progress,save:remember,next:url(chapter,2)});
       return;
     }
     const firstMissing = steps.findIndex(step => practiceStart[chapter.type]?.test(step.title));

@@ -524,3 +524,42 @@
 #book .film-playback{width:7.8em;justify-content:center;flex-shrink:0}
 .freight-inquiry .inquiry-heading{margin-bottom:.65rem}
 @media(max-width:500px){.freight-film .film-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;min-height:4.15rem}.freight-film .film-heading h3{font-size:1rem}.freight-position{font-size:.88rem}}
+
+.freight-map-lesson,.freight-practice{min-width:0;color:#1a3e34}
+.freight-map-line{display:flex;align-items:center;flex-wrap:wrap;gap:.35rem;margin:.6rem 0 .9rem}
+#book .freight-map-line button{display:inline-flex;align-items:center;gap:.35em;padding:.38em .62em;border:1px solid #b4cbb8;background:#f5f8f2;color:#254939;border-radius:.5rem}
+#book .freight-map-line button[aria-pressed=true]{background:#215e49;border-color:#215e49;color:white}
+.freight-exchange,.practice-choice-board{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(.7rem,1.6vw,1.3rem);align-items:start}
+.freight-exchange section{border-left:3px solid #629875;padding:.4rem .85rem;background:#f1f6ed}
+.freight-exchange p,.freight-practice p{max-width:72ch;line-height:1.4;margin:.35rem 0 .7rem}
+.freight-proof-cost{display:flex;align-items:baseline;justify-content:space-between;gap:.35rem;border-top:1px solid #c8dacd;padding:.35rem 0;font-variant-numeric:tabular-nums}
+.freight-practice .freight-brief{max-width:55rem}
+.practice-condition{margin:.3rem 0 .5rem}.practice-condition summary,.freight-result summary{cursor:pointer;color:#24593e}
+.practice-decisions{display:grid;align-content:start;gap:.4rem}
+#book .practice-decisions button{width:100%;text-align:left;border:1px solid #b5cbbc;border-radius:.45rem;background:#fafcf8;color:#1c4735;padding:.6em .75em}
+#book .practice-decisions button:hover{background:#e7f1e4}
+#book .practice-decisions button[aria-pressed=true],.practice-decisions [role=status]{background:#fff0da;color:#714d19}
+.practice-decisions [role=status],.freight-verdict{padding:.45rem .7rem;border-left:3px solid #a97c42}
+.freight-verdict{background:#edf6eb;border-color:#45855f;font-weight:650}
+.freight-practice h3{margin:.35rem 0 .65rem}
+.freight-practice>.book-primary,.freight-result details{margin:.6rem 0}
+.freight-history{padding-left:1.6rem;line-height:1.4}
+#book .freight-history button{border:0;border-bottom:1px solid #86a68e;background:transparent;padding:.2rem .05rem;color:#245a40}
+@media(prefers-reduced-motion:no-preference){.freight-exchange td[data-sign] .old-load,.freight-film td[data-sign] .old-load{animation:trial-step .6s ease-out}.freight-exchange .freight-proof-cost b{animation:trial-step .4s ease-out}}
+@media(max-width:800px){.freight-exchange,.practice-choice-board{grid-template-columns:minmax(0,1fr)}.freight-map-line{gap:.2rem}.freight-map-line>svg{width:10px}.freight-map-line button{font-size:.87rem}}
+
+.reflection:has(.freight-map-lesson){max-width:none}
+.reflection:has(.freight-map-lesson) :is(textarea,#draft-help,.book-callout){max-width:72ch}
+.exchange-receipt{display:grid;gap:.2rem;font-size:.88em;font-variant-numeric:tabular-nums;padding:.45rem 0}
+.freight-film [data-factor]{color:#1d583d}
+.practice-evidence{padding:.4rem .6rem;background:#edf5ea;border-left:2px solid #5b8b6a}
+
+.brief-dispatch{display:flex;align-items:center;gap:.7rem;margin:.5rem 0 1rem;flex-wrap:wrap}
+.brief-dispatch>div{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:0 .45rem;background:#eef4eb;color:#25543e;padding:.4rem .65rem;border-radius:.5rem}
+.brief-dispatch>div svg{grid-row:span 2}
+.brief-dispatch span{font-size:.8em}
+.freight-grid td[data-sign] span>small:not(.old-load){display:inline-grid;place-items:center;min-width:1.1em;height:1.1em;border-radius:100%;border:1px solid currentColor;font-size:.72em;vertical-align:middle;margin-right:.2em}
+.freight-charges{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:.35rem 1rem;list-style:none;margin:.5rem 0;padding:0}
+.freight-charges li{display:flex;align-items:baseline;justify-content:space-between;gap:.35rem;border-bottom:1px solid #d6e3d7;font-size:.9em}
+
+.freight-grid td[data-sign] .old-load{display:inline;font-size:.81em;font-weight:500;margin:0}

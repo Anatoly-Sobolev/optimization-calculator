@@ -50,7 +50,7 @@ function improvement(T,step,f){
         'У выбранного свободного маршрута вычитаем из тарифа потенциал склада и потенциал магазина. Так учитываем встречные изменения на других рейсах.',
         'Отрицательный результат показывает экономию за каждый ящик, который удастся перенести по замкнутой цепочке. Сколько ящиков доступно, проверим следующим шагом.'],
       sums:[<>Начинаем с u₁ = 0. Для {tag}: u{sub(i+1)} = {t(u)}, v{sub(j+1)} = {t(v)}.</>,
-        <>Δ = тариф − u − v = {t(c)} − ({t(u)}) − ({t(v)}) = {t(delta)}</>,t(delta.abs())+' ед. экономии за ящик'],
+        <>Δ = тариф − u − v = <b data-factor="c">{t(c)}</b> − (<b data-factor="u">{t(u)}</b>) − (<b data-factor="v">{t(v)}</b>) = <b data-factor="delta">{t(delta)}</b></>,t(delta.abs())+' ед. экономии за ящик'],
       detail:<details><summary>Откуда взялись потенциалы?</summary><ol>{s.pot.order.map((o,k)=>{
         if(o.start)return <li key={k}>Берём u₁ = 0 как точку отсчёта.</li>;
         const [a,b]=o.from,known=o.kind==='u'?s.pot.v[b]:s.pot.u[a];
@@ -77,7 +77,7 @@ function optimal(T,f){
     sums:[t(P.sb)+' ящ. для магазинов',s.delta.flat().filter(v=>v!=null).map(t).join(' · ')||'Свободных клеток нет',charges.map(l=>t(l.q)+' × '+t(l.c)).join(' + ')+' = '+t(T.cost)+' ед.'],
     grid:{P,values:f===1?s.delta:s.X,rows:P.a,cols:P.b,caption:f===1?'Оценки свободных клеток · единиц стоимости на ящик':'Итоговый план · ящики',rowLabel:'Запас',colLabel:'Заказ'}};
 }
-function CycleTrail({path,frame}){
+export function CycleTrail({path,frame}){
   const svg=useRef(null);
   useLayoutEffect(()=>{
     const layer=svg.current,table=layer?.parentElement.querySelector('.freight-grid');
@@ -115,10 +115,16 @@ export function FreightReader({model,steps,initial,onMove,finish}){
     <FreightWalk key={step.id} model={model} step={step}/>
   </section>;
 }
-function FreightWalk({model:T,step}){
+export function freightPage(T,step,f){
+  if(step.freightLeg!=null||step.title==='Выбор начальной клетки')return distribution(T,step,f);
+  if(step.freightIteration!=null)return improvement(T,step,f);
+  return step.title==='Баланс перевозок'?balance(T,f):optimal(T,f);
+}
+export function FreightWalk({model:T,step,onComplete,heading:Heading='h3'}){
   const [f,frame]=useState(()=>LU.reduced()?2:0),[paused,pause]=useState(false);
   const [visible,setVisible]=useState(false),host=useRef(null);
-  const page=step.freightLeg!=null||step.title==='Выбор начальной клетки'?distribution(T,step,f):step.freightIteration!=null?improvement(T,step,f):step.title==='Баланс перевозок'?balance(T,f):optimal(T,f);
+  const page=freightPage(T,step,f);
+  useEffect(()=>{if(f===2)onComplete?.(true);},[f,onComplete]);
   useEffect(()=>{
     const article=host.current;let onScreen=false;
     const sync=()=>setVisible(onScreen&&!document.hidden);
@@ -132,21 +138,43 @@ function FreightWalk({model:T,step}){
     return ()=>clearTimeout(timer);
   },[f,paused,visible]);
   useLayoutEffect(()=>{
-    if(f===0||page.quantity==null||LU.reduced())return;
-    const root=host.current,from=root.querySelector(f===1?'[data-source="'+page.source+'"]':'[data-cue="1"] [data-payload]'),to=root.querySelector(f===1?'[data-cue="1"] [data-payload]':'[data-write]');
-    if(!from||!to)return;
-    const start=from.getBoundingClientRect(),end=to.getBoundingClientRect();
-    const chip=document.createElement('span');chip.className='freight-moving-number';chip.setAttribute('aria-hidden','true');chip.textContent=t(page.quantity);
-    root.append(chip);const rect=root.getBoundingClientRect();
-    chip.style.left=(end.left+end.width/2-rect.left)+'px';chip.style.top=(end.top+end.height/2-rect.top)+'px';
-    const motion=chip.animate([{transform:'translate(-50%,-50%) translate('+(start.left+start.width/2-end.left-end.width/2)+'px,'+(start.top+start.height/2-end.top-end.height/2)+'px)'},{transform:'translate(-50%,-50%)'}],{duration:720,easing:'ease-in-out'});
-    motion.onfinish=()=>chip.remove();return ()=>{motion.cancel();chip.remove();};
-  },[step,f]);
+    if(f===0||LU.reduced())return;
+    const root=host.current,active=root.querySelector('td[data-selected=true]'),clean=[];
+    const find=selector=>root.querySelector(selector);
+    function carry(value,from,to){
+      if(!from||!to)return;
+      const start=from.getBoundingClientRect(),end=to.getBoundingClientRect(),rect=root.getBoundingClientRect();
+      const chip=document.createElement('span');chip.className='freight-moving-number';chip.setAttribute('aria-hidden','true');chip.textContent=t(value);
+      root.append(chip);
+      chip.style.left=(end.left+end.width/2-rect.left)+'px';chip.style.top=(end.top+end.height/2-rect.top)+'px';
+      const dx=start.left+start.width/2-end.left-end.width/2,dy=start.top+start.height/2-end.top-end.height/2;
+      const motion=chip.animate([{transform:'translate(-50%,-50%) translate('+dx+'px,'+dy+'px)'},{transform:'translate(-50%,-50%)'}],{duration:800,easing:'ease-in-out'});
+      motion.onfinish=()=>chip.remove();clean.push(()=>{motion.cancel();chip.remove();});
+    }
+    if(page.quantity!=null){
+      const formula=find('[data-cue="1"] [data-payload]');
+      carry(page.quantity,f===1?find('[data-source="'+page.source+'"]'):formula,f===1?formula:find('[data-write]'));
+    }else if(step.potential){
+      const [c,u,v]=step.potential;
+      if(f===1){
+        carry(c,active,find('[data-factor="c"]'));
+        carry(u,find('[data-source="stock"]'),find('[data-factor="u"]'));
+        carry(v,find('[data-source="order"]'),find('[data-factor="v"]'));
+      }else carry(c.sub(u).sub(v),find('[data-factor="delta"]'),active);
+    }else if(step.cycleTrace&&f===2){
+      const it=T.iters[step.freightIteration],table=find('.freight-grid');
+      if(it.theta.s>0)for(const cell of it.cyc.filter(c=>c.sign==='+')){
+        const other=it.cyc.find(c=>c.i===cell.i&&c.sign!=='+'),row=table.tBodies[0].rows[cell.i];
+        carry(it.theta,row.cells[other.j+1],row.cells[cell.j+1]);
+      }
+    }
+    return ()=>clean.forEach(stop=>stop());
+  },[step,f,T]);
   function playback(){
     if(f===2){frame(0);pause(false);}else pause(!paused);
   }
   return <article className="freight-walk worked-step freight-film" ref={host} data-frame={f}>
-    <div className="film-heading"><h3>{page.title}</h3><button type="button" className="film-playback" onClick={playback}>{f===2?<RotateCcw size={15}/>:paused?<Play size={15}/>:<Pause size={15}/>} {f===2?'Повторить':paused?'Продолжить':'Пауза'}</button></div>
+    <div className="film-heading"><Heading>{page.title}</Heading><button type="button" className="film-playback" onClick={playback}>{f===2?<RotateCcw size={15}/>:paused?<Play size={15}/>:<Pause size={15}/>} {f===2?'Повторить':paused?'Продолжить':'Пауза'}</button></div>
     {step.title==='Баланс перевозок'&&T.first&&<p className="freight-first-rule">Сначала проверим, хватит ли груза. Затем распределим его методом {T.init==='mc'?'минимальной стоимости':'северо-западного угла'}. В конце проверим, можно ли выполнить те же заказы дешевле.</p>}
     <div className="freight-lesson-board"><div className="freight-grid-wrap" data-locate={step.title==='Выбор начальной клетки'||step.freightLeg!=null}><FreightGrid {...page.grid}/>{page.grid.marks&&<CycleTrail path={page.grid.marks} frame={f}/>}</div>
       <div className="walk-current film-notes" aria-live="polite" aria-relevant="additions text">{page.labels.map((label,k)=><div key={label} className="film-cue" data-cue={k} data-shown={k<=f} data-current={f===k} aria-hidden={k>f}><strong>{label}</strong><p>{page.notes[k]}</p><div className="film-arithmetic">{page.sums[k]}</div></div>)}{page.detail}</div>
