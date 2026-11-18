@@ -1,4 +1,6 @@
 import React, {useRef, useState} from 'react';
+import {ArrowLeft,ChevronLeft,ChevronRight,ListVideo} from 'lucide-react';
+import './scene-shipment.jsx';
 import {createRoot} from 'react-dom/client';
 import {flushSync} from 'react-dom';
 import {Accordion} from '@heroui/react/accordion';
@@ -69,13 +71,14 @@ function Lesson({title,summary,source,variant,phases,active,lab,data}) {
     setReading(false);
     requestAnimationFrame(()=>back.current?.focus());
   }
-  return <><Mast lab={lab}/><main className="book-main">
-    <div className="lesson-intro"><Link href="index.html#contents">← Все задания</Link>
-      <div className="lesson-identity"><MethodMark type={data.type}/><p className="book-kicker">{source} · Вариант {variant}</p></div><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1>{active!==0&&<><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></>}
-    </div>
+  return <><Mast lab={lab}/><main className="book-main lesson-page">
+    <header className="lesson-intro"><MethodMark type={data.type}/><div>
+      <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1></div>
+      {active!==0&&<details className="lesson-brief"><summary>О задаче</summary><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></details>}
+    </header>
     {active===0&&<><div hidden={reading}><LessonIntro data={data} onOpen={openReading}/></div>
-      {reading&&<Button variant="ghost" onPress={openIntro}>← Вернуться к наглядному примеру</Button>}</>}
-    <div className="book-layout" hidden={!reading}><aside className="book-outline"><h2>Ход занятия</h2>
+      {reading&&<Button className="back-to-primer" variant="ghost" onPress={openIntro}><ArrowLeft size={16} aria-hidden="true"/>К наглядному примеру</Button>}</>}
+    <div className="book-layout" hidden={!reading}><aside className="book-outline"><label className="phase-picker">Этап занятия <select value={active} onChange={e=>{location.href=phases[Number(e.target.value)].href;}}>{phases.map(({name},i)=><option key={i} value={i}>{i+1}. {name}</option>)}</select></label><h2>Ход занятия</h2>
       <nav aria-label="Этапы занятия">{phases.map(({name,href},i)=><Link key={href} href={href} aria-current={i===active?'step':undefined}><span>{i+1}</span>{name}</Link>)}</nav>
       <Link className="book-reference" href={lab}>Открыть лабораторию ↗</Link></aside>
       <section className="lesson-work"><div className="book-kicker">Этап {active+1} из {phases.length}</div><h2 tabIndex="-1" ref={heading}>{phases[active].name}</h2><div id="lesson-body"/></section>
@@ -98,16 +101,16 @@ function Gallery({titles,onSelect}) {
   </Button>);
   return <div className="scene-head">
     <div className="demo-toolbar"><h3 id="demo-heading">Разбор в движении</h3>
-      {titles.length>1 && <span className="demo-count">{active+1} из {titles.length}</span>}</div>
+      {titles.length>1 && <span className="demo-count">Анимация {active+1} из {titles.length}</span>}</div>
     {titles.length===1 ? <p className="scene-title">{titles[0]}</p> :
-      titles.length<=3 ? <div className="short-scenes" role="group" aria-label="Темы анимации">{choices}</div> :
+      titles.length<=3 ? <div className="short-scenes" role="group" aria-label="Анимации текущего задания">{choices}</div> :
       <><div className="scene-current"><p className="scene-title">{titles[active]}</p>
-        <Button ref={trigger} className="scene-switch" variant="secondary" aria-expanded={open} aria-controls="scene-index" onPress={()=>setOpen(!open)}>{open?'Свернуть темы':'Выбрать тему'}</Button></div>
-        <div id="scene-index" hidden={!open} className="scene-index" role="group" aria-label="Темы анимации" onKeyDown={e=>{
+        <Button ref={trigger} className="scene-switch" variant="secondary" aria-expanded={open} aria-controls="scene-index" onPress={()=>setOpen(!open)}><ListVideo size={17} aria-hidden="true"/>{open?'Скрыть список':'Список анимаций'}</Button></div>
+        <div id="scene-index" hidden={!open} className="scene-index" role="group" aria-label="Анимации текущего задания" onKeyDown={e=>{
           if(e.key==='Escape'){setOpen(false);trigger.current?.focus();}
         }}>{open && choices}</div>
-        <div className="scene-travel"><Button variant="ghost" isDisabled={active===0} aria-label="Предыдущая тема" onPress={()=>choose(active-1)}>← Назад</Button>
-          <Button variant="ghost" isDisabled={active===titles.length-1} aria-label="Следующая тема" onPress={()=>choose(active+1)}>Следующая тема →</Button></div></>}
+        <div className="scene-travel" role="group" aria-label="Переключить анимацию"><Button variant="ghost" isDisabled={active===0} aria-label="Предыдущая анимация" onPress={()=>choose(active-1)}><ChevronLeft size={18} aria-hidden="true"/></Button>
+          <Button variant="ghost" isDisabled={active===titles.length-1} aria-label="Следующая анимация" onPress={()=>choose(active+1)}><ChevronRight size={18} aria-hidden="true"/></Button></div></>}
   </div>;
 }
 

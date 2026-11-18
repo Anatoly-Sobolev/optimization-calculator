@@ -16,7 +16,7 @@ const {chromium} = require('playwright');
     }
     const view=page.locator('.demo-view:visible');
     async function choose(name) {
-      await page.getByRole('button',{name:'Выбрать тему'}).click();
+      await page.getByRole('button',{name:'Список анимаций'}).click();
       await page.locator('.scene-item').filter({hasText:name}).click();
     }
     async function end() {

@@ -153,7 +153,9 @@ const Handbook = (() => {
           const item = demo.querySelector(selector);
           if (item) options.append(item);
         }
-        controls.after(settings);
+        demo.append(settings);
+        const stage = demo.querySelector('.dmstage');
+        if (stage) stage.before(controls);
         demo.querySelector('.dm-prev').textContent = '← Кадр';
         demo.querySelector('.dm-next').textContent = 'Кадр →';
       }

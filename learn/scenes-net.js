@@ -24,17 +24,13 @@
   /* В таблицах решателя свободные клетки могут быть пустыми: приводим их к нулю. */
   const nx = X => X.map(row => row.map(v => v == null ? Z() : Q.of(v)));
   const planOf = r => { const X = r.X || (r.iters && r.iters.length ? r.iters[r.iters.length - 1].X : null); return X ? nx(X) : null; };
-  const nameA = (P, i) => i < (P.m0 ?? P.m) ? `A${i + 1}` : 'A (фикт.)', nameB = (P, j) => j < (P.n0 ?? P.n) ? `B${j + 1}` : 'B (фикт.)';
+  const nameA = (P, i) => i < (P.m0 ?? P.m) ? `A${i + 1}` : 'Недопоставка', nameB = (P, j) => j < (P.n0 ?? P.n) ? `B${j + 1}` : 'Резерв';
   const costOf = (P, X) => X.reduce((s, row, i) => row.reduce((t, v, j) => t.add(P.c[i][j].mul(v)), s), Z());
   const sumRow = (X, i) => X[i].reduce((s, v) => s.add(v), Z()), sumCol = (X, j) => X.reduce((s, row) => s.add(row[j]), Z());
-  function flowSvg(P, X, label) {
-    const m = P.m, n = P.n, W = 380, H = Math.max(m, n) * 52 + 24, mx = Math.max(1, ...X.flat().map(v => num(v)));
-    const ya = i => 34 + i * ((H - 68) / Math.max(m - 1, 1)), yb = j => 34 + j * ((H - 68) / Math.max(n - 1, 1));
-    let s = `<svg class="geo net" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}" focusable="false">`;
-    for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) { const v = num(X[i][j]); if (v <= 0) continue; const x1 = 96, x2 = W - 96, y1 = ya(i), y2 = yb(j), t = 0.32 + 0.36 * ((j + 0.5) / n); s += `<line class="flow-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${1.5 + 6 * v / mx}"/><text class="flow-val" x="${x1 + (x2 - x1) * t}" y="${y1 + (y2 - y1) * t - 5}" text-anchor="middle">${esc(txt(X[i][j]))}</text>`; }
-    for (let i = 0; i < m; i++) s += `<g class="flow-node"><rect x="6" y="${ya(i) - 15}" width="90" height="30" rx="6"/><text x="51" y="${ya(i) + 4}" text-anchor="middle">${esc(nameA(P, i))}: ${esc(txt(P.a[i]))}</text></g>`;
-    for (let j = 0; j < n; j++) s += `<g class="flow-node"><rect x="${W - 96}" y="${yb(j) - 15}" width="90" height="30" rx="6"/><text x="${W - 51}" y="${yb(j) + 4}" text-anchor="middle">${esc(nameB(P, j))}: ${esc(txt(P.b[j]))}</text></g>`;
-    return s + '</svg>';
+  function flowSvg(P, X, label, selected) {
+    const plan = {P:{m:P.m,n:P.n,m0:P.m0??P.m,n0:P.n0??P.n,a:P.a.map(num),b:P.b.map(num)},
+      matrix:X.map(row=>row.map(num)),selected};
+    return `<shipment-plan aria-label="${esc(label)}" data-plan="${esc(JSON.stringify(plan))}"></shipment-plan>`;
   }
   const planTable = (P, X, withSums) => `<div class="learn-scroll"><table class="sx"><thead><tr><th>План</th>${P.b.map((_, j) => `<th>${esc(nameB(P, j))}</th>`).join('')}<th>запас</th></tr></thead><tbody>${X.map((row, i) => `<tr><th scope="row">${esc(nameA(P, i))}</th>${row.map((v,j) => `<td tabindex="0" data-origin="В проверяемом плане задана поставка A${i+1} → B${j+1}: ${txt(v)}. Сумма строки даёт отгрузку склада, сумма столбца — поставку в магазин.">${f(v)}</td>`).join('')}<td tabindex="0" data-origin="Доступный запас склада из условия задачи.">${f(P.a[i])}</td></tr>`).join('')}<tr><th scope="row">спрос</th>${P.b.map(b => `<td tabindex="0" data-origin="Спрос пункта в сбалансированной задаче.">${f(b)}</td>`).join('')}<td></td></tr></tbody></table></div>`;
   const flowReady = inst => { const r = inst.data && inst.data.T; return !!(r && r.P && r.P.status !== 'infeasible' && planOf(r) && r.P.m * r.P.n <= 36); };
@@ -56,12 +52,12 @@
       if (task === 'build') {
         const ins = [...body.querySelectorAll('input')], svg = body.querySelector('.flow-svg');
         const read = () => { const M = P.a.map(() => P.b.map(() => Z())); ins.forEach(i => { let v; try { v = Q.parse(i.value || '0'); } catch (_) { v = Z(); } if (v.s < 0) v = Z(); M[+i.dataset.i][+i.dataset.j] = v; }); return M; };
-        const upd = () => {
+        const upd = event => {
           const M = read(); let ok = true;
           P.a.forEach((a, i) => { const s = sumRow(M, i), good = s.le(a); ok = ok && good; body.querySelector(`.flow-rs[data-i="${i}"]`).textContent = `${txt(s)} / ${txt(a)} ${good ? '✓' : '✗'}`; });
           P.b.forEach((b, j) => { const s = sumCol(M, j), good = s.ge(b); ok = ok && good; body.querySelector(`.flow-cs[data-j="${j}"]`).textContent = `${txt(s)} / ${txt(b)} ${good ? '✓' : '✗'}`; });
           const cost = costOf(P, M); body.querySelector('.flow-cost').textContent = 'стоимость ' + txt(cost);
-          svg.innerHTML = flowSvg(P, M, 'Перевозки между поставщиками и потребителями');
+          svg.innerHTML = flowSvg(P, M, 'Перевозки между поставщиками и потребителями', event ? [+event.target.dataset.i,+event.target.dataset.j] : undefined);
           const total = M.flat().some(v => v.s > 0);
           if (ok && total) api.pass(`<strong>Ваш план допустим.</strong> Стоимость ${LU.f(cost)}; решатель нашёл план стоимостью ${LU.f(r.cost)}${cost.gt(r.cost) ? ': есть план дешевле' : cost.eq(r.cost) ? ': вы нашли такой же по цене' : ''}.`);
           else api.say(ok ? 'Введите перевозки.' : 'Пока условия нарушены (метки ✗): не превышайте запасы и покройте спрос.');

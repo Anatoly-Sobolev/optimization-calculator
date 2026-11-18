@@ -3,14 +3,14 @@ import {ShipmentMap,partialPlan} from './shipment-map.jsx';
 import {ReadingDiagram} from './reading-diagram.jsx';
 import {CoordinateField} from './coordinate-field.jsx';
 import React,{useState} from 'react';
-import {Workshop,CutPieces,PayoffBalance,MethodMark} from './teaching-figures.jsx';
+import {Workshop,CutPieces,PayoffBalance,EqualObjectives,MethodMark} from './teaching-figures.jsx';
 import {Button} from '@heroui/react/button';
 
 const show = LU.txt, num = LU.num, vec = LU.vec;
 const x = j=>'x'+LU.sub(j+1), y = j=>'y'+LU.sub(j+1);
 const aim = p=>p.sense==='max'?'наибольшее':'наименьшее';
 const zero = ()=>Q.of(0);
-const frame = (title,copy,draw)=>({title,copy,draw});
+const frame = (title,copy,draw,aside)=>({title,copy,draw,aside});
 function expression(a,variable=x) {
   return a.reduce((s,c,j)=>{
     if (!c.s) return s;
@@ -63,10 +63,10 @@ function dualSimplex(d) {
     })
   ];
 }
-function DeliveryLedger({model,best}){
-  const [route,setRoute]=useState([0,0]),[i,j]=route;
+function DeliveryLedger({model,best,route,setRoute}){
+  const [i,j]=route;
   const matrix=best?model.X:model.X0,qty=matrix[i][j]||zero(),tariff=model.P.c[i][j];
-  return <><ShipmentMap P={model.P} matrix={matrix.map(row=>row.map(v=>v?num(v):0))} i={i} j={j} onSelect={setRoute}/><div className="reading-grid route-ledger"><table><caption>Перевозки по маршрутам, ящики</caption>
+  return <><div className="reading-grid route-ledger"><table><caption>Перевозки по маршрутам, ящики</caption>
     <thead><tr><th scope="col">Склад</th>{model.P.b.map((_,j)=><th key={j} scope="col">{j<model.P.n0?'B'+LU.sub(j+1):'Резерв'}</th>)}</tr></thead>
     <tbody>{matrix.map((row,i)=><tr key={i}><th scope="row">A{LU.sub(i+1)}</th>{row.map((q,j)=><td key={j}><button type="button" aria-label={'Склад '+(i+1)+', '+(j<model.P.n0?'магазин '+(j+1):'неиспользованный запас')} aria-pressed={i===route[0]&&j===route[1]} onClick={()=>setRoute([i,j])}>{show(q||zero())}</button></td>)}</tr>)}</tbody></table>
     <small>{j<model.P.n0?'Стоимость выбранного маршрута':'Затраты на перевозку резерва'} · {show(qty)} × {show(tariff)} = {show(qty.mul(tariff))}. Общие затраты складываются из стоимостей всех маршрутов.</small></div></>;
@@ -75,16 +75,16 @@ function transport(d,leg=0) {
   const t=d.T,s=t.first.steps[leg],P=t.P,shop=s.j<P.n0?'магазин '+(s.j+1):'резерв';
   const boxes=(n,set,{changeLeg})=><>
     <ShipmentMap P={P} matrix={partialPlan(t,leg,n)} i={s.i} j={s.j} fraction={num(s.x)?n/num(s.x):null}/>
-    <div className="shipment-legs"><button type="button" disabled={!leg} onClick={()=>changeLeg(leg-1)} aria-label="Предыдущая поставка">←</button>
+    <div className="shipment-inputs"><div className="shipment-legs"><button type="button" disabled={!leg} onClick={()=>changeLeg(leg-1)} aria-label="Предыдущая поставка">←</button>
       <label>Поставка <select value={leg} onChange={e=>changeLeg(+e.target.value)}>{t.first.steps.map((v,k)=><option key={k} value={k}>{k+1}. A{LU.sub(v.i+1)} → {v.j<P.n0?'B'+LU.sub(v.j+1):'резерв'}</option>)}</select></label>
       <button type="button" disabled={leg===t.first.steps.length-1} onClick={()=>changeLeg(leg+1)} aria-label="Следующая поставка">→</button></div>
-    <Dial key={leg} label={s.j>=P.n0?"Учтено в резерве":"Отправлено ящиков"} max={num(s.x)} value={n} change={set}/>
+    <Dial key={leg} label={s.j>=P.n0?"Учтено в резерве":"Отправлено ящиков"} max={num(s.x)} value={n} change={set}/></div>
     <Formula>{n} ящ. × {show(P.c[s.i][s.j])} за ящик = {show(P.c[s.i][s.j].mul(n))} ед. затрат</Formula>
     <small>{!num(s.x)?'Это нулевая базисная клетка: запас или заказ уже исчерпан. Груз по этому маршруту не едет. ':''}При выборе поставки все предыдущие уже учтены полностью.</small></>;
   return [
     frame('Откуда и куда везти груз','Слева показаны все склады варианта, справа — получатели. В этом варианте складов '+P.m0+', магазинов '+P.n0+'. '+(P.fict==='col'?'Резерв обозначает неиспользованный запас. ':'')+'Общий запас равен '+show(P.sa)+', общий заказ — '+show(P.sb)+'. Передвиньте ползунок и проследите, на каком складе убывает груз и чей заказ закрывается. Затем выберите следующую поставку.',boxes),
     frame('Как заполняется одна клетка',s.j>=P.n0?'Заказы магазинов закрыты. В последнем столбце учитываем '+show(s.x)+' лишних ящ. Они остаются на складе A'+LU.sub(s.i+1)+'.':'Выбран склад '+(s.i+1)+' и '+shop+'. Перед этим рейсом на складе '+show(s.a0)+' ящ., получателю требуется '+show(s.b0)+'. В клетку на пересечении строки склада и столбца получателя можно записать до '+show(s.x)+' ящ. Переключайте поставки, чтобы собрать весь начальный план.',boxes),
-    frame('Почему одного плана мало','Даже если все заказы закрыты, маршруты могут быть дорогими. Метод меняет поставки между маршрутами, сохраняя суммы по складам и магазинам. Выберите первый или лучший план. Нажмите на линию или клетку: число ящиков умножается на тариф этого маршрута.',(n,set)=><><DeliveryLedger model={t} best={n===1}/><Gauge label="Общие затраты" value={n?t.cost:t.cost0} extent={num(t.cost0)} caption={'Экономия после перераспределения · '+show(t.cost0.sub(t.cost))}/><Choices labels={['Первый план','Лучший план']} selected={n} change={set}/></>)
+    frame('Почему одного плана мало','Даже если все заказы закрыты, маршруты могут быть дорогими. Метод меняет поставки между маршрутами, сохраняя суммы по складам и магазинам. Выберите первый или лучший план. Нажмите на линию или клетку: число ящиков умножается на тариф этого маршрута.',(n,set,{route,setRoute})=><><ShipmentMap P={P} matrix={(n?t.X:t.X0).map(row=>row.map(v=>v?num(v):0))} i={route[0]} j={route[1]} onSelect={setRoute}/><Gauge label="Общие затраты" value={n?t.cost:t.cost0} extent={num(t.cost0)} caption={'Экономия после перераспределения · '+show(t.cost0.sub(t.cost))}/><Choices labels={['Первый план','Лучший план']} selected={n} change={set}/></>,(n,{route,setRoute})=><DeliveryLedger model={t} best={n===1} route={route} setRoute={setRoute}/>)
   ];
 }
 function PlanMap({d,index,choose,picked,setPicked}) {
@@ -104,7 +104,7 @@ function PlanMap({d,index,choose,picked,setPicked}) {
     <path d={'M'+sx(0)+' '+sy(point[1])+'H'+sx(point[0])+'V'+sy(0)} fill="none" stroke="#664b35" strokeDasharray="3 3"/>
     <circle data-plan-point="" cx={sx(point[0])} cy={sy(point[1])} r="6" stroke="white" strokeWidth="2" fill={valid?'#235e44':'#a44626'}/>
     </>}</CoordinateField><Choices labels={vertices.map(v=>vec(v.p))} selected={picked?-1:index} change={i=>{setPicked(null);choose(i);}}/>
-    <RowChecks model={d.P} plan={point}/><Formula>{vec(point)} · {valid?'План допустим':negative?'Количество должно быть неотрицательным':'Нарушено условие'}</Formula><small>Значение цели в этой точке · {show(LSCENE.objValue(d.P,point))}</small></>;
+    <Formula>{vec(point)} · {valid?'План допустим':negative?'Количество должно быть неотрицательным':'Нарушено условие'}</Formula><small>Значение цели в этой точке · {show(LSCENE.objValue(d.P,point))}</small></>;
 }
 function graph(d) {
   const vs=d.rec.graph.verts,best=vs.findIndex(v=>v.f.eq(d.f));
@@ -113,7 +113,7 @@ function graph(d) {
     frame('Каждая точка — один план','По горизонтали откладываем первое количество x₁, по вертикали — второе x₂. Каждая цветная полуплоскость показывает, где выполнено одно условие. Зелёный многоугольник — их общая допустимая область. Перетащите точку внутрь фигуры и за её границу. Кнопки под графиком ставят точку точно в угол.',diagram),
     frame('Как сравнить два плана','Цель задаёт число для каждой точки. Подставляем обе координаты в выражение '+expression(d.P.c)+'. Среди допустимых планов ищем '+aim(d.P)+' значение.',diagram),
     frame('Где достигается лучшее значение','У линейной цели на этом многоугольнике достаточно сравнить углы. На рисунке выбран один из лучших планов. Переключитесь на соседний и сравните значения.',diagram)
-  ].map((f,i)=>({...f,start:i===2?best:i===1&&vs.length>1?1:0}));
+  ].map((f,i)=>({...f,aside:(n,{picked})=><RowChecks model={d.P} plan={picked??vs[n].p}/>,start:i===2?best:i===1&&vs.length>1?1:0}));
 }
 function simplex(d) {
   const p=d.P,snaps=d.rec.lp.phase2.steps;
@@ -150,7 +150,7 @@ function dual(d) {
           return <td key={l}><button type="button" aria-label={(transposed?'Вторая':'Исходная')+', строка '+(k+1)+', столбец '+(l+1)+', число '+show(v)} aria-pressed={i===sourceRow&&j===sourceCol} onClick={()=>set(sourceRow*p.c.length+sourceCol)}>{show(v)}</button></td>;
         })}</tr>)}</tbody></table></div>;
     }
-    return <><div className="primer-transpose">{matrix(p.rows,false)}{matrix(dual.rows,true)}</div>
+    return <><div className="primer-transpose">{matrix(p.rows,false)}<span className="transpose-turn" aria-hidden="true">↱</span>{matrix(dual.rows,true)}</div>
       <div className="primer-pair"><span>Строка {i+1} ↔ {y(i)}</span><span>{x(j)} ↔ условие {j+1}</span></div>
       <Formula>{show(p.rows[i].a[j])} × {x(j)} <span aria-hidden="true"> ⇄ </span> {show(dual.rows[j].a[i])} × {y(i)}</Formula>
       <small>Из строки {i+1} исходной задачи</small><Formula>{expression(p.rows[i].a)} {R.sg(p.rows[i].s)} {show(p.rows[i].b)}</Formula>
@@ -159,7 +159,7 @@ function dual(d) {
   const prices=d.rec.duality;
   return [frame('Два взгляда на один план','Одну и ту же задачу можно читать двумя способами. В первой записи x — количества, а каждая строка задаёт условие. Во второй записи у каждого условия появляется своя оценка y. Сначала проследим одно число: выберите его в первой схеме и найдите выделенную ячейку во второй.',board),
     frame('Как строка превращается в столбец','Первую строку исходной схемы ставим первым столбцом второй. Вторая строка станет вторым столбцом. Так число сохраняет свою роль: оно связывает то же количество x с оценкой того же условия y.',board),
-    prices?.equal?frame('Как две оценки подтверждают ответ','Лучшая оценка сверху совпала со значением исходного плана. Между ними уже нет промежутка для улучшения.',()=><><Points names={['Исходная цель','Двойственная цель']} values={[prices.L,prices.g]}/><Formula>Оценки условий · {vec(prices.y)}</Formula></>):
+    prices?.equal?frame('Как две оценки подтверждают ответ','Лучшая оценка сверху совпала со значением исходного плана. Между ними уже нет промежутка для улучшения.',()=><><EqualObjectives left={prices.L} right={prices.g}/><Formula>Оценки условий · {vec(prices.y)}</Formula></>):
     frame('Из чего складывается новая цель','Правая часть каждого исходного условия умножается на его оценку. Получается выражение ниже. Построение завершается, когда записаны новая цель, условия и разрешённые знаки переменных.',()=><><Points names={dual.c.map((_,i)=>'Вес '+y(i))} values={dual.c}/><Formula>{expression(dual.c,y)} → {dual.sense==='min'?'минимум':'максимум'}</Formula></>)];
 }
 function canonical(d) {
@@ -200,9 +200,10 @@ function network(d) {
         <circle cx="34" cy={top} r="15" fill="#fdfaf0" stroke={col} strokeWidth="2"/><text x="34" y={top+4} textAnchor="middle">{a.i}</text>
         <rect x="77" y={top-11} width="45" height="19" rx="6" fill="#fffdf7" stroke={col}/><text x="99" y={top+3} textAnchor="middle">{show(a.d)}</text></g>;})}
       <circle cx="257" cy={end} r="19" fill="#21664c"/><text x="257" y={end+4} textAnchor="middle" style={{fill:'white'}}>{merge.e}</text></svg>
-      <Choices labels={merge.inc.map(({a})=>'Работа '+a.i+' → '+a.j)} selected={n} change={set}/><Formula>{show(branch.v.sub(arc.d))} + {show(arc.d)} = {show(branch.v)}</Formula><small>Начало выбранной работы + длительность = время её завершения.</small><WorkSchedule net={net} selected={arc}/></>;};
-  return [frame('Почему работы приходится ждать','Представьте сборку: начать следующий этап можно, только когда готовы все детали. Круг на схеме — момент готовности, стрелка — работа между двумя такими моментами. На стрелке указана её длительность.',draw),
-    frame('Почему берём более поздний срок','В событие '+merge.e+' ведут несколько работ. Завершения одной недостаточно: нужно дождаться остальных. По очереди выберите входящие стрелки. Самая поздняя готова к моменту '+show(merge.val)+'.',draw),
+      <Choices labels={merge.inc.map(({a})=>'Работа '+a.i+' → '+a.j)} selected={n} change={set}/><Formula>{show(branch.v.sub(arc.d))} + {show(arc.d)} = {show(branch.v)}</Formula><small>Начало выбранной работы + длительность = время её завершения.</small></>;};
+  const schedule=n=><WorkSchedule net={net} selected={merge.inc[n].a}/>;
+  return [frame('Почему работы приходится ждать','Представьте сборку: начать следующий этап можно, только когда готовы все детали. Круг на схеме — момент готовности, стрелка — работа между двумя такими моментами. На стрелке указана её длительность.',draw,schedule),
+    frame('Почему берём более поздний срок','В событие '+merge.e+' ведут несколько работ. Завершения одной недостаточно: нужно дождаться остальных. По очереди выберите входящие стрелки. Самая поздняя готова к моменту '+show(merge.val)+'.',draw,schedule),
     frame('Какие работы определяют срок','У выделенной цепочки нет запаса времени. Задержка любой её работы задержит весь проект. Сумма длительностей на этом критическом пути равна сроку проекта.',()=><><WorkSchedule net={net} critical/><div className="primer-chain">{path.map(a=><span key={a.i+'-'+a.j}>{a.i} → {a.j}<b>{show(a.d)}</b></span>)}</div><Formula>{path.map(a=>show(a.d)).join(' + ')} = {show(net.T)}</Formula></>)];
 }
 function game(d) {
@@ -242,13 +243,15 @@ export function LessonIntro({data,onOpen}) {
   function choose(v){setValues(prev=>({...prev,[page]:v}));}
   const [legs,setLegs]=useState({}),leg=legs[page]??0;
   function changeLeg(next){setLegs(prev=>({...prev,[page]:next}));choose(0);}
+  const [route,setRoute]=useState([0,0]);
+  const tools={picked,setPicked,changeLeg,route,setRoute};
   const frames=stories[data.type](data,leg), current=frames[page], n=values[page]??current.start??0;
-  return <section className="lesson-primer" aria-label="Знакомство с вариантом">
+  return <section className="lesson-primer" data-part={page} aria-label="Знакомство с вариантом">
     <div className="primer-pages" role="group" aria-label="Части наглядного примера">{parts.map((p,i)=><button type="button" key={p} aria-current={page===i?'step':undefined} onClick={()=>openPage(i)}><MethodMark type={['brief',data.type,'optcheck'][i]}/>{i+1}. {p}</button>)}</div>
-    <div className={'primer-spread'+(page===1?' with-reading':'')}><div className="primer-copy"><h2>{current.title}</h2><p>{current.copy}</p>
+    <div className={'primer-spread'+(page===1?' with-reading':'')}><div className="primer-copy"><h2>{current.title}</h2>{page===1?<details className="primer-explanation"><summary>Пояснение к схеме</summary><p>{current.copy}</p></details>:<p>{current.copy}</p>}
       {page===0&&<IntroLegend data={data}/>}
-      {page===1&&<ReadingDiagram key={leg} leg={leg} data={data} value={n} choose={choose} point={picked}/>}</div>
-    <div className="primer-art" key={page}>{current.draw(n,choose,{picked,setPicked,changeLeg})}</div></div>
+      {page===1&&<ReadingDiagram key={leg} leg={leg} data={data} value={n} choose={choose} point={picked}/>}{current.aside&&(page===1?<details className="primer-explanation extra-model"><summary>{data.type==='netw'?'Сроки всех работ':'Проверка каждого условия'}</summary>{current.aside(n,tools)}</details>:current.aside(n,tools))}</div>
+    <div className="primer-art" key={page}>{current.draw(n,choose,tools)}</div></div>
     <div className="primer-nav">{page>0&&<Button variant="ghost" onPress={()=>openPage(page-1)}>← Назад</Button>}
     <Button className="primer-next" onPress={()=>page<2?openPage(page+1):onOpen()}>{['Как читать схему →','Посмотреть результат →','Открыть пошаговое решение →'][page]}</Button>
     {page<2&&<Button variant="ghost" onPress={onOpen}>Сразу к решению</Button>}</div></section>;
