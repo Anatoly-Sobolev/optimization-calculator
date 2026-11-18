@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
 import {ArrowRight} from 'lucide-react';
+import {DeliveryTown,makeTown} from './delivery-town.jsx';
 import {LessonArt} from './lesson-art.jsx';
 import {lessonContext} from './lesson-context.jsx';
 
@@ -18,13 +19,14 @@ function Measure({label,value,unit,limit,max,min=0}){
 function example(d,index){
   const t=d.type;
   if(t==='transp'){
-    const {P}=d.T,a=LU.num(P.a[0]),b=LU.num(P.b[0]),cap=Math.min(a,b),rate=P.c[0][0];
+    const {P}=d.T,a=LU.num(P.a[0]),b=LU.num(P.b[0]),cap=Math.min(a,b),town=makeTown(P.m0,P.n0),rate=town.km[0][0];
+    const supply=P.a.slice(0,P.m0).map(LU.num),demand=P.b.slice(0,P.n0).map(LU.num);
     const choices=options([0,1,cap],'ящ.'),q=choices[index][0];
-    return {title:'Как развезти ящики дешевле?',story:`На складах ${fmt(P.sa)} ящ., а магазины ждут ${fmt(P.sb)}. Один и тот же магазин можно снабжать с разных складов. В таблице одна клетка — один маршрут, тариф в ней — цена перевозки одного ящика.`,
+    return {title:'Как развезти ящики дешевле?',story:`На складах ${fmt(P.sa)} ящ., а магазины ждут ${fmt(P.sb)}. Один магазин может получить ящики с нескольких складов. Вы выбираете, какой склад его снабдит и сколько ящиков поедет. Каждый километр пути одного ящика стоит 1 ед. В симуляторе можно также выбрать тарифы из задания.`,
       goal:'Назначьте груз каждой машине. Все магазины должны получить свой заказ, а сумма затрат по рейсам должна быть наименьшей.',
       caption:'Рейс склада A₁ в магазин B₁',prompt:'Сколько ящиков загрузить?',choices,
-      visual:<LessonArt scene="transport" left={'На складе · '+(a-q)} right={'Магазину нужно ещё · '+(b-q)} changed={q>0} shipment={q}/>,
-      result:`Из ${a} ящ. со склада отправлено ${q}. По тарифу варианта этот рейс стоит ${q} × ${fmt(rate)} = ${fmt(rate.mul(q))} ед.`};
+      visual:<div className="opening-town"><DeliveryTown town={town} supply={supply} demand={demand} stock={supply.map((v,i)=>v-(i===0?q:0))} need={demand.map((v,j)=>v-(j===0?q:0))} i={0} j={0} trips={[]} preview={q?{q,i:0,j:0}:null}/></div>,
+      result:`На складе A₁ остаётся ${a} − ${q} = ${a-q} ящ. Магазину B₁ ещё нужно ${b-q} ящ. Стоимость рейса: ${q} ящ. × ${rate} км × 1 = ${q*rate} ед.`};
   }
   if(t==='netw'){
     const a=d.N.arcs[0],days=LU.num(a.d),delay=index;

@@ -368,3 +368,49 @@
 .walk-cells small{font:600 12px system-ui,sans-serif;color:#4b6557}
 
 .linear-workbench .variable-control[data-invalid=true]{box-shadow:inset 3px 0 #a74428;background:#fff2eb}.sub-system .calc-heading small{white-space:normal;text-align:right}
+
+/* Transport desk: the street plan and load sheet use the same route selection. */
+.context-trial:has(.freight-sim){max-width:1380px;margin-inline:auto}
+.freight-sim{background:#fffcf6;padding:clamp(9px,1.3vw,18px)}
+#book .freight-header{align-items:center;padding-bottom:9px;border-bottom:1px solid #d8d7c5;margin-bottom:12px}
+.freight-header p{max-width:85ch}
+.freight-work{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(12px,1.8vw,24px)}
+.freight-geography .town-map{margin:0}
+.freight-geography .town-map>svg{display:block;height:auto;max-height:none;width:100%;border:1px solid #b8b7a1;border-radius:9px;background:#efe4cd}
+.town-map .town-stop text{paint-order:stroke;stroke:#fffdf2;stroke-width:1.5px}
+#book .freight-sheet table.dispatch-matrix{border-color:#c9d1be}
+#book table.dispatch-matrix tbody td{background:#fffef8}
+#book table.dispatch-matrix td[data-route=true]{background:#d5e5d9;box-shadow:inset 0 0 0 1.5px #377361}
+.freight-cell{display:flex;align-items:center;gap:1px}
+#book .freight-sheet table.dispatch-matrix input{flex:1;min-width:0;font:650 16px/1 system-ui,sans-serif;height:32px;border-color:transparent;background:transparent}
+#book .freight-sheet table.dispatch-matrix input[data-filled=true]{color:#24593f;background:#edf4e8}
+#book .freight-sheet table.dispatch-matrix input[aria-invalid=true]{background:#ffebe2}
+#book .freight-cell .cell-plus{height:26px;min-height:26px;width:24px;flex:none;padding:0;border:0;background:#edf1e6;border-radius:5px;color:#305f47}
+#book .freight-cell .cell-plus:enabled:hover{background:#285b46;color:white}
+#book .freight-cell .cell-plus:disabled{opacity:.32}
+.route-editor{padding:10px 12px;margin-top:9px;background:#f1f4e9;border-radius:8px;border:1px solid #cbd6c3}
+.editor-heading,.editor-quantity,.route-stepper,.editor-balance,.guide-top,.guide-top>div{display:flex;align-items:center;gap:7px}
+.editor-heading{color:#234b3f}.editor-heading>span{margin-left:auto}
+.editor-quantity{margin:7px 0;flex-wrap:wrap}.route-stepper output{font-weight:700;min-width:4.3em;text-align:center;font-variant-numeric:tabular-nums}
+#book .route-stepper button{width:31px;height:30px;min-height:30px;padding:0}
+#book .route-stepper button:last-child{background:#265b45;color:#fff}
+#book .take-limit{margin-left:auto;font-size:13px}
+.editor-balance{padding-top:7px;border-top:1px solid #cdd8c5;flex-wrap:wrap;justify-content:space-between}
+.editor-balance span{font-size:12px;color:#455d4b}.editor-balance b{color:#264d38;white-space:nowrap}
+.freight-guide{margin-top:8px}.guide-top{flex-wrap:wrap;justify-content:space-between;gap:3px 8px}
+.guide-top h4{margin:0;font:650 14px/1.3 system-ui,sans-serif}
+.guide-top>div{gap:2px}
+#book .guide-top button{padding:3px 6px;min-height:27px;font-size:12px;background:transparent;border-color:transparent}
+#book .guide-top button[aria-pressed=true]{background:#e4ecdb;border-color:#bbcdb7}
+.freight-guide-page{padding:6px 0 0;font-size:14px;color:#244d3e}
+.freight-guide-page p{font-size:13px;line-height:1.4;color:#496152;margin:2px 0}
+.freight-improvement p{margin:4px 0;font-size:14px}.freight-improvement summary{cursor:pointer;color:#245d45}
+.fleet-result .open-next-route{margin-top:5px}
+@media(prefers-reduced-motion:no-preference){.freight-guide-page{animation:trial-step .24s ease-out}}
+@media(max-width:760px){.freight-work{grid-template-columns:minmax(0,1fr)}#book .freight-header{display:flex;align-items:flex-start}.freight-header label{display:grid}#book .freight-header select{min-width:0;max-width:138px}}
+@media(max-width:540px){#book .freight-cell .cell-plus{width:20px;height:26px}.freight-sheet .freight-key{font-size:12px}.route-editor{padding:7px}.editor-balance{gap:3px 8px}.freight-guide-page p{margin-bottom:3px}}
+@media(max-width:430px){#book .freight-header{display:grid;gap:4px}.freight-header label{display:flex}#book .freight-header select{max-width:none}}
+
+.opening-town .town-map{margin:0}.opening-town .town-map>svg{display:block;width:100%;height:auto;border-radius:8px}
+.opening-town .town-map figcaption{font-size:12px;padding:0 0 3px}
+@media(max-width:540px){.editor-quantity{gap:5px}.editor-quantity .take-limit{margin-left:0}#book .route-stepper button{min-height:36px;min-width:36px}}

@@ -16,6 +16,18 @@ const {chromium}=require('playwright');
     const town=page.locator('.town-map');
     const cell=(i,j)=>page.getByRole('textbox',{name:'Склад '+(i+1)+', магазин '+(j+1),exact:true});
     const launch=page.locator('.launch-fleet'),result=page.locator('.fleet-result');
+    const add=page.getByRole('button',{name:'Добавить ящик: склад 1, магазин 1',exact:true});
+    await add.click();await add.click();
+    assert.equal(await cell(0,0).inputValue(),'2');
+    await click('Убрать ящик с выбранного рейса');assert.equal(await cell(0,0).inputValue(),'1');
+    await click('2. Груз');assert.match(await page.locator('.freight-guide-page').innerText(),/до 24 ящ/);
+    await click('3. Стоимость');assert.match(await page.locator('.freight-guide-page').innerText(),/1 ящ. × 5 ед. за ящик = 5 ед/);
+    await click('Взять максимум · 24');assert.ok(await add.isDisabled());
+    await click('Очистить');
+    await page.setViewportSize({width:360,height:740});
+    await add.click();assert.equal(await cell(0,0).inputValue(),'1');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.setViewportSize({width:1280,height:720});
     await town.getByRole('button',{name:/Склад 2,/}).press('Enter');
     await town.getByRole('button',{name:/Магазин 3,/}).click();
     assert.equal(await cell(1,2).getAttribute('data-active'),'true');
@@ -50,6 +62,17 @@ const {chromium}=require('playwright');
       await launch.click();
       assert.equal(await result.getAttribute('data-state'),won?'won':'result');
       assert.match(await result.innerText(),won?/план оптимален/:/план не оптимален/);
+      if(key==='first'){
+        const qty=()=>page.locator('.dispatch-matrix input').evaluateAll(xs=>xs.map(x=>x.value));
+        const before=await qty();
+        const cost=()=>page.locator('.freight-console dd').last().innerText().then(s=>Number(s.match(/\d+/)[0]));
+        const firstCost=await cost();
+        await page.locator('.freight-improvement summary').click();
+        await click('Испытать этот обмен');await launch.click();
+        assert.ok(await cost()<firstCost);
+        assert.match(await result.innerText(),/Все заказы выполнены/);
+        await click('Вернуть план');assert.deepEqual(await qty(),before);
+      }
       await click('Очистить');
     }
     await open('rgr.netw');

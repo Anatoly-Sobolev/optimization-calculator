@@ -30,7 +30,9 @@ const { chromium } = require('playwright');
           assert.ok(await trial.isVisible(),topic);
           const opening=trial.locator('.lesson-opening');
           assert.ok(await opening.isVisible(),topic);
-          await opening.locator('.lesson-art img').evaluate(image=>image.decode());
+          if(topic.includes('.transp')){
+            await opening.locator('.town-map image').evaluate(el=>{const img=new Image();img.src=el.getAttribute('href');return img.decode();});
+          }else await opening.locator('.lesson-art img').evaluate(image=>image.decode());
 
           assert.equal(await trial.locator('input:visible, .trial-challenge:visible').count(),0);
           assert.doesNotMatch(await opening.innerText(),/undefined|NaN|\[object Object\]/,topic);
