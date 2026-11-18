@@ -31,13 +31,46 @@ const Handbook = (() => {
   function mast() {
     return '<div class="book-mast"><a href="index.html" class="book-brand"><span aria-hidden="true">∑</span> Методы оптимизации</a><nav aria-label="Навигация пособия"><a href="index.html#contents">Оглавление</a><a href="' + lab() + '">Лаборатория ↗</a></nav></div>';
   }
+  // Start with the student's goal; show the choice of source only after the method.
+  const paths = [
+    ['transp','Доставить груз с наименьшими затратами','Транспортная задача'],
+    ['graph','Найти лучший план на чертеже','Графический метод'],
+    ['simplex','Найти лучший план по таблице','Симплекс-метод'],
+    ['canon','Подготовить ограничения к решению','Каноническая форма'],
+    ['artificial','Начать решение, когда базис не виден','Искусственный базис'],
+    ['dual duality','Построить двойственную задачу и оценить ресурсы','Двойственность'],
+    ['dsx dsimplex','Исправить недопустимый базисный план','Двойственный симплекс-метод'],
+    ['optcheck','Проверить предложенный план','Условия оптимальности'],
+    ['ilp gomory','Найти решение в целых числах','Целочисленное программирование'],
+    ['netw','Определить срок проекта и критические работы','Сетевое планирование'],
+    ['game','Выбрать стратегию против соперника','Матричные игры']
+  ];
+  function catalogue(section,topics) {
+    section.innerHTML='<h2>Какую задачу хотите решить?</h2><label class="catalog-search">Поиск по задаче или методу<input type="search" placeholder="Например, груз или симплекс"></label><div class="catalog-list"></div><p class="catalog-empty" role="status" hidden>Совпадений нет. Попробуйте другое слово.</p>';
+    const list=section.querySelector('.catalog-list');
+    for(const [types,goal,method] of paths){
+      const routes=topics.filter(t=>types.split(' ').includes(t.type));
+      if(!routes.length)continue;
+      const group=document.createElement('details');
+      group.innerHTML='<summary><span><strong>'+goal+'</strong><small>'+method+'</small></span></summary><div class="catalog-routes">'+routes.map(t=>'<a class="chapter-link" href="'+url(t)+'"><span>'+esc(t.title)+'</span><small>'+sourceName(t.src)+' →</small></a>').join('')+'</div>';
+      list.append(group);
+    }
+    section.querySelector('input').oninput=e=>{
+      const term=e.target.value.trim().toLocaleLowerCase('ru');
+      for(const group of list.children){
+        group.hidden=!group.textContent.toLocaleLowerCase('ru').includes(term);
+        group.open=Boolean(term)&&!group.hidden;
+      }
+      section.querySelector('.catalog-empty').hidden=Boolean(list.querySelector('details:not([hidden])'));
+    };
+  }
   function home(topics) {
-    const last = read('last');
-    const recent = topics.find(t => key(t) === last.topic);
-    book.innerHTML = mast() + '<main class="book-main"><div class="book-intro"><div><div class="book-kicker">ОмГТУ / Интерактивное пособие</div><h1>Методы<br><em>оптимизации</em></h1><p>Оптимизация начинается с выбора. Два склада могут выполнить один заказ разными способами. Какой план обойдётся дешевле? Попробуйте обменять маршруты в примере и проследите за ценой.</p><a class="book-cta" href="' + url(recent || topics.find(t => t.type === 'transp'),recent ? last.phase : 0) + '">' + (recent ? 'Продолжить занятие' : 'Перейти от примера к занятию') + ' →</a></div><div id="featured"></div></div><section id="contents"><h2>Оглавление</h2>' + ['rgr','zyk'].map(src => '<h3 class="book-source">' + sourceName(src) + '</h3><div class="chapter-grid">' + topics.filter(t => t.src === src).map(t => '<a class="chapter-link" href="' + url(t) + '"><strong>' + esc(t.title) + '</strong><span>→</span></a>').join('') + '</div>').join('') + '</section></main>';
+    const last=read('last'), recent=topics.find(t=>key(t)===last.topic);
+    const first=topics.find(t=>t.type==='transp');
+    book.innerHTML=mast()+'<main class="book-main"><div class="book-intro"><div><div class="book-kicker">ОмГТУ / Интерактивное пособие</div><h1>Методы<br><em>оптимизации</em></h1><p>Начните с доставки: измените один маршрут и посмотрите, как меняется цена всего заказа. Затем разберите этот выбор по шагам.</p><a class="book-cta" href="'+url(first)+'">Начать с доставки →</a><p><a href="#contents">Найти своё задание ↓</a></p>'+(recent?'<a href="'+url(recent,last.phase)+'">Продолжить: '+esc(recent.title)+' →</a>':'')+'</div><div id="featured"></div></div><section id="contents"></section></main>';
     LessonVisuals.cycleFigure(book.querySelector('#featured'));
-    book.querySelector('#contents').insertAdjacentHTML('afterbegin','<aside class="study-guide"><h2>Как пройти первое занятие</h2><ol><li>Откройте интересующую задачу. В начале главы разберите, кто принимает решение и что требуется получить.</li><li>Посмотрите готовый пример. Кнопка «Следующий переход» показывает одну операцию за раз.</li><li>Когда сможете объяснить выбор, дополните похожее решение и попробуйте новый вариант самостоятельно.</li></ol></aside>');
-    if (location.hash === '#contents') book.querySelector('#contents').scrollIntoView();
+    catalogue(book.querySelector('#contents'),topics);
+    if(location.hash==='#contents') book.querySelector('#contents').scrollIntoView();
   }
   function start() {
     const legacy = query.has('lab') || new URLSearchParams(location.hash.slice(1)).has('s') && !query.has('lesson');
