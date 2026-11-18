@@ -20,10 +20,11 @@ const LessonVisuals = (() => {
       <svg class="delivery-map freight-map" viewBox="0 0 366 192" role="img" aria-label="План перевозок">
         <g class="freight-label"><text x="41" y="15">СКЛАДЫ</text><text x="325" y="15">МАГАЗИНЫ</text></g>
         <g class="route-lines" fill="none">${paths.map(d=>'<path d="'+d+'"/>').join('')}</g>
+        <g fill="none" stroke="#d2edb5" stroke-width="1.8" aria-hidden="true">${[53,146,63,157].map(y=>`<path d="M277 ${y-3.4}l7 3.4-7 3.4"/>`).join('')}</g>
         <g class="route-values">${badges.map(([x,y],i)=>`<g transform="translate(${x} ${y})"><rect x="-26" y="-9" width="52" height="18" rx="9"/><text y="3.8" text-anchor="middle"><tspan class="route-load"></tspan><tspan> × ${routes[i][2]} ₽</tspan></text></g>`).join('')}</g>
         <g text-anchor="middle">${stop(41,55,warehouse,'Склад 1','6 ящиков')}${stop(41,149,warehouse,'Склад 2','3 ящика')}${stop(325,55,shop,'Парк','4 ящика')}${stop(325,149,shop,'Мир','5 ящиков')}</g>
       </svg>
-      <p class="freight-legend">На каждом маршруте число ящиков умножено на цену за ящик.</p>
+      <p class="freight-legend">Стрелки ведут от двух складов к двум магазинам. На каждом рейсе указаны число ящиков и цена за ящик.</p>
       <p class="delivery-total" aria-live="polite"></p><p class="cycle-caption"></p>
       <div class="cycle-control"><button type="button"></button><label>Обменов <input type="range" min="0" max="4" value="0"></label></div>
       <details><summary>Маршруты, тарифы и таблица</summary><table><caption>Цена за один ящик</caption>

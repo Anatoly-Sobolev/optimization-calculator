@@ -65,6 +65,34 @@ const { chromium } = require('playwright');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic+' overflows');
       }
     }
+    // Follow a split order across two depots, then account for the surplus locally.
+    await page.goto(topics.find(u=>u.includes('lesson=rgr.transp'))+'&part=scheme');
+    const map=page.locator('.shipment-network'),sheet=page.locator('.reading-diagram'),volume=page.locator('.primer-art input[type=range]');
+    assert.equal(await map.locator('[data-side=supply]').count(),4);
+    assert.equal(await map.locator('[data-side=demand]').count(),5);
+    await volume.press('End');
+    assert.equal(await sheet.locator('[data-flight=to]').innerText(),'24');
+    await page.getByRole('button',{name:'Следующая поставка'}).click();
+    assert.match(await map.locator('.shipment-receipt').innerText(),/24 из 35/);
+    await volume.press('End');
+    assert.match(await map.locator('.shipment-receipt').innerText(),/24 \(A₁\) \+ 11 \(A₂\) = 35 из 35/);
+    assert.equal(await sheet.locator('[data-flight=to]').innerText(),'11');
+    await page.locator('.shipment-legs select').selectOption('7');
+    await volume.press('End');
+    assert.equal(await map.locator('.shipment-vehicle').count(),0);
+    assert.match(await map.locator('[data-side=supply]').last().textContent(),/5 из 36/);
+    assert.match(await map.locator('.shipment-receipt').innerText(),/5 из 5/);
+    await page.locator('.primer-next').click();
+    await map.getByRole('button',{name:/Выбрать A2 → B1/}).press('Enter');
+    assert.match(await map.locator('figcaption').innerText(),/A₂ → B₁/);
+
+    await page.goto(topics.find(u=>u.includes('lesson=zyk.transp'))+'&part=scheme');
+    const legs=page.locator('.shipment-legs select');
+    await legs.selectOption('5');await volume.press('End');
+    await legs.selectOption('6');assert.ok(await volume.isDisabled());
+    await legs.selectOption('7');await volume.press('End');
+    assert.equal(await sheet.locator('[data-flight=to]').innerText(),'14');
+
     const dualSimplex = topics.find(topic=>topic.includes('lesson=rgr.dsx'));
     await page.goto(dualSimplex);
     const intro=page.locator('.lesson-primer');

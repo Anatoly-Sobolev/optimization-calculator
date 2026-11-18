@@ -1,3 +1,4 @@
+import {partialPlan} from './shipment-map.jsx';
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Pause,Play,RotateCcw} from 'lucide-react';
 
@@ -10,16 +11,19 @@ const text=v=>v?.text??txt(v);
 const add=values=>values.reduce((a,b)=>a.add(b),Q.of(0));
 
 // Each stop refers to the same numbers as the adjacent interactive example.
-function shipments(d,n){
-  const {P,first}=d.T, s=first.steps[0],i=s.i,j=s.j;
+function shipments(d,n,point,leg){
+  const {P,first}=d.T, s=first.steps[leg],i=s.i,j=s.j;
+  const previous=partialPlan(d.T,leg,0);
+  const stockBefore=P.a.map((v,k)=>LU.num(v)-previous[k].reduce((a,b)=>a+b,0));
+  const demandBefore=P.b.map((v,l)=>LU.num(v)-previous.reduce((sum,row)=>sum+row[l],0));
   const store=k=>'A'+sub(k+1),shop=k=>k>=P.n0?'Резерв':'B'+sub(k+1);
   return {title:'План перевозок, ящики',headers:['Склад',...P.b.map((_,k)=>k===j?mark(shop(k),1):shop(k)),'Запас'],
-    rows:[...P.a.map((stock,k)=>[k===i?mark(store(k),0):store(k),...P.b.map((_,l)=>k===i&&l===j?mark(n,2):'·'),k===i?mark(stock,0):stock]),
-      ['Заказ',...P.b.map((v,k)=>k===j?mark(v,1):v),'—']],
+    rows:[...P.a.map((stock,k)=>[k===i?mark(store(k),0):store(k),...P.b.map((_,l)=>k===i&&l===j?mark(n,2):(previous[k][l]??'·')),k===i?mark(stockBefore[k],0):stockBefore[k]]),
+      ['Нужно',...demandBefore.map((v,k)=>k===j?mark(v,1):v),'—']],
     stops:[
       ['Склад','Найдите строку склада '+(i+1)+'. Справа записан его запас до отправки.',store(i)+' → '+txt(s.a0)+' ящ.'],
-      ['Магазин','Найдите столбец магазина '+(j+1)+'. Внизу указан его заказ. Первую поставку ограничивает меньшее из двух чисел.','min('+txt(s.a0)+', '+txt(s.b0)+') = '+txt(s.x)],
-      ['Поставка','На пересечении стоит отправленное количество. Точки обозначают маршруты, которые ещё предстоит заполнить.',store(i)+' → '+shop(j)+' = '+n+' ящ.']],
+      [(j<P.n0?'Магазин':'Резерв'),j<P.n0?'Найдите столбец магазина '+(j+1)+'. Внизу указан остаток заказа перед рейсом. Поставку ограничивает меньшее из двух чисел.':'Последний столбец учитывает запас сверх заказов. Груз остаётся на складе.','min('+txt(s.a0)+', '+txt(s.b0)+') = '+txt(s.x)],
+      [(j<P.n0?'Поставка':'Остаток'),j>=P.n0?'Перенесите остаток в клетку резерва склада. Затраты на перевозку здесь нулевые.':'На пересечении стоит отправленное количество. Другие числа показывают предыдущие поставки. Точка означает, что по маршруту пока ничего не отправили.',store(i)+' → '+shop(j)+' = '+n+' ящ.']],
     // In a manual experiment the slider may take any intermediate value.
     preset:[0,0,LU.num(s.x)],travel:n===LU.num(s.x)?txt(s.x):undefined};
 }
@@ -103,10 +107,10 @@ function guarantees(d,n){
 const lessons={transp:shipments,graph:products,simplex:basis,artificial:basis,dsx:balances,dsimplex:balances,
   dual:transpose,duality:transpose,canon:canonical,ilp:cuts,gomory:cuts,optcheck:products,netw:deadlines,game:guarantees};
 
-export function ReadingDiagram({data,value,choose,point}){
+export function ReadingDiagram({data,value,choose,point,leg}){
   const [step,setStep]=useState(0),[playing,setPlaying]=useState(false);
   const root=useRef(null),overlay=useRef(null);
-  const scene=lessons[data.type](data,value,point),[,explain,formula]=scene.stops[step];
+  const scene=lessons[data.type](data,value,point,leg),[,explain,formula]=scene.stops[step];
   const last=scene.stops.length-1;
   function go(next){
     setStep(next);
@@ -154,7 +158,7 @@ export function ReadingDiagram({data,value,choose,point}){
     const Tag=tag;
     return <Tag key={index} scope={tag==='th'?'row':undefined} data-flight={flight} data-band={band||undefined} data-lit={lit(v,step)}>{text(v)}</Tag>;
   }
-  const transport=data.type==='transp',s=transport&&data.T.first.steps[0];
+  const transport=data.type==='transp',s=transport&&data.T.first.steps[leg];
   function port(row,col){
     if(transport){
       if(row===s.i&&col===s.j+1)return 'to';

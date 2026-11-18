@@ -3,16 +3,18 @@ import React from 'react';
 
 export function Workshop({count,capacity,rate}) {
   const available=Math.max(0,1-count*rate/capacity);
-  return <svg viewBox="0 0 300 90" className="teaching-art" role="img" aria-label={'Мастерская. Выпущено '+count+', осталось ресурса '+Math.max(0,capacity-count*rate)}>
+  return <svg viewBox="0 0 300 97" className="teaching-art" role="img" aria-label={'Мастерская. Выпущено '+count+', осталось ресурса '+Math.max(0,capacity-count*rate)}>
     <path d="M9 75H292" className="art-ground"/><path d="M21 73V37h43v8h23v20H61v8z" fill="#7b9d86"/>
     <path d="M32 38V19h14v19m10 8h25" stroke="#425e4d" fill="#c5d5bb" strokeWidth="3"/>
     <rect x="87" y="63" width="185" height="9" rx="4" fill="#53695d"/>
-    {Array.from({length:Math.min(count,10)},(_,i)=><path key={i} d={'M'+(90+i*16)+' 60v-12l5-3h7v15z'} fill="#c29458" stroke="#735c3b"/>)}
+    {Array.from({length:count},(_,i)=><path key={i} d={'M'+(90+i*Math.min(16,175/Math.max(1,count)))+' 60v-12l5-3h7v15z'} fill="#c29458" stroke="#735c3b"/>)}
     <rect x="117" y="19" width="153" height="9" rx="3" fill="#d5ded1"/><rect x="117" y="19" width={153*available} height="9" rx="3" fill="#588766"/>
+    <text x="117" y="14">Ресурс: осталось {LU.ru(Math.max(0,capacity-count*rate))} из {LU.ru(capacity)}</text>
+    <text x="88" y="90">Расход: {count} × {LU.ru(rate)} = {LU.ru(count*rate)}</text>
   </svg>;
 }
-export function CutPieces({amount}) {
-  const units=Math.max(1,Math.ceil(amount)), width=230/units;
+export function CutPieces({amount,units}) {
+  const width=230/Math.max(1,units);
   return <svg className="teaching-art" viewBox="0 0 300 58" role="img" aria-label={'Длина заготовки в целых деталях: '+LU.ru(amount)}>
     <path className="art-ground" d="M20 48H280"/>{Array.from({length:units},(_,i)=><g key={i}>
       <rect x={32+i*width} y="12" width={width-3} height="28" rx="3" fill="none" stroke="#869b88" strokeDasharray="4 2"/>
@@ -20,11 +22,10 @@ export function CutPieces({amount}) {
     </g>)}</svg>;
 }
 export function PayoffBalance({value,limit}) {
-  const y=36-22*value/Math.max(1,limit),z=72-y;
-  return <svg className="teaching-art" viewBox="0 0 300 82" role="img" aria-label={'Баланс выигрышей: выигрыш A равен '+LU.ru(value)}>
-    <path d="M133 69l17-35 17 35z" fill="#93a88b"/><path d={'M48 '+y+' L252 '+z} stroke="#536250" strokeWidth="4"/>
-    {[[57,y,'A'],[243,z,'B']].map(([a,b,n])=><g key={n}><circle cx={a} cy={b} r="12" fill={n==='A'?'#2b6651':'#a66d43'}/><text x={a} y={Number(b)+4} textAnchor="middle" style={{fill:'#fff'}}>{n}</text></g>)}
-    <path d="M28 71H272" className="art-ground"/></svg>;
+  const share=44*Math.abs(value)/Math.max(1,limit);
+  return <figure className="model-figure payoff-flow"><figcaption>Счёт после выбранных ходов</figcaption>
+    {['A','B'].map((who,i)=>{const score=i?-value:value;return <div key={who}><b>{who}</b><span className="payoff-axis"><i style={{left:(score<0?50-share:50)+'%',width:share+'%',background:score<0?'#aa6242':'#34765d'}}/></span><strong>{score>0?'+':''}{LU.ru(score)}</strong></div>;})}
+    <small>От нуля влево — потеря, вправо — выигрыш. Сумма двух результатов равна нулю.</small></figure>;
 }
 const symbols={
   transp:Truck,graph:ChartArea,simplex:Table2,canon:ListFilter,artificial:Layers,

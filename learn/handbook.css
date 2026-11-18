@@ -482,3 +482,53 @@ td[data-origin]:hover,td[data-origin]:focus-visible,td.origin-selected{outline:2
 .intro-key>div{display:flex;align-items:baseline;gap:9px}
 .intro-key dt{flex:none;color:#20553f;font:650 .95rem/1.35 system-ui,sans-serif}
 .intro-key dd{margin:0;color:#425d50;font:.93rem/1.4 system-ui,sans-serif}
+
+.shipment-network,.model-figure{margin:0;min-width:0;color:#244c3e}
+.shipment-network figcaption,.model-figure figcaption{font:650 .98rem/1.35 system-ui,sans-serif;margin:0 0 .55rem}
+.shipment-network figcaption{display:flex;align-items:baseline;justify-content:space-between;gap:.4rem;border-bottom:1px solid #b8ccbb;padding-bottom:.35rem}
+.shipment-network figcaption b{color:#196048;font-variant-numeric:tabular-nums}
+.primer-art .shipment-network>svg{width:100%;max-height:none}
+.shipment-stop>rect{fill:#fbfcf5;stroke:#bdcdbd}
+.shipment-stop.chosen>rect{fill:#e0efdf;stroke:#417a5f;stroke-width:1.6}
+.primer-art .shipment-stop text{font:11.5px system-ui,sans-serif;fill:#33594a}
+.primer-art .shipment-stop .stop-title{font-weight:700;fill:#234f3f}
+.primer-art .shipment-network .map-heading{font:600 10px system-ui,sans-serif}
+.current-leg{stroke:#167057;stroke-width:2.7}
+.fulfilled-leg{stroke:#7c9885;stroke-width:1.8}
+.possible-leg{stroke:#99afa1;stroke-width:1;stroke-dasharray:2 5}
+.shipment-vehicle{transition:transform .38s ease-in-out}
+.shipment-legs{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.shipment-legs label{display:flex;align-items:center;gap:7px;font:600 .94rem system-ui,sans-serif}
+.shipment-legs select{padding:6px;border:1px solid #aabfb0;background:#fffdf7;color:#244c3e;border-radius:6px;font:inherit}
+.shipment-legs button:disabled{opacity:.48}
+.model-figure{padding:12px;background:#fcfdf6;border:1px solid #d0ddcf;border-radius:9px}
+.model-figure ul{list-style:none;margin:0 0 6px;padding:0}
+.conditions li,.schedule li,.payoff-flow>div{display:grid;grid-template-columns:auto minmax(30px,1fr) auto;align-items:center;gap:8px;padding:3px 0;font:500 .82rem/1.35 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.conditions li[data-current]{font-weight:750}
+.condition-track,.parts-track,.payoff-axis,.schedule li>div{position:relative;background:#e7ece5;border-radius:3px;height:9px}
+.condition-track i,.condition-track b,.condition-track em,.payoff-axis i,.schedule li i{position:absolute;height:100%;top:0}
+.condition-track i{background:#bddac7}
+.condition-track em,.payoff-axis:after{width:2px;background:#425d50;height:15px;top:-3px}
+.condition-track b{width:9px;height:9px;border:1px solid white;border-radius:50%;transform:translateX(-50%);background:#1a614a}
+.condition-track b[data-ok=false]{background:#ab492a}
+.parts-track{display:flex;overflow:hidden;height:14px}
+.parts-track i{transition:width .28s}
+.parts-key{display:flex;flex-wrap:wrap;gap:6px 13px;margin-top:7px}
+.parts-key span{display:flex;align-items:center;gap:5px;font:.85rem system-ui,sans-serif}
+.parts-key i{width:9px;height:9px;border-radius:2px}
+.payoff-axis:after{content:'';position:absolute;left:50%}
+.payoff-axis i{transition:width .25s,left .25s}
+.payoff-flow strong{min-width:3em;text-align:right}
+.schedule li{grid-template-columns:4em minmax(30px,1fr) 4em}
+.schedule li>span:last-child{text-align:right}
+.schedule li i{border-radius:3px;background:#96ab9b}
+.schedule li[data-active] i{background:#245e47}
+.schedule li[data-active]{font-weight:750}
+
+.shipment-hit{stroke:transparent;stroke-width:12;pointer-events:stroke;cursor:pointer}
+.shipment-hit:hover,.shipment-hit:focus-visible{stroke:#37745d59;outline:none}
+.shipment-receipt{display:flex;flex-wrap:wrap;gap:3px 10px;padding:7px 0;margin:4px 0;border-block:1px solid #c6d7c5;font:.88rem/1.4 system-ui,sans-serif}
+
+.primer-meter[data-signed=false]::after{left:0}
+.meter-labels{display:flex;justify-content:space-between;font:.72rem/1 system-ui,sans-serif;color:#4a6554;margin-bottom:5px;font-variant-numeric:tabular-nums}
+@media(max-width:530px){.primer-art .shipment-stop text{font-size:13px}.primer-art .shipment-network .map-heading{font-size:11px}}
