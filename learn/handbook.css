@@ -286,3 +286,83 @@
   #book .sc-state .tblwrap table.sx :is(th,td) {padding:3px 2px;min-width:0;}
   #book .sc-state .vtag {white-space:normal;overflow-wrap:anywhere;max-width:5ch;}
 }
+
+/* Guided entry to each worked example. */
+#book .book-layout[hidden]{display:none}
+.lesson-intro:has(+ div > .lesson-primer){margin-bottom:12px}
+.lesson-primer{background:#fffef9;border:1px solid #c6d2c6;border-radius:20px;overflow:clip;margin:14px 0 32px}
+.primer-pages,.primer-nav,.primer-choices,.primer-pair,.primer-pieces,.primer-chain{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.primer-pages,.primer-nav{padding:14px clamp(14px,3vw,38px)}
+.primer-pages{border-bottom:1px solid #e0e6dc}
+.lesson-primer button{appearance:none;background:#fffef9;color:#234e40;border:1px solid #c7d5ca;border-radius:10px;box-shadow:none;font:600 .92rem/1.25 "Segoe UI",system-ui,sans-serif;min-height:40px;padding:8px 13px;cursor:pointer}
+.primer-pages button{border-color:transparent;border-radius:99px;color:#52655a}
+.primer-pages button[aria-current=step]{color:#154c38;background:#e3f0d8}
+.lesson-primer button:focus-visible{outline:3px solid #447652;outline-offset:2px}
+.lesson-primer button:hover{border-color:#779583}
+.primer-spread{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(20px,4vw,60px);align-items:center;padding:clamp(18px,3.2vw,44px)}
+.primer-copy h2{font:500 clamp(26px,3.4vw,44px)/1.08 Georgia,serif;letter-spacing:-.03em;color:#153d30;margin:0 0 .4em}
+.primer-copy p{font-size:clamp(16px,1.35vw,19px);line-height:1.55;margin:0;color:#344b40;max-width:45ch}
+.primer-art{min-width:0;display:grid;gap:14px;align-content:center;padding:clamp(14px,2.5vw,32px);border-radius:14px;background-color:#eef3e9;background-image:radial-gradient(#cadac8 .7px,transparent .9px);background-size:12px 12px;min-height:205px;color:#183c30}
+.primer-art svg{display:block;width:100%;max-height:230px;margin:auto}
+.primer-art svg text{fill:#294437;font:12px system-ui,sans-serif}
+.primer-axis{fill:none;stroke:#445c4e;stroke-width:1.4}
+.primer-art small{line-height:1.4;font-size:.86rem;color:#3a5648}
+.primer-formula{background:#fffef9;color:#224835;border-left:3px solid #729c65;border-radius:0 6px 6px 0;padding:8px 12px;font:550 clamp(16px,1.5vw,20px)/1.45 Cambria,Georgia,serif;overflow-wrap:anywhere}
+.primer-pieces{align-items:stretch}
+.primer-pieces>div,.primer-route>div{flex:1 1 54px;background:#fffef9;border:1px solid #cedacc;border-radius:9px;padding:8px;text-align:center;display:grid;justify-items:center;align-content:center}
+.primer-pieces strong,.primer-route strong,.primer-order-title strong,.primer-gauge strong{font:600 clamp(20px,2vw,28px)/1.1 Georgia,serif}
+.primer-gauge>div:first-child,.primer-order-title,.primer-dial>span{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.primer-meter{position:relative;height:11px;margin:8px 0;background:#d4ddcf;border-radius:5px}
+.primer-meter::after{content:'';position:absolute;left:50%;height:17px;top:-3px;border-left:2px solid #485c4a}
+.primer-meter i{position:absolute;height:100%;transition:width .25s,left .25s;border-radius:4px}
+.primer-dial{display:grid;gap:4px;font-size:.93rem}
+.primer-dial input{width:100%;accent-color:#22664b;min-height:28px;margin:0}
+.primer-nav{border-top:1px solid #e0e6dc}
+#book .primer-nav button{background:transparent;border:0;color:#305343}
+#book .primer-nav .primer-next,.primer-art button[aria-pressed=true]{background:#21563e;color:white;border-color:#21563e}
+.primer-art .primer-choices button{font-size:.88rem}
+.primer-order,.primer-crates{display:flex;flex-wrap:wrap;gap:5px}
+.primer-order i,.primer-crates i{position:relative;display:block;width:24px;height:23px;border:1.5px dashed #849780;border-radius:3px;background:#fffc;transition:background .28s}
+.primer-crates i{width:17px;height:16px}
+.primer-order .filled,.primer-crates .sent{border-style:solid;border-color:#426e45;background:linear-gradient(90deg,#91bd84 41%,#d6e8c4 42% 58%,#91bd84 59%)}
+.primer-route,.primer-events{display:flex;gap:8px;align-items:center;justify-content:space-around}
+.primer-road{font-size:2rem;color:#53785e}
+.cargo-truck{transition:transform .3s ease-out}
+.primer-plot{touch-action:none;cursor:crosshair}
+.primer-branches{display:grid;gap:8px}
+.primer-events{padding:6px;border-radius:7px;border:1px solid transparent}
+.primer-events.active{border-color:#729873;background:#fffef9}
+.primer-transpose{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.primer-transpose>div{min-width:0}
+.primer-transpose .primer-matrix{margin-top:5px}
+@media(max-width:530px){.primer-transpose{grid-template-columns:minmax(0,1fr)}}
+.primer-events b{border-radius:50%;background:#2d5d44;color:white;padding:10px;min-width:42px;text-align:center}
+.primer-events span{border-bottom:2px solid #577459;padding:0 4px 4px;position:relative;text-align:center}
+.primer-events span::after{position:absolute;content:'';right:-2px;bottom:-5px;border:4px solid transparent;border-left-color:#577459}
+.primer-chain span,.primer-pair span{padding:7px 10px;background:#fffdf6;border:1px solid #cbd7c9;border-radius:8px}
+.primer-chain b{display:block;color:#3b674f;text-align:center}
+.primer-matrix,.primer-payoffs{display:grid;grid-template-columns:repeat(var(--columns),minmax(0,1fr));gap:4px;text-align:center;align-items:stretch}
+.primer-payoffs{grid-template-columns:minmax(28px,.75fr) repeat(var(--columns),minmax(0,1fr))}
+.primer-art :is(.primer-matrix,.primer-payoffs) button{padding:6px 2px;font-variant-numeric:tabular-nums}
+.primer-payoffs>b{align-self:center;font-size:.86rem}
+@media(max-width:760px){
+  .primer-spread{grid-template-columns:minmax(0,1fr);gap:14px}
+  .primer-copy p{max-width:none}
+  .primer-art{min-height:0}
+}
+@media(max-width:420px){
+  .primer-pages{gap:2px;padding:9px 7px}
+  .primer-pages button{font-size:.78rem;padding:7px}
+  .primer-spread{padding:14px}
+  .primer-nav{gap:4px}
+  .primer-order i{width:18px;height:18px}
+}
+
+
+#book .primer-pages button{border:0;border-radius:18px;background:transparent;box-shadow:none}
+#book .primer-pages button[aria-current=step]{background:#deecd4;color:#234b35}
+@media(max-width:530px){
+  #book .primer-pages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  #book .primer-pages button{font-size:.83rem;padding:6px 2px}
+  #book .lesson-intro:has(+ div > .lesson-primer){padding-block:10px;margin-bottom:6px}
+}

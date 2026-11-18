@@ -24,6 +24,20 @@ const { chromium } = require('playwright');
         await page.goto(topic.replace('phase=0','phase='+phase));
         assert.equal(await page.locator('#lesson-body h3, #book-reason').count(),1,topic);
         if(phase===0) {
+          const primer=page.locator('.lesson-primer');
+          assert.ok(await primer.isVisible(),topic);
+          assert.ok(await page.locator('.book-layout').isHidden(),topic);
+          for (let n=0;n<3;n++) {
+            assert.equal(await primer.locator('[aria-current="step"]').count(),1);
+            assert.ok((await primer.locator('.primer-copy h2').innerText()).length>5);
+            assert.doesNotMatch(await primer.innerText(),/undefined|NaN/);
+            assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic);
+            const dial=primer.getByRole('slider'), choice=primer.locator('.primer-art button[aria-pressed="false"]').first();
+            if(await dial.count()) await dial.press('End');
+            else if(await choice.count()) await choice.click();
+            await primer.locator('.primer-next').click();
+          }
+          assert.ok(await page.locator('.book-layout').isVisible());
           assert.ok(await page.locator('.lesson-context dt').count()>=4,topic);
           await page.getByRole('button',{name:'Исследовать вариант',exact:true}).click();
           assert.ok(await page.locator('#variant-explorer button,#variant-explorer input,#variant-explorer [tabindex="0"]').count(),topic);
@@ -34,8 +48,22 @@ const { chromium } = require('playwright');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic+' overflows');
       }
     }
+    const dualSimplex = topics.find(topic=>topic.includes('lesson=rgr.dsx'));
+    await page.goto(dualSimplex);
+    const intro=page.locator('.lesson-primer');
+    await intro.getByRole('button',{name:'Включить на час'}).click();
+    assert.equal(await intro.locator('.primer-order .filled').count(),10);
+    assert.equal(await intro.locator('.primer-formula').innerText(),'10 − 14 = −4');
+    await intro.locator('.primer-next').click();
+    await intro.getByRole('slider').press('End');
+    assert.equal(await intro.locator('.primer-gauge strong').innerText(),'0');
+    await intro.locator('.primer-next').click();
+    assert.match(await intro.innerText(),/Минимальные затраты · 15/);
+
     const artificial = topics.find(topic=>topic.includes('lesson=rgr.artificial'));
     await page.goto(artificial);
+    await page.getByRole('button',{name:'Сразу к решению'}).click();
+    await page.locator('details.lesson-context > summary').click();
     assert.ok(await page.locator('.starting-equation').isVisible());
     const deck = page.locator('.book-demos');
     const visibleScene = deck.locator('.demo-view:visible');
@@ -67,6 +95,8 @@ const { chromium } = require('playwright');
 
     const transport = topics.find(topic=>topic.includes('lesson=rgr.transp'));
     await page.goto(transport);
+    await page.getByRole('button',{name:'Сразу к решению'}).click();
+    await page.locator('details.lesson-context > summary').click();
     const ship = page.getByRole('button',{name:'Отправить 1 ящик'});
     for (let i=0;i<4;i++) await ship.click();
     assert.ok(await ship.isDisabled());

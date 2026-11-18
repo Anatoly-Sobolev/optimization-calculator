@@ -6,6 +6,7 @@ import {Button} from '@heroui/react/button';
 import {Label} from '@heroui/react/label';
 import {Link} from '@heroui/react/link';
 import {SearchField} from '@heroui/react/search-field';
+import {LessonIntro} from './lesson-intro.jsx';
 import {PlanProbe} from './plan-probe.jsx';
 import {TextArea} from '@heroui/react/textarea';
 
@@ -56,15 +57,27 @@ function Home({groups,first,recent,lab}) {
     </div><div id="featured"/></section><Catalogue groups={groups}/></main></>;
 }
 
-function Lesson({title,summary,source,variant,phases,active,lab}) {
+function Lesson({title,summary,source,variant,phases,active,lab,data}) {
+  const [reading,setReading]=useState(active!==0);
+  const heading=useRef(null), back=useRef(null);
+  function openReading() {
+    setReading(true);
+    requestAnimationFrame(()=>heading.current?.focus());
+  }
+  function openIntro() {
+    setReading(false);
+    requestAnimationFrame(()=>back.current?.focus());
+  }
   return <><Mast lab={lab}/><main className="book-main">
     <div className="lesson-intro"><Link href="index.html#contents">← Все задания</Link>
-      <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title">{title}</h1><p className="lesson-summary">{summary}</p>
+      <p className="book-kicker">{source} · Вариант {variant}</p><h1 className="lesson-title" ref={back} tabIndex="-1">{title}</h1>{active!==0&&<><p className="lesson-summary">{summary}</p><Link href={phases[0].href}>Посмотреть наглядный пример с начала →</Link></>}
     </div>
-    <div className="book-layout"><aside className="book-outline"><h2>Ход занятия</h2>
+    {active===0&&<><div hidden={reading}><LessonIntro data={data} onOpen={openReading}/></div>
+      {reading&&<Button variant="ghost" onPress={openIntro}>← Вернуться к наглядному примеру</Button>}</>}
+    <div className="book-layout" hidden={!reading}><aside className="book-outline"><h2>Ход занятия</h2>
       <nav aria-label="Этапы занятия">{phases.map(({name,href},i)=><Link key={href} href={href} aria-current={i===active?'step':undefined}><span>{i+1}</span>{name}</Link>)}</nav>
       <Link className="book-reference" href={lab}>Открыть лабораторию ↗</Link></aside>
-      <section className="lesson-work"><div className="book-kicker">Этап {active+1} из {phases.length}</div><h2>{phases[active].name}</h2><div id="lesson-body"/></section>
+      <section className="lesson-work"><div className="book-kicker">Этап {active+1} из {phases.length}</div><h2 tabIndex="-1" ref={heading}>{phases[active].name}</h2><div id="lesson-body"/></section>
     </div></main></>;
 }
 

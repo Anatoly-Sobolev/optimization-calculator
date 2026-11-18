@@ -84,11 +84,11 @@ const Handbook = (() => {
     document.title = chapter.title + ' · ' + phases[phase];
     BookUI.lesson(book, {
       title:chapter.title, summary:profile.summary, source:sourceName(chapter.src),
-      variant:current.v, phases:phases.map((name,i)=>({name,href:url(chapter,i)})), active:phase, lab:lab()
+      variant:current.v, data:LEARN.sceneData, phases:phases.map((name,i)=>({name,href:url(chapter,i)})), active:phase, lab:lab()
     });
     draw();
     if (phase === 0) {
-      const intro = document.createElement('section');
+      const intro = document.createElement('details');
       intro.className = 'lesson-context';
       const row = steps[0]?.startingRow;
       let firstAction = esc(profile.start);
@@ -99,7 +99,7 @@ const Handbook = (() => {
           'Обе части уже должны быть равны. Эту строку можно сразу перенести в таблицу.';
         firstAction = 'Посмотрите на первое ограничение своего варианта.<span class="starting-equation">'+expression+' '+R.sg(row.s)+' '+R.fq(row.b)+'</span>'+rule;
       }
-      intro.innerHTML = '<div class="lesson-example"><h3>На простом примере</h3><p>'+esc(profile.analogy.replace(/^Учебная аналогия: /,''))+'</p>'+
+      intro.innerHTML = '<summary>Обозначения и дополнительный пример</summary><div class="lesson-example"><h3>Дополнительный пример</h3><p>'+esc(profile.analogy.replace(/^Учебная аналогия: /,''))+'</p>'+
         '</div><div class="lesson-first"><h4>Ваш первый шаг</h4><p>'+firstAction+'</p></div>'+
         '<details class="lesson-glossary"><summary>Справка по обозначениям</summary><dl>'+
         profile.symbols.map(([symbol,meaning])=>'<div><dt>'+esc(symbol)+'</dt><dd>'+esc(meaning)+'</dd></div>').join('')+
@@ -252,7 +252,7 @@ const Handbook = (() => {
     const firstMissing = steps.findIndex(step => practiceStart[chapter.type]?.test(step.title));
     const shown = phase === 0 || phase === 2 && position < (firstMissing < 0 ? steps.length-1 : firstMissing);
     const solved=Boolean(progress.answers?.[position]);
-    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><div id="step-foot"></div><h3 tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.prompt) + '</p><div class="book-state">' + s.before + '</div><div id="answer-controls"></div><div id="response"></div>';
+    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><div id="step-foot"></div><h3 tabindex="-1">' + esc(s.title) + '</h3>' + (phase===0?'':'<p>'+esc(s.prompt)+'</p>') + '<div class="book-state">' + s.before + '</div><div id="answer-controls"></div><div id="response"></div>';
     const response=host.querySelector('#response'), foot=host.querySelector('#step-foot');
     if (phase >= 2) host.append(foot);
     const next=() => {
