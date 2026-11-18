@@ -7,7 +7,7 @@ const path=require('node:path');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
-const url=pathToFileURL(path.join(root,'index.html')).href;
+const url=pathToFileURL(path.join(root,'index.html')).href+'?lab';
 const browserRoot=path.join(process.env.LOCALAPPDATA||'','ms-playwright');
 const installed=fs.existsSync(browserRoot)?fs.readdirSync(browserRoot).filter(n=>/^chromium-\d+$/.test(n)).sort().reverse():[];
 const executable=process.env.CHROMIUM_PATH||installed.map(n=>path.join(browserRoot,n,'chrome-win64','chrome.exe')).find(fs.existsSync);

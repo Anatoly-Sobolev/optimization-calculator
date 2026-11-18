@@ -50,6 +50,9 @@ const LEARN = (() => {
         const leave=choice(`${prefix} ${k+1}: выходящая строка`,tableau(s,(i,j)=>j===(d?-1:s.q)?'learn-relevant':''),leavingRule,`Строка ${s.p+1}`,s.rows.map((_,i)=>[`Строка ${i+1}`,'Этот выбор нарушает правило минимального допустимого шага или правило разрешения равенств. '+leavingRule]),leavingRule,{after:tableau(s,(i,j)=>i===s.p||j===s.q?'learn-relevant':''),tier:1});
         entry.interaction={kind:'column',values:s.cols.map(j=>vn(j))};
         leave.interaction={kind:'row',values:s.rows.map((_,i)=>`Строка ${i+1}`)};
+        if (!d && s.rows.every(row => row.b instanceof Q && row.a[s.q] instanceof Q)) {
+          leave.resourceLimits = s.rows.map(row => ({stock:txt(row.b), rate:txt(row.a[s.q])}));
+        }
         out.push(...(d?[leave,entry]:[entry,leave]).filter(stage=>stage.options.length>1));
       }
       out.push(number(`${prefix} ${k+1}: поворот`,tableau(s,(i,j)=>i===s.p||j===s.q?'learn-relevant':''),`Строка ${s.p+1}, столбец ${s.q+1} выделены. На какое число делим ведущую строку?`,s.rows[s.p].a[s.q],'Разделите ведущую строку на элемент пересечения. Затем вычтите её кратные из остальных строк, чтобы столбец стал единичным.',{after,tier:1,interaction:{kind:'cell',row:s.p,col:s.q,values:s.rows.map(row=>Object.fromEntries(s.cols.map(j=>[j,txt(row.a[j])])))} }));
@@ -246,6 +249,8 @@ const LEARN = (() => {
       if(visual) { const clone=visual.cloneNode(true); clone.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));clone.removeAttribute('id');all[all.length-1].after+=`<div class="learn-scroll">${clone.outerHTML}</div>`; }
     }
     allStages=all;
+    // The handbook renders the same solver trace with its own lesson sequence.
+    if (Handbook.inLesson) { root.hidden=true; return; }
     try { sdata=LSCEN.dataFrom(get,state,structure,context.variant); }
     catch(error) { console.error('Данные сцен:',error); sdata={type:state.type,rec:{}}; }
     try { stages=scenario(); } catch(error) { console.error('Сценарий режима:',error); stages=[]; }

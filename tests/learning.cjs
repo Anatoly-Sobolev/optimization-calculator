@@ -19,7 +19,7 @@ const server=http.createServer((req,res)=>{
 const report={rendered:0,stages:0,flows:0,registry:[],errors:[],checks:[]};
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-  const url=`http://127.0.0.1:${server.address().port}`;
+  const url=`http://127.0.0.1:${server.address().port}/?lab`;
   const browser=await chromium.launch({headless:true,...(executable?{executablePath:executable}:{})});
   try {
     const page=await browser.newPage(),baseline=await browser.newPage();

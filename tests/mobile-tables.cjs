@@ -8,7 +8,7 @@ const executable=process.env.CHROMIUM_PATH||fs.readdirSync(cache).filter(n=>/^ch
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   try {
-    await page.goto(pathToFileURL(path.resolve('index.html')).href);
+    await page.goto(pathToFileURL(path.resolve('index.html')).href+'?lab');
     const registry=await page.evaluate(()=>LEARN.registry().map(t=>({src:t.src,type:t.type,base:t.base,v:t.variants.find(v=>!v.broken).v})));
     let tables=0;
     for(const t of registry){
