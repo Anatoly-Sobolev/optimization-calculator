@@ -60,6 +60,6 @@ function GameTrial({game:g}){
 export function ContextTrial({data,onOpen}){
   return <section className="context-trial" aria-label="Постановка задачи и ваш эксперимент">
     {data.type==='transp'?<ShippingTrial data={data}/>:data.type==='netw'?<NetworkTrial net={data.N}/>:data.type==='game'?<GameTrial game={data.G}/>:<LinearTrial data={data}/>}
-    <div className="trial-footer"><span>Можно менять свой вариант и сравнивать результаты.</span><button className="trial-primary" onClick={onOpen}>Перейти к методу <ArrowRight/></button></div>
+    <div className="trial-footer">{data.type!=='transp'&&<span>Можно менять свой вариант и сравнивать результаты.</span>}<button className="trial-primary" onClick={onOpen}>Перейти к методу <ArrowRight/></button></div>
   </section>;
 }

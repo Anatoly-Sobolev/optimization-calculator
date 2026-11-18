@@ -26,7 +26,7 @@ const { chromium } = require('playwright');
         if(phase===0) {
           const trial=page.locator('.context-trial');
           assert.ok(await trial.isVisible(),topic);
-          assert.equal(await trial.locator('.trial-challenge:visible').count(),1,topic);
+          assert.equal(await trial.locator('.trial-challenge:visible, .freight-sim:visible').count(),1,topic);
           assert.doesNotMatch(await trial.innerText(),/undefined|NaN/);
           await trial.getByRole('button',{name:'Перейти к методу'}).click();
           await page.getByRole('button',{name:'Разобранный пример',exact:true}).click();

@@ -1,81 +1,117 @@
-import React,{useEffect,useMemo,useState} from 'react';
-import {Truck,Undo2,Play,Pause} from 'lucide-react';
-import {TrialChallenge} from './trial-challenge.jsx';
+import React,{useEffect,useMemo,useRef,useState} from 'react';
+import {Truck,RotateCcw,Package,Wallet,Check,Undo2} from 'lucide-react';
 import {makeTown,DeliveryTown} from './delivery-town.jsx';
 
-export function ShippingTrial({data}) {
-  const {P}=data.T;
-  const town=useMemo(()=>makeTown(P.m0,P.n0),[P]);
-  const byDistance=useMemo(()=>ALGT.solve({a:P.a.slice(0,P.m0),b:P.b.slice(0,P.n0),c:town.km}),[P,town]);
-  const [pricing,setPricing]=useState('km');
-  const prices=pricing==='km'?byDistance:data.T;
-  const minimum=prices.cost;
-  const supply=P.a.slice(0,P.m0).map(LU.num), demand=P.b.slice(0,P.n0).map(LU.num);
-  const [route,setRoute]=useState([0,0]),[amount,setAmount]=useState('1');
-  const [trips,setTrips]=useState([]),[notice,setNotice]=useState(''),[frame,setFrame]=useState(null);
-  const [playing,setPlaying]=useState(false);
-  const shown=frame??trips.length, last=trips[shown-1];
-  const [i,j]=frame!==null&&last?[last.i,last.j]:route;
-  useEffect(()=>{
-    if(!playing)return;
-    const timer=setTimeout(()=>{
-      if(shown<trips.length)setFrame(shown+1);
-      else {setPlaying(false);setFrame(null);if(last)setRoute([last.i,last.j]);}
-    },1050);
-    return ()=>clearTimeout(timer);
-  },[playing,shown,trips]);
-  const matrix=supply.map(()=>demand.map(()=>0));
-  let cost=Q.of(0);
-  for(const trip of trips.slice(0,shown)){
-    matrix[trip.i][trip.j]+=trip.q;
-    cost=cost.add(prices.P.c[trip.i][trip.j].mul(trip.q));
-  }
-  const stock=supply.map((a,k)=>a-matrix[k].reduce((sum,q)=>sum+q,0));
-  const need=demand.map((b,l)=>b-matrix.reduce((sum,row)=>sum+row[l],0));
-  const limit=Math.min(stock[i],need[j]), missing=need.reduce((a,b)=>a+b,0);
-  const complete=missing===0, replaying=frame!==null;
-  function select(a,b){setRoute([a,b]);setNotice('');}
-  function send(e){
-    e.preventDefault();
-    const q=Number(amount);
-    if(!Number.isSafeInteger(q)||q<=0){setNotice('Введите целое число ящиков больше нуля.');return;}
-    if(q>limit){setNotice('Такой рейс невозможен. На складе '+stock[i]+' ящ., магазину нужно '+need[j]+'. По этому маршруту можно отправить до '+limit+' ящ.');return;}
-    setTrips([...trips,{i,j,q}]);setNotice('');
-  }
-  function undo(){
-    const removed=trips.at(-1);setTrips(trips.slice(0,-1));select(removed.i,removed.j);setAmount(String(removed.q));setNotice('Последний рейс отменён. Ящики снова на складе.');
-  }
-  function replay(){
-    if(playing){setPlaying(false);return;}
-    if(frame===null||frame===trips.length)setFrame(0);
-    setPlaying(true);setNotice('');
-  }
+const sum=values=>values.reduce((a,b)=>a+b,0);
+const sub=LU.sub;
+const emptyPlan=(m,n)=>Array.from({length:m},()=>Array(n).fill(''));
+function loadPlan(key,m,n){
+  try{
+    const saved=JSON.parse(localStorage.getItem(key));
+    if(Array.isArray(saved?.cells)&&saved.cells.length===m&&saved.cells.every(row=>
+      Array.isArray(row)&&row.length===n&&row.every(v=>typeof v==='string'&&v.length<=7))){
+      return {cells:saved.cells,pricing:saved.pricing==='variant'?'variant':'km'};
+    }
+  }catch{/* Local storage may be unavailable in private browsing. */}
+  return {cells:emptyPlan(m,n),pricing:'km'};
+}
+const quantity=v=>/^\d{1,7}$/.test(v)?Number(v):0;
 
-  const lastOnRoute=last?.i===i&&last?.j===j;
+export function ShippingTrial({data}){
+  const {P}=data.T;
+  const m=P.m0,n=P.n0;
+  const supply=P.a.slice(0,m).map(LU.num),demand=P.b.slice(0,n).map(LU.num);
+  const town=useMemo(()=>makeTown(m,n),[m,n]);
+  const distancePlan=useMemo(()=>ALGT.solve({a:P.a.slice(0,m),b:P.b.slice(0,n),c:town.km}),[P,town,m,n]);
+  const storageKey='shipping-plan.v1.'+JSON.stringify([data.state.src,data.variant.v,supply,demand,P.c.map(r=>r.map(LU.txt))]);
+  const [draft,setDraft]=useState(()=>loadPlan(storageKey,m,n));
+  const [saved,setSaved]=useState(false);
+  const [previous,setPrevious]=useState(null);
+  const [[i,j],select]=useState([0,0]);
+  const [run,setRun]=useState(null),[elapsed,setElapsed]=useState(0);
+  const [records,setRecords]=useState({});
+  const sequence=useRef(0),inputs=useRef([]);
+  const {cells,pricing}=draft,prices=pricing==='km'?distancePlan:data.T;
+  useEffect(()=>{
+    try{localStorage.setItem(storageKey,JSON.stringify(draft));setSaved(true);}
+    catch{setSaved(false);}
+  },[draft,storageKey]);
+
+  const counts=cells.map(row=>row.map(quantity)),used=counts.map(sum);
+  const received=demand.map((_,l)=>sum(counts.map(row=>row[l])));
+  const trips=counts.flatMap((row,k)=>row.flatMap((q,l)=>q?[{i:k,j:l,q,km:town.km[k][l],cost:prices.P.c[k][l].mul(q),duration:1000+145*town.km[k][l]}]:[]));
+  const totalCost=trips.reduce((s,t)=>s.add(t.cost),Q.of(0)),boxes=sum(used),requested=sum(demand);
+  const stock=supply.map((v,k)=>v-used[k]),need=demand.map((v,l)=>v-received[l]);
+  const badEntry=cells.some(row=>row.some(v=>v!==''&&!/^\d{1,7}$/.test(v)));
+  const overStock=stock.findIndex(v=>v<0),overOrder=need.findIndex(v=>v<0);
+  let error='';
+  if(badEntry)error='В выделенной клетке укажите целое число ящиков от нуля.';
+  else if(overStock>=0)error='Со склада '+(overStock+1)+' назначено на '+(-stock[overStock])+' ящ. больше запаса. Уменьшите число в этой строке.';
+  else if(overOrder>=0)error='Магазину '+(overOrder+1)+' назначено на '+(-need[overOrder])+' ящ. больше заказа. Уменьшите число в этом столбце.';
+  const finished=!!run&&elapsed>=run.end,running=!!run&&!finished;
+  const arrivals=run?.trips.filter(t=>elapsed>=t.duration)??[];
+  const delivered=sum(arrivals.map(t=>t.q));
+  const spent=arrivals.reduce((s,t)=>s.add(t.cost),Q.of(0));
+  const missing=requested-boxes;
+  const optimal=missing===0&&prices.status==='optimal'&&totalCost.eq(prices.cost);
+  useEffect(()=>{
+    if(!run)return;
+    const timers=[...new Set(run.trips.map(t=>t.duration))].map(duration=>
+      setTimeout(()=>setElapsed(duration),duration));
+    return ()=>timers.forEach(clearTimeout);
+  },[run]);
+  useEffect(()=>{
+    if(finished&&missing===0)setRecords(r=>r[pricing]&&r[pricing].le(totalCost)?r:{...r,[pricing]:totalCost});
+  },[finished,missing,pricing,totalCost.toText()]);
+  function edit(k,l,value){
+    setRun(null);setPrevious(null);
+    setDraft(d=>({...d,cells:d.cells.map((row,a)=>a===k?row.map((old,b)=>b===l?value:old):row)}));
+  }
+  function choose(k,l){
+    select([k,l]);
+    inputs.current[k*n+l]?.focus({preventScroll:true});
+  }
+  function launch(){
+    if(error||!trips.length||running)return;
+    const fast=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fleet=trips.map(t=>({...t,duration:fast?0:t.duration}));
+    setElapsed(0);setRun({id:++sequence.current,trips:fleet,end:Math.max(...fleet.map(t=>t.duration))});
+  }
+  const limit=Math.max(0,Math.min(stock[i],need[j])+counts[i][j]);
   const unit=prices.P.c[i][j];
-  return <div className="trial-spread shipping-trial"><div className="dispatch-intro">
-    <h2>Как развезти заказы магазинов?</h2><p>Выполните все заказы как можно дешевле. Выберите склад и магазин на карте, укажите число ящиков и отправьте машину. Заказ можно разделить между складами.</p>
-    <label className="trial-field tariff-mode">Как считать затраты<select value={pricing} disabled={replaying} onChange={e=>setPricing(e.target.value)}><option value="km">По расстоянию · учебная карта</option><option value="variant">По тарифам исходного задания</option></select></label>
-    <p className="trial-term">{pricing==='km'?'Цена рейса = ящики × километры в одну сторону. За 1 ящик на 1 км платим 1 ед.':'За каждый ящик платим тариф выбранной пары из условия. Километраж показан для ориентира на учебной карте.'}</p>
-  </div><div className="trial-board primer-art"><DeliveryTown town={town} supply={supply} demand={demand} stock={stock} need={need} i={i} j={j} select={select} locked={replaying} trip={lastOnRoute} serial={shown}/>
-    <form onSubmit={send} noValidate><fieldset disabled={replaying} className="dispatch-controls">
-      <label>Откуда<select aria-label="Откуда" value={i} onChange={e=>select(+e.target.value,j)}>{supply.map((_,k)=><option key={k} value={k}>Склад {k+1}</option>)}</select></label>
-      <label>Куда<select aria-label="Куда" value={j} onChange={e=>select(i,+e.target.value)}>{demand.map((_,l)=><option key={l} value={l}>Магазин {l+1}</option>)}</select></label>
-      <label>Ящиков<input type="number" min="1" step="1" value={amount} onChange={e=>{setAmount(e.target.value);setNotice('');}}/></label>
-      <div className="dispatch-price">Остаток склада · {stock[i]} ящ. Магазину нужно · {need[j]} ящ.<br/>Тариф · {LU.txt(unit)} за ящик. {Number.isSafeInteger(+amount)&&+amount>0&&<>За рейс · {amount} × {LU.txt(unit)} = {LU.txt(unit.mul(+amount))}.</>}</div>
-      <button type="button" disabled={!limit} onClick={()=>{setAmount(String(limit));setNotice('');}}>Взять максимум · {limit}</button>
-      <button className="trial-primary" type="submit"><Truck/>Отправить</button></fieldset></form>
-    <div className="dispatch-note" role="status">{notice||(lastOnRoute?'Рейс '+shown+' · A'+LU.sub(i+1)+' → B'+LU.sub(j+1)+', '+last.q+' ящ. · осталось доставить '+missing+' ящ.':limit?'Выберите маршрут и нажмите «Отправить».':'Выберите другой маршрут: запас исчерпан или заказ закрыт.')}</div>
-  </div><div className="dispatch-ledger">
-    <div className="reading-grid trial-ledger"><table><caption>Ваш план · уже отправлено ящиков</caption><thead><tr><th>Склад</th>{demand.map((_,l)=><th key={l}>B{LU.sub(l+1)}</th>)}<th>Запас</th></tr></thead>
-    <tbody>{matrix.map((row,k)=><tr key={k}><th>A{LU.sub(k+1)}</th>{row.map((v,l)=><td key={l}><button type="button" disabled={replaying} aria-label={'Склад '+(k+1)+', магазин '+(l+1)} aria-pressed={k===i&&l===j} onClick={()=>select(k,l)}>{v}</button></td>)}<td>{supply[k]}</td></tr>)}<tr><th>Заказ</th>{demand.map((b,l)=><td key={l}>{b}</td>)}<td> </td></tr></tbody></table></div>
-    <p className="trial-term">Строка — склад, столбец — магазин. В клетке A{LU.sub(i+1)}B{LU.sub(j+1)} учтены все ящики на этом маршруте.</p>
-    <div className="trial-verdict" role="status"><b>{replaying?'Просмотр · рейсов '+shown+' из '+trips.length:complete?'Заказы выполнены':'Осталось доставить '+missing+' ящ.'}</b><span>Затраты по плану · {LU.txt(cost)}</span>
-    {complete&&<span>Оцените план, чтобы проверить его стоимость. {stock.some(v=>v>0)?'Лишний запас остаётся на складах.':''}</span>}</div>
-    {['km','variant'].map(mode=><div key={mode} hidden={mode!==pricing}><TrialChallenge label="Оценить мой план" enabled={!replaying} value={cost} valid={complete} optimum={minimum} reason={'План пока не завершён. Магазинам нужно ещё '+missing+' ящ.'} steps={['Рейсов · '+shown,'Ещё требуется · '+missing+' ящ.','Затраты · '+LU.txt(cost)]}/></div>)}
-    <div className="trial-actions"><button disabled={!trips.length||replaying} onClick={undo}><Undo2/>Отменить рейс</button>
-    <button disabled={!trips.length} onClick={replay}>{playing?<Pause/>:<Play/>}{playing?'Пауза':replaying&&shown<trips.length?'Продолжить просмотр':'Проиграть мои рейсы'}</button>
-    {trips.length>0&&!replaying&&<button onClick={()=>{setTrips([]);select(0,0);setAmount('1');}}>Новый план</button>}
-    {replaying&&<button onClick={()=>{setPlaying(false);setFrame(null);}}>К моему плану</button>}</div>
-  </div></div>;
+  return <section className="freight-sim" aria-label="Симулятор перевозок">
+    <header className="freight-header"><div><h2>Распределите ящики по магазинам</h2>
+      <p>Строки — склады A, столбцы — магазины B. Введите число ящиков для каждой машины.</p></div>
+      <label>Тариф<select aria-label="Тариф" value={pricing} disabled={running} onChange={e=>{setRun(null);setDraft({...draft,pricing:e.target.value});}}>
+        <option value="km">По расстоянию</option><option value="variant">Из условия задачи</option></select></label></header>
+    <div className="freight-work"><section className="freight-sheet"><h3>План отгрузки <span>ящики</span></h3>
+      <table className="dispatch-matrix"><colgroup><col className="depot-col"/>{demand.map((_,l)=><col key={l}/>)}<col className="stock-col"/></colgroup>
+        <thead><tr><th scope="col">Склад</th>{demand.map((_,l)=><th scope="col" key={l}><span className="market-word">Маг. </span>B{sub(l+1)}</th>)}<th scope="col">Запас</th></tr></thead>
+        <tbody>{cells.map((row,k)=><tr key={k}><th scope="row"><i style={{background:town.colors[k]}}/>A{sub(k+1)}</th>
+          {row.map((v,l)=><td key={l}><input ref={el=>{inputs.current[k*n+l]=el;}} aria-label={'Склад '+(k+1)+', магазин '+(l+1)} type="text" inputMode="numeric" autoComplete="off" maxLength={7} disabled={running} value={v} placeholder="0"
+            data-active={k===i&&l===j} data-filled={quantity(v)>0} aria-invalid={(v!==''&&!/^\d{1,7}$/.test(v))||((stock[k]<0||need[l]<0)&&quantity(v)>0)}
+            onFocus={e=>{select([k,l]);e.target.select();}} onChange={e=>edit(k,l,e.target.value)}/></td>)}
+          <td className="capacity" data-invalid={stock[k]<0}>{used[k]}<small> / {supply[k]}</small></td></tr>)}</tbody>
+        <tfoot><tr><th scope="row">Заказ</th>{demand.map((v,l)=><td key={l} data-invalid={need[l]<0}>{received[l]}<small> / {v}</small></td>)}<td/></tr></tfoot>
+      </table><p className="freight-key">В итогах первое число — ваш план, второе — запас склада или заказ магазина.</p>
+      <div className="route-inspector"><div><strong>Склад {i+1} → магазин {j+1}</strong>
+        <span>{town.km[i][j]} км · {counts[i][j]} ящ. × {LU.txt(unit)} ед. = {LU.txt(unit.mul(counts[i][j]))} ед.</span></div>
+        <button type="button" disabled={running||!limit||counts[i][j]===limit} onClick={()=>edit(i,j,String(limit))}>Взять максимум · {limit}</button>
+      </div>
+      <div className="draft-actions"><small>{saved?'План сохранён в этом браузере':'План хранится до закрытия страницы'}</small>
+      {previous?<button disabled={running} onClick={()=>{setRun(null);setDraft({...draft,cells:previous});setPrevious(null);}}><Undo2/>Вернуть план</button>:
+        <button disabled={running||!cells.some(row=>row.some(Boolean))} onClick={()=>{setPrevious(cells);setRun(null);setDraft({...draft,cells:emptyPlan(m,n)});}}><RotateCcw/>Очистить</button>}</div>
+    </section><div className="freight-geography"><DeliveryTown town={town} supply={supply} demand={demand} stock={run?supply.map((s,k)=>s-sum(run.trips.filter(t=>t.i===k).map(t=>t.q))):stock}
+      need={run?demand.map((b,l)=>b-sum(arrivals.filter(t=>t.j===l).map(t=>t.q))):need} i={i} j={j} select={choose} locked={running} trips={trips} run={run} elapsed={elapsed}/>
+      <p className="freight-key">{pricing==='km'?'Квартал — 1 км. Перевозка одного ящика на 1 км стоит 1 ед.':'Каждый ящик оплачивается по тарифу маршрута из задания.'} Число над машиной — ящики в кузове.</p></div></div>
+    <div className="freight-console"><dl>
+      <div><dt><Truck/>{run?'Прибыло машин':'Машины'}</dt><dd>{run?arrivals.length+' / ':''}{trips.length}</dd></div>
+      <div><dt><Package/>{run?'Доставлено':'Назначено'}</dt><dd>{run?delivered:boxes} <small>/ {requested} ящ.</small></dd></div>
+      <div><dt><Wallet/>{running?'Затраты / план':'Затраты'}</dt><dd>{LU.txt(run?spent:totalCost)} <small>{running?'/ '+LU.txt(totalCost)+' ':''}ед.</small></dd></div></dl>
+      <button className="trial-primary launch-fleet" disabled={running||!!error||!trips.length} onClick={launch}><Truck/>{running?'Машины в пути':finished?'Повторить запуск':'Запустить все машины'}</button></div>
+    <div role="status" className="fleet-result" data-state={error?'error':finished?(optimal?'won':'result'):'draft'}>
+      {finished&&optimal&&<Check/>}<div><b>{error||(!run?(trips.length?'План готов к запуску':'Начните с любой клетки таблицы'):running?'Доставка идёт':missing?'Доставка завершена · план неполный':optimal?'Все заказы выполнены · план оптимален':'Все заказы выполнены · план не оптимален')}</b>
+      {!error&&<span>{finished?(missing?'Осталось распределить '+missing+' ящ. Дополните план и запустите машины снова.':optimal?'Такие заказы невозможно выполнить дешевле.':'Можно сэкономить '+LU.txt(totalCost.sub(prices.cost))+' ед., если изменить распределение.'):(running?'При прибытии каждой машины обновляются количество доставленных ящиков и затраты.':trips.length?'Плановые затраты · '+LU.txt(totalCost)+' ед. Все назначенные машины стартуют одновременно.':'Например, введите 5 в клетку A₁ × B₁, чтобы назначить пять ящиков из первого склада в первый магазин.')}</span>}
+      {records[pricing]&&<small>Ваш лучший полный план · {LU.txt(records[pricing])} ед.</small>}</div></div>
+  </section>;
 }
