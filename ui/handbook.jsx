@@ -203,4 +203,4 @@ export const views = (host,props) => mount(host,<StudyViews {...props}/>);
 export const answer = (host,props) => mount(host,<Answer {...props}/>);
 export const shipmentExample = host => mount(host,<ShipmentExample/>);
 
-export const planProbe = (host,model) => mount(host,<PlanProbe model={model}/>);
+export const planProbe = (host,data) => mount(host,<PlanProbe data={data}/>);

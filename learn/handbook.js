@@ -188,7 +188,7 @@ const Handbook = (() => {
     const scenes = ['model','strategy','meaning'].flatMap(mode=>LSCEN.scenes(mode,data,'deep'));
     const primary = scenes.find(item=>item.scene===preferred[chapter.type]) || scenes.find(item=>item.scene==='map');
     const plane = ['simplex','graph'].includes(chapter.type) && data.P?.c.length>=2;
-    if (plane) BookUI.planProbe(main,data.P);
+    if (plane) BookUI.planProbe(main,data);
     else LSCENE.mount(main,primary);
 
     const followups = {

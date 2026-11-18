@@ -3,7 +3,9 @@ import {ShipmentMap,partialPlan} from './shipment-map.jsx';
 import {ReadingDiagram} from './reading-diagram.jsx';
 import {CoordinateField} from './coordinate-field.jsx';
 import React,{useState} from 'react';
-import {Workshop,CutPieces,PayoffBalance,EqualObjectives,MethodMark} from './teaching-figures.jsx';
+import {lessonContext} from './lesson-context.jsx';
+import {LessonArt} from './lesson-art.jsx';
+import {CutPieces,PayoffBalance,EqualObjectives,MethodMark} from './teaching-figures.jsx';
 import {Button} from '@heroui/react/button';
 
 const show = LU.txt, num = LU.num, vec = LU.vec;
@@ -110,22 +112,24 @@ function graph(d) {
   const vs=d.rec.graph.verts,best=vs.findIndex(v=>v.f.eq(d.f));
   const diagram=(n,set,probe)=><PlanMap d={d} index={n} choose={set} {...probe}/>;
   return [
-    frame('Каждая точка — один план','По горизонтали откладываем первое количество x₁, по вертикали — второе x₂. Каждая цветная полуплоскость показывает, где выполнено одно условие. Зелёный многоугольник — их общая допустимая область. Перетащите точку внутрь фигуры и за её границу. Кнопки под графиком ставят точку точно в угол.',diagram),
+    frame('Каждая точка — один план','По горизонтали откладываем метры льна, по вертикали — метры шёлка. Например, точка (2; 1) означает два метра льна и метр шёлка. Каждая цветная полуплоскость показывает, где выполнено одно условие. Зелёный многоугольник — их общая допустимая область. Перетащите точку внутрь фигуры и за её границу. Кнопки под графиком ставят точку точно в угол.',diagram),
     frame('Как сравнить два плана','Цель задаёт число для каждой точки. Подставляем обе координаты в выражение '+expression(d.P.c)+'. Среди допустимых планов ищем '+aim(d.P)+' значение.',diagram),
     frame('Где достигается лучшее значение','У линейной цели на этом многоугольнике достаточно сравнить углы. На рисунке выбран один из лучших планов. Переключитесь на соседний и сравните значения.',diagram)
   ].map((f,i)=>({...f,aside:(n,{picked})=><RowChecks model={d.P} plan={picked??vs[n].p}/>,start:i===2?best:i===1&&vs.length>1?1:0}));
 }
 function simplex(d) {
-  const p=d.P,snaps=d.rec.lp.phase2.steps;
+  const p=d.P,snaps=d.rec.lp.phase2.steps,world=lessonContext(d);
+  const [first,,unit]=world.variables[0],[resource,resourceUnit]=world.rows[0];
+  const names=world.variables.map(([label,,u],i)=>x(i)+' · '+label+', '+u);
   const plans=snaps.map(s=>p.c.map((_,j)=>{const k=s.basis.findIndex(v=>s.vars[v].kind==='x'&&s.vars[v].k===j+1);return k<0?zero():s.rows[k].b;}));
-  const desk=(n,set)=><><Points values={plans[n]}/><RowChecks model={p} plan={plans[n]}/><Gauge signed={plans.some(v=>LSCENE.objValue(p,v).s<0)} label="Значение цели" value={LSCENE.objValue(p,plans[n])} extent={Math.max(1,...plans.map(v=>Math.abs(num(LSCENE.objValue(p,v)))))} caption={'Цель · '+expression(p.c)+(n?' · изменение за шаг: '+show(LSCENE.objValue(p,plans[n]).sub(LSCENE.objValue(p,plans[n-1]))):' · начальный план')}/><Dial label="План в ходе решения" max={plans.length-1} value={n} change={set} display={(n+1)+' из '+plans.length}/></>;
+  const desk=(n,set)=><><Points names={names} values={plans[n]}/><RowChecks model={p} plan={plans[n]}/><Gauge signed={plans.some(v=>LSCENE.objValue(p,v).s<0)} label="Значение цели" value={LSCENE.objValue(p,plans[n])} extent={Math.max(1,...plans.map(v=>Math.abs(num(LSCENE.objValue(p,v)))))} caption={'Цель · '+expression(p.c)+(n?' · изменение за шаг: '+show(LSCENE.objValue(p,plans[n]).sub(LSCENE.objValue(p,plans[n-1]))):' · начальный план')}/><Dial label="План в ходе решения" max={plans.length-1} value={n} change={set} display={(n+1)+' из '+plans.length}/></>;
   return [
-    frame('Что выбираем','Представьте, что мастерская выпускает несколько видов изделий. Количество первого обозначим x₁. В первой строке каждое такое изделие расходует '+show(p.rows[0].a[0])+' единиц ресурса, а всего доступно '+show(p.rows[0].b)+'. Увеличьте выпуск и посмотрите на остаток. Здесь остальные количества равны нулю.',(n,set)=>{
+    frame('Как расходуется время смены',world.story+' Сначала меняйте только «'+first+'». Каждый дополнительный '+unit+' занимает '+show(p.rows[0].a[0])+' '+resourceUnit+' из '+show(p.rows[0].b)+' '+resourceUnit+'. Остальные поля равны нулю.',(n,set)=>{
       const row=p.rows[0], remainder=row.b.sub(row.a[0].mul(n));
-      return <><Workshop count={n} capacity={num(row.b)} rate={num(row.a[0])}/><RowChecks model={p} plan={p.c.map((_,j)=>Q.of(j===0?n:0))}/><Gauge signed label="Свободный остаток" value={remainder} extent={num(row.b)} caption={remainder.s<0?'Выпуск превышает доступный запас.':'Первое ограничение выполнено.'}/><Dial label="Выпуск первого изделия" max={Math.ceil(num(row.b)/num(row.a[0]))+1} value={n} change={set}/></>;
+      return <><LessonArt scene="workshop" remaining={num(remainder)/num(row.b)} left={first+' · '+n+' '+unit} right={(remainder.s<0?'Не хватает ':'Осталось ')+show(remainder.abs())+' '+resourceUnit}/><RowChecks model={p} plan={p.c.map((_,j)=>Q.of(j===0?n:0))}/><Gauge signed label={resource+' · остаток, '+resourceUnit} value={remainder} extent={num(row.b)} caption={remainder.s<0?'Выпуск превышает доступный запас.':'Первое ограничение выполнено.'}/><Dial label={first+', '+unit} max={Math.ceil(num(row.b)/num(row.a[0]))+1} value={n} change={set}/></>;
     }),
-    frame('Что меняет один шаг','Теперь учитываем все изделия и все ограничения сразу. Каждая плитка показывает количество одного изделия. Ползунок переключает допустимые планы из расчёта. Сравните, как меняется результат: здесь его нужно '+(p.sense==='max'?'увеличить':'уменьшить')+'.',desk),
-    {...frame('Как прочитать ответ','Каждая плитка показывает количество одного вида в лучшем плане. Подстановка этих количеств в целевое выражение даёт '+show(d.f)+'. В подробном разборе видно, как выбрать каждый переход.',desk),start:plans.length-1}
+    frame('Что меняет один шаг','В каждой плитке указаны название, единица измерения и значение для выбранного плана. Ползунок переключает допустимые планы из расчёта. Сравните, как меняется результат: здесь его нужно '+(p.sense==='max'?'увеличить':'уменьшить')+'.',desk),
+    {...frame('Как прочитать ответ','Подставьте значения из плиток в формулу. В лучшем плане показатель «'+world.objective+'» равен '+show(d.f)+'. В подробном разборе видно, как выбрать каждый переход.',desk),start:plans.length-1}
   ];
 }
 function artificial(d) {
@@ -222,8 +226,8 @@ function IntroLegend({data:d}){
       entries=[['A','склады в этом варианте · '+d.T.P.m0],['B','магазины в этом варианте · '+d.T.P.n0]];
       break;
     }
-    case 'graph': entries=[['x₁','количество по горизонтали'],['x₂','количество по вертикали']];break;
-    case 'simplex': entries=[['x₁','выпуск первого изделия'],['Остаток','доступный ресурс за вычетом расхода']];break;
+    case 'graph': entries=[['x₁','метры льна по горизонтали'],['x₂','метры шёлка по вертикали']];break;
+    case 'simplex': entries=lessonContext(d).variables.map(([name,,unit],i)=>[x(i),name+', '+unit]);break;
     case 'artificial': entries=[['t','временное количество в одной строке'],['h','сумма всех временных количеств']];break;
     case 'dual': case 'duality': entries=[['x','количества в исходном плане'],['y','оценки условий этого плана']];break;
     case 'dsx': case 'dsimplex': entries=[['Клетка','одна требуемая деталь'],['Минус','деталей пока меньше, чем требуется']];break;

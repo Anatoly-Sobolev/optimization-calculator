@@ -26,12 +26,12 @@ function LiquidLevels({volumes,minimum}){
     <path d={`M475 ${y(minimum)}h238`} fill="none" stroke="#163e59" strokeWidth="2" strokeDasharray="8 6"/>
   </svg>;
 }
-export function LessonArt({scene,left,right,changed=false,volumes,minimum=1,remaining,choices,selected,days}){
+export function LessonArt({scene,left,right,changed=false,volumes,minimum=1,remaining,choices,selected,days,shipment}){
   const [file,description]=scenes[scene];
   const src=scene==='transport'?'assets/delivery-town.webp':'assets/lessons/'+file+'.webp';
   return <span className="lesson-art" data-scene={scene} data-changed={changed}>
     <span className="art-canvas"><img src={src} width="800" height="400" alt={description}/>
-      {scene==='transport'&&<span className="art-route" aria-hidden="true"><span><Truck size={20}/></span></span>}
+      {scene==='transport'&&<span className="art-route" aria-hidden="true"><span key={shipment} className={shipment>0?'truck-arrival':undefined}><Truck size={20}/>{shipment>0&&<b>{shipment}</b>}</span></span>}
       {choices&&<span className="art-payoffs" aria-label="Выигрыш A при выборе хода B">{choices.map((v,j)=><span key={j} data-selected={selected===j}>B{LU.sub(j+1)} · {LU.txt(v)} {selected===j?'✓':''}</span>)}</span>}
       {days&&<span className="art-duration">Работа занимает {days} дн.</span>}
       {volumes&&<LiquidLevels volumes={volumes} minimum={minimum}/>}

@@ -9,7 +9,7 @@ export function CoordinateField({model,maxX,maxY,tall=false,wide=false,region=fa
   const pick=useRef(onPlace);
   useLayoutEffect(()=>{pick.current=onPlace;},[onPlace]);
   useLayoutEffect(()=>{
-    const field=ref.current,removeCamera=GraphCamera.attach(field,wide?{off:new Set(model.rows.map((_,i)=>String(i)))}:{},true);
+    const field=ref.current,removeCamera=GraphCamera.attach(field,{},true);
     const select=({detail})=>pick.current([detail.x,detail.y].map(n=>Math.round(n*10)/10));
     field.addEventListener('graphpick',select);
     return ()=>{field.removeEventListener('graphpick',select);removeCamera();};

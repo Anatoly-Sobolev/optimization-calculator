@@ -39,6 +39,11 @@ const GraphCamera=(()=>{
       arrows:plot.querySelector('.gside[data-i="'+i+'"]'),
       label:plot.querySelector('.glb[data-i="'+i+'"]')
     }));
+    // The bottom and left rulers stay fixed. Zero coordinates move with the world.
+    const zero=document.createElementNS('http://www.w3.org/2000/svg','path');
+    zero.setAttribute('class','field-zero');
+    zero.setAttribute('aria-hidden','true');
+    plot.append(zero);
     const partialRegions=[...plot.querySelectorAll('[data-s]')];
     const dots=[...plot.querySelectorAll('circle[r]')].map(el=>[el,Number(el.getAttribute('r'))]);
     const world=(x,y)=>point(svg,x,y);
@@ -50,7 +55,11 @@ const GraphCamera=(()=>{
       plot.setAttribute('viewBox',[px(x),py(y+h),w*W/X,h*H/Y].join(' '));
       plot.style.setProperty('--camera-scale',String(k));
       dots.forEach(([el,r])=>el.setAttribute('r',r*k));
-      const box=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
+      // Extend past the viewing frame. Only mathematical boundaries should
+      // leave a stroke inside it when a half-plane continues out of sight.
+      const dx=w*.02,dy=h*.02,x0=x-dx,x1=x+w+dx,y0=y-dy,y1=y+h+dy;
+      const box=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
+      zero.setAttribute('d',`M${px(x0)} ${py(0)}H${px(x1)}M${px(0)} ${py(y0)}V${py(y1)}`);
       let common=clip(clip(box,[1,0,0,'>=']).result,[0,1,0,'>=']).result;
       const areas=[common];
       equations.forEach((eq,i)=>{
@@ -156,7 +165,7 @@ const GraphCamera=(()=>{
       touches.delete(e.pointerId);
     });
     for(const t of ['pointercancel','lostpointercapture'])on(t,e=>touches.delete(e.pointerId));
-    return ()=>{ac.abort();controls.remove();};
+    return ()=>{ac.abort();controls.remove();zero.remove();};
   }
   return {attach,point};
 })();

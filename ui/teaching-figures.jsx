@@ -1,12 +1,7 @@
 import {UserRound,Truck,ChartArea,Table2,ListFilter,Layers,ArrowRightLeft,TableCellsMerge,Grid2X2,Waypoints,Dices,ClipboardCheck,BookOpenText,ScanSearch,ListOrdered,Clapperboard} from 'lucide-react';
 import React from 'react';
-import {LessonArt} from './lesson-art.jsx';
 
-export function Workshop({count,capacity,rate}) {
-  const remaining=capacity-count*rate;
-  return <LessonArt scene="workshop" remaining={remaining/capacity} left={remaining>=0?'Остаток · '+LU.ru(remaining):'Не хватает · '+LU.ru(-remaining)} right={'Выпуск · '+count+' шт.'}/>;
 
-}
 export function CutPieces({amount,units}) {
   const width=230/Math.max(1,units);
   return <svg className="teaching-art" viewBox="0 0 300 58" role="img" aria-label={'Длина заготовки в целых деталях: '+LU.ru(amount)}>
