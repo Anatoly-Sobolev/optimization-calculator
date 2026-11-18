@@ -83,11 +83,11 @@ function example(d,index){
   const other=ALG.check(p,base.map((v,i)=>i===j?Q.of(0):v))[0].lhs;
   const bound=LU.num(r.b),rule=r.s==='='?'ровно':r.s==='>='?'не меньше':'не больше';
   const parts=(t==='artificial'||t==='dsx')&&d.state.src==='rgr';
-  const missing=world.rows.filter((_,i)=>!checks[i].ok).map(([part])=>part.toLowerCase());
+  const missing=parts?world.rows.flatMap(([part],i)=>checks[i].ok?[]:[part.toLowerCase()+' — ещё '+fmt(p.rows[i].b.sub(checks[i].lhs))+' шт.']):[];
   return {...world,caption:parts?'Выпуск деталей за смену':resource+' · '+rule+' '+fmt(r.b)+' '+measure,prompt:name+' — выберите '+(unit==='ч'?'время работы':'объём'),choices:values.map(v=>[LU.num(v),fmt(v)+' '+unit]),
     visual:<LessonArt scene={world.scene} left={name+' · '+fmt(plan[j])+' '+unit} right={world.objective+' · '+fmt(total)+' '+world.money}/>,
     evidence:parts?<div className="output-trays">{world.rows.map(([part],i)=><div key={part}><b>{part}</b><span>{fmt(checks[i].lhs)} шт. · нужно {fmt(p.rows[i].b)}</span><progress value={Math.min(LU.num(checks[i].lhs),LU.num(p.rows[i].b))} max={LU.num(p.rows[i].b)} aria-label={part}/></div>)}</div>:<Measure label={resource} value={LU.num(value)} unit={measure} limit={bound} min={Math.min(0,bound,...ends)} max={Math.max(0,bound,...ends)}/>,
-    result:`${name}: ${fmt(plan[j])} ${unit}. ${resource}: ${other.s?fmt(other)+' + ':''}${fmt(r.a[j])} × ${fmt(plan[j])} = ${fmt(value)} ${measure}. ${world.objective} — ${fmt(total)} ${world.money}.`+(parts?(missing.length?' Ещё нужно изготовить: '+missing.join(', ')+'.':' Все три требования выполнены.'):'')};
+    result:`${name}: ${fmt(plan[j])} ${unit}. ${resource}: ${other.s?fmt(other)+' + ':''}${fmt(r.a[j])} × ${fmt(plan[j])} = ${fmt(value)} ${measure}${measure.endsWith('.')?'':'.'} ${world.objective} — ${fmt(total)} ${world.money}.`+(parts?(missing.length?' До выполнения заказа: '+missing.join(', '):' Все три требования выполнены.'):'')};
 }
 export function LessonOpening({data,onTry}){
   const [index,setIndex]=useState(0),e=example(data,index);
