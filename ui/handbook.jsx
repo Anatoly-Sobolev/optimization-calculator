@@ -6,6 +6,7 @@ import {Button} from '@heroui/react/button';
 import {Label} from '@heroui/react/label';
 import {Link} from '@heroui/react/link';
 import {SearchField} from '@heroui/react/search-field';
+import {MethodMark} from './teaching-figures.jsx';
 import {LessonIntro} from './lesson-intro.jsx';
 import {PlanProbe} from './plan-probe.jsx';
 import {TextArea} from '@heroui/react/textarea';
@@ -38,8 +39,8 @@ function Catalogue({groups}) {
     <div className="topic-list">
       {visible.length ? <Accordion allowsMultipleExpanded expandedKeys={expanded} onExpandedChange={setExpanded}>
         {visible.map(group=><Accordion.Item id={group.goal} key={group.goal}>
-          <Accordion.Heading><Accordion.Trigger><span className="topic-name"><strong>{group.goal}</strong><small>{group.method}</small></span><Accordion.Indicator/></Accordion.Trigger></Accordion.Heading>
-          <Accordion.Panel><Accordion.Body>{group.routes.map(r=><Link className="chapter-link" key={r.href} href={r.href}><span>{r.title}</span><small>{r.source} →</small></Link>)}</Accordion.Body></Accordion.Panel>
+          <Accordion.Heading><Accordion.Trigger><MethodMark type={group.type}/><span className="topic-name"><strong>{group.goal}</strong><small>{group.method}</small></span><Accordion.Indicator/></Accordion.Trigger></Accordion.Heading>
+          <Accordion.Panel><Accordion.Body>{group.routes.map(r=><Link className="chapter-link" key={r.href} href={r.href}><span>{r.source}</span>{group.routes.filter(row=>row.source===r.source).length>1&&<small>{r.title}</small>}<i aria-hidden="true">↗</i></Link>)}</Accordion.Body></Accordion.Panel>
         </Accordion.Item>)}
       </Accordion> : <p role="status">Совпадений нет. Попробуйте название метода или другое слово из условия.</p>}
     </div>

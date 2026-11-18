@@ -15,7 +15,7 @@ const LEARN = (() => {
   function stop() { animationEpoch++; animations.forEach(a=>a.cancel()); animations=[]; }
   function begin() { stop(); records=[]; recording=true; }
   const get = k => records.find(r=>r.key===k);
-  const matrix = (rows, headers) => `<div class="learn-scroll"><table class="sx"><thead><tr>${headers.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const matrix = (rows, headers, origin) => `<div class="learn-scroll"><table class="sx"><thead><tr>${headers.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map((row,i)=>`<tr>${row.map((x,j)=>`<td ${origin?`tabindex="0" data-origin="${esc(origin(i,j))}"`:''}>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const problem = p => `<p>${p.c.map((c,j)=>`${f(c)}·x<sub>${j+1}</sub>`).join(' + ')} → ${esc(p.sense)}</p>${p.rows.map((r,i)=>`<p>(${i+1}) ${equation(r)}</p>`).join('')}`;
   const tableau = (s, mark) => R.table({...s,p:null,q:null},{mark});
   function choice(title,before,prompt,answer,alternatives,reason,extra={}) {
@@ -28,6 +28,7 @@ const LEARN = (() => {
     return choice(label,before,'Какой вывод допускает полученный результат?',answer,Object.values(names).filter(s=>s!==answer).map(s=>[s,'Этот вывод требует другого критерия. Проверьте последний этап и его условия.']),`Результат текущей трассы: ${answer.toLowerCase()}. Предел итераций не доказывает отсутствие решения.`,{deep:'Не смешивайте несовместность ограничений, неограниченность цели и остановку реализации по лимиту.'});
   }
   function pivots(ss, dual=false, prefix='Итерация', onlyFirst=false) {
+    R.rememberTables(ss);
     const out=[];
     ss.forEach((s,k)=>{
       if(onlyFirst && k>0)return;
@@ -100,7 +101,7 @@ const LEARN = (() => {
       let pair=null;
       for(let i=0;i<boundaries.length&&!pair;i++)for(let j=i+1;j<boundaries.length;j++)if(!boundaries[i].a[0].mul(boundaries[j].a[1]).eq(boundaries[i].a[1].mul(boundaries[j].a[0]))){pair=[boundaries[i],boundaries[j]];break;}
       if(pair)out.push(number('Пересечение границ',pair.map(row=>`<p>${equation({...row,s:'='})}</p>`).join(''),'Решите систему границ. Чему равна координата x₁?',w.p[0],'Вершина получается на пересечении независимых границ. После решения системы проверьте остальные ограничения и неотрицательность.',{tier:1,after:`<p>Пересечение: (${w.p.map(f).join('; ')}). Оно удовлетворяет всем ограничениям.</p>`}));
-      out.push(number('Сравнение вершин',`<p>Допустимая вершина (${w.p.map(f).join('; ')}).</p><p>c = (${p.c.map(f).join('; ')}), свободный член ${f(p.c0||Z())}.</p>`,'Чему равна цель в этой вершине?',w.f,'Подставьте координаты вершины в цель, включая свободный член. Значения сравнивают только среди допустимых точек.',{tier:1,after:matrix(r.verts.map(v=>[v.p.map(f).join('; '),f(v.f)]),['Допустимая вершина','Цель'])}));
+      out.push(number('Сравнение вершин',`<p>Допустимая вершина (${w.p.map(f).join('; ')}).</p><p>c = (${p.c.map(f).join('; ')}), свободный член ${f(p.c0||Z())}.</p>`,'Чему равна цель в этой вершине?',w.f,'Подставьте координаты вершины в цель, включая свободный член. Значения сравнивают только среди допустимых точек.',{tier:1,after:matrix(r.verts.map(v=>[v.p.map(f).join('; '),f(v.f)]),['Допустимая вершина','Цель'],(i,j)=>j?p.c.map((c,k)=>'('+txt(c)+') × ('+txt(r.verts[i].p[k])+')').join(' + ')+' + '+txt(p.c0||Z())+' = '+txt(r.verts[i].f):'Пересечение границ ограничений: '+r.verts[i].on.map(k=>typeof k==='number'?'строка '+(k+1):k+' = 0').join(', '))}));
     }
     out.push(verdict(r.status,`<p>Допустимых вершин: ${r.verts.length}. ${r.status==='optimal'?`Лучшее значение ${f(r.f)}; проверка решателем подтверждает конечный оптимум.`:r.status==='unbounded'?'Проверка обнаружила допустимое направление неограниченного улучшения.':'Проверка системы не нашла допустимых точек.'}</p>`,'Геометрический вывод'));
     return out;
@@ -120,7 +121,14 @@ const LEARN = (() => {
   }
   function transport(rec) {
     const r=rec.result,P=r.P,out=[];
-    const grid=(X)=>matrix(X.map((row,i)=>[`A${i+1}`,...row.map(f)]),['План',...P.b.map((_,j)=>`B${j+1}`)]);
+    const grid=(X)=>matrix(X.map((row,i)=>[`A${i+1}`,...row.map(f)]),['План',...P.b.map((_,j)=>`B${j+1}`)],(i,col)=>{
+      const j=col-1;if(j<0)return 'Номер склада в условии.';
+      const index=r.iters.findIndex(step=>step.X===X);
+      for(let k=index-1;k>=0;k--){const step=r.iters[k],at=step.cyc?.find(c=>c.i===i&&c.j===j);
+        if(at)return 'При перераспределении по циклу: '+txt(step.X[i][j]||Z())+' '+at.sign+' '+txt(step.theta)+' = '+txt(X[i][j]||Z())+'.';}
+      const entry=r.first?.steps.find(s=>s.i===i&&s.j===j);
+      return entry?'Первая поставка: min('+txt(entry.a0)+'; '+txt(entry.b0)+') = '+txt(entry.x)+'. Берём меньшее из запаса и спроса.':'В начальном плане по этому маршруту груз не отправляли.';
+    });
     const difference = P.sa.sub(P.sb);
     const balance = difference.isZero() ? 'Запас равен спросу. Весь груз уже учтён.' :
       difference.s > 0 ? `После выполнения заказов останется ${txt(difference)} ед. груза. В таблице этот остаток записывают в отдельный столбец.` :
@@ -129,7 +137,7 @@ const LEARN = (() => {
       ['Спрос невыполним',balance],['Добавить фиктивного потребителя',balance],['Добавить фиктивного поставщика','Дополнительный склад означал бы новый груз. '+balance],['Баланс уже выполнен',balance]
     ],balance,{after:`<p>Запас − спрос = ${f(P.sa)} − ${f(P.sb)} = ${f(difference)}.</p>`}));
     if(!r.first) return out;
-    out.push(choice('Выбор начальной клетки',matrix(P.c.map(row=>row.map(f)),P.b.map((_,j)=>`B${j+1}`)),`Как выбираем первую клетку методом «${r.init==='mc'?'минимальная стоимость':'северо-западный угол'}»?`,r.init==='mc'?'Минимальный тариф среди доступных клеток':'Левая верхняя доступная клетка',[[r.init==='mc'?'Левая верхняя доступная клетка':'Минимальный тариф среди доступных клеток','Это правило другого способа построения начального плана.'],['Максимальная возможная перевозка независимо от клетки','Размер перевозки определяют после выбора клетки.']],'Северо-западный угол не использует тарифы; минимальная стоимость сначала сравнивает тарифы доступных клеток.',{after:`<p>Первая клетка трассы: A${r.first.steps[0].i+1}B${r.first.steps[0].j+1}.</p>`,tier:1}));
+    out.push(choice('Выбор начальной клетки',matrix(P.c.map(row=>row.map(f)),P.b.map((_,j)=>`B${j+1}`),(i,j)=>'Тариф из условия варианта: стоимость перевозки единицы груза со склада A'+(i+1)+' в магазин B'+(j+1)+'.'),`Как выбираем первую клетку методом «${r.init==='mc'?'минимальная стоимость':'северо-западный угол'}»?`,r.init==='mc'?'Минимальный тариф среди доступных клеток':'Левая верхняя доступная клетка',[[r.init==='mc'?'Левая верхняя доступная клетка':'Минимальный тариф среди доступных клеток','Это правило другого способа построения начального плана.'],['Максимальная возможная перевозка независимо от клетки','Размер перевозки определяют после выбора клетки.']],'Северо-западный угол не использует тарифы; минимальная стоимость сначала сравнивает тарифы доступных клеток.',{after:`<p>Первая клетка трассы: A${r.first.steps[0].i+1}B${r.first.steps[0].j+1}.</p>`,tier:1}));
     r.first.steps.forEach((s,k)=>out.push(number('Начальный план',`<p>Метод: ${r.init==='mc'?'минимальная стоимость':'северо-западный угол'}. Клетка A${s.i+1}B${s.j+1}; остаток запаса ${f(s.a0)}, спроса ${f(s.b0)}${s.c?`, тариф ${f(s.c)}`:''}.</p>`,'Сколько можно перевезти в выбранной клетке?',s.x,'Берём минимум оставшегося запаса и спроса: нельзя превысить ни один из них.',{tier:k?2:0,after:`<p>x<sub>${s.i+1},${s.j+1}</sub> = min(${f(s.a0)}, ${f(s.b0)}) = ${f(s.x)}.</p>`})));
     const initialStage = out.find(stage => stage.title === 'Начальный план');
     if (initialStage) initialStage.allocation = {
@@ -159,7 +167,7 @@ const LEARN = (() => {
     ],'Критический путь идёт от начала к завершению проекта по критическим работам; его длительность равна T.',{after:`<p>T = ${f(r.T)}. Пути: ${r.paths.map(p=>[p[0].i,...p.map(a=>a.j)].join(' → ')).join('; ')}.</p>`})); return out;
   }
   function game(rec) {
-    const r=rec.result, grid=matrix(r.C.map(row=>row.map(f)),r.C[0].map((_,j)=>`B${j+1}`));
+    const r=rec.result, grid=matrix(r.C.map(row=>row.map(f)),r.C[0].map((_,j)=>`B${j+1}`),(i,j)=>'Выигрыш дан в условии для пары стратегий A'+(i+1)+' и B'+(j+1)+'.');
     const out=[number('Нижняя цена игры',grid,'Найдите α = maxᵢ minⱼ aᵢⱼ.',r.lower,'Сначала минимум каждой строки (худший ответ соперника), затем максимум этих гарантий.',{after:`<p>Минимумы строк: ${r.rowMin.map(f).join('; ')}. α=${f(r.lower)}.</p>`}),number('Верхняя цена игры',grid,'Найдите β = minⱼ maxᵢ aᵢⱼ.',r.upper,'Второй игрок минимизирует максимальный проигрыш: максимум каждого столбца, затем минимум.',{after:`<p>Максимумы столбцов: ${r.colMax.map(f).join('; ')}. β=${f(r.upper)}.</p>`,tier:1}),choice('Седловая точка',`<p>α=${f(r.lower)}, β=${f(r.upper)}.</p>`,'Какие стратегии требуются?',r.saddle?'Достаточно чистых стратегий':'Нужны смешанные стратегии',[[r.saddle?'Нужны смешанные стратегии':'Достаточно чистых стратегий','Чистая седловая точка существует тогда и только тогда, когда α=β.']],'При α=β строка и столбец седловой точки дают оптимальные чистые стратегии. При α<β ищем вероятностные смеси.',{after:`<p>${r.saddle?'Седловые клетки: '+r.points.map(([i,j])=>`A${i+1}B${j+1}`).join('; '):'Переходим к задаче ЛП для смешанных стратегий.'}</p>`})];
     if(r.status==='mixed') {
       out.push(number('Нормировка вероятностей',`<p>Вспомогательные веса p = (${r.sol.x.map(f).join('; ')}), Σp=${f(r.sumP)}.</p>`,'Чему равна вероятность первой стратегии x₁=p₁/Σp?',r.x[0],'Веса решения ЛП нормируются на сумму, поэтому вероятности неотрицательны и в сумме дают 1.',{after:`<p>x=(${r.x.map(f).join('; ')}), y=(${r.y.map(f).join('; ')}).</p>`,tier:1}));

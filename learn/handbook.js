@@ -47,7 +47,7 @@ const Handbook = (() => {
     const last = read('last');
     const recent = topics.find(t=>key(t)===last.topic);
     const groups = paths.map(([types,goal,method])=>({
-      goal, method, routes: topics.filter(t=>types.split(' ').includes(t.type)).map(t=>({
+      goal, method, type:types.split(' ')[0], routes: topics.filter(t=>types.split(' ').includes(t.type)).map(t=>({
         title:t.title, source:sourceName(t.src), href:url(t)
       }))
     })).filter(group=>group.routes.length);
@@ -140,6 +140,7 @@ const Handbook = (() => {
       panel.id = 'demo-view-'+i;
       panel.hidden = i !== 0;
       panel.append(demo);
+      if(i===0) demo.activateHandbook?.();
       section.append(panel);
       const controls = demo.querySelector('.dmctl');
       if (controls) {
@@ -164,6 +165,7 @@ const Handbook = (() => {
       panels[active].querySelector('.demo.playing .dm-play')?.click();
       panels[active].hidden = true;
       panels[index].hidden = false;
+      panels[index].firstElementChild.activateHandbook?.();
       active = index;
     }
     BookUI.gallery(toolbar,{titles,onSelect});

@@ -366,3 +366,44 @@
   #book .primer-pages button{font-size:.83rem;padding:6px 2px}
   #book .lesson-intro:has(+ div > .lesson-primer){padding-block:10px;margin-bottom:6px}
 }
+
+/* Figures, their legends and their working notes share the reading surface. */
+.netsvg .net-times:not(:has(.ntp:not(:empty),.ntn:not(:empty))){display:none}
+.net-key,.origin-tip,.graph-camera small{font:14px/1.4 "Segoe UI",sans-serif;color:#466253}
+.origin-tip{display:none;margin:0 0 8px}
+.demo:has(.dmstage td[data-origin])>.origin-tip{display:block}
+td[data-origin]{cursor:help}
+td[data-origin]:hover,td[data-origin]:focus-visible,td.origin-selected{outline:2px solid #497358;outline-offset:-2px}
+.cell-reading{display:grid;gap:4px;margin:9px 0;padding:10px 14px;border-left:3px solid #668969;background:#eef4eb;font:15px/1.45 "Segoe UI",sans-serif;color:#233f33;overflow-wrap:anywhere}
+.weight-source{display:grid;gap:7px;margin-bottom:12px;padding:12px;background:#edf2e9;border-radius:9px}
+.weight-line{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.weight-line strong,.weight-source p{font:600 14px/1.4 "Segoe UI",sans-serif;margin:0}
+.weight-line>span{background:#fffef8;padding:2px 8px;border-radius:5px}
+.weight-line small{color:#54725e}
+.camera-surface{touch-action:none;user-select:none}
+.camera-surface.camera-pan{cursor:grab}
+.camera-surface.camera-pan:active{cursor:grabbing}
+.camera-no-fill{display:none!important}
+.graph-camera{display:grid;gap:7px;margin:9px 0 3px;min-width:0;font:14px/1.4 "Segoe UI",sans-serif;text-align:left}
+.camera-tools,.graph-camera fieldset{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.graph-camera fieldset{margin:0;padding:4px 0;border:0;min-width:0}
+.graph-camera label{display:inline-flex;align-items:center;border-bottom:2px solid var(--ink);padding:3px 5px;gap:4px}
+#book .graph-camera label input,.graph-camera input[type=checkbox]{display:inline-block;margin:0;padding:0;width:15px;height:15px;accent-color:#376447}
+#book .camera-tools button,.camera-tools button{min-height:34px;font:600 14px/1.2 "Segoe UI",sans-serif;background:#fffef8;color:#234632;border:1px solid #bbcebc;border-radius:7px;padding:6px 10px;box-shadow:none}
+.camera-tools button[aria-pressed=true]{background:#d2e6d6!important}
+.art-ground{fill:none;stroke:#809883;stroke-width:2}
+.primer-art .teaching-art{max-height:103px}
+#book .topic-list{background:none;border:0;padding:0}
+#book .topic-list [data-slot=accordion-item]{border-bottom:1px solid #c9d4c7;background:transparent;padding:0}
+#book .topic-list [data-slot=accordion-trigger]{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:14px;padding:16px 10px;text-align:left;color:#193e30;border-radius:8px;outline-offset:-3px}
+#book .topic-list [data-slot=accordion-trigger]:hover{background:#edf2e6}
+#book .topic-list [data-slot=accordion-trigger]:focus:not(:focus-visible){outline:0}
+.method-mark{width:36px;height:35px;color:#5c7a5c}
+#book .topic-list [data-slot=accordion-body]{display:block;padding:3px 10px 17px 66px}
+#book .topic-list .accordion__body-inner{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;padding:0}
+#book .topic-list .chapter-link{width:100%}
+#book .topic-list .chapter-link{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;text-align:left;gap:3px 7px;position:relative;border:1px solid #c6d6c4;border-radius:8px;background:#fffef8;padding:10px 12px;margin:0}
+.chapter-link i{color:#597758;grid-row:1;grid-column:2;font-style:normal}
+#book .chapter-link small{grid-column:1/-1;text-align:left}
+@media(max-width:520px){#book .topic-list [data-slot=accordion-body]{padding-left:10px}}
+.cell-reading button{justify-self:start;background:#fffcf4;color:#28533e;border:1px solid #b7cbb8;border-radius:7px;padding:6px 10px;font:600 14px/1.3 system-ui,sans-serif;cursor:pointer}

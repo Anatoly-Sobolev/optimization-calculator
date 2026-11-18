@@ -352,7 +352,7 @@ const VIEWS = (() => {
   }
   function dmShell(id, title, o = {}) {
     return `<div class="demo" id="${id}"><div class="dmhead"><span class="dmtag">${o.tag || 'анимация'}</span><span class="dmtl">${title}</span>${o.detail ? `<label class="dmdet"><input type="checkbox" class="dm-det"> ${o.detail}</label>` : ''}</div>
-      <div class="dmstage"></div><div class="dmcap" aria-live="polite"></div><div class="dmprog"><i></i></div>
+      <div class="origin-tip">Выберите заполненную ячейку, чтобы разобрать её значение.</div><div class="dmstage"></div><div class="dmcap" aria-live="polite"></div><div class="dmprog"><i></i></div>
       <div class="dmctl"><button class="btn dm-re" title="Проиграть с начала">↺ Заново</button><button class="btn dm-prev" title="Предыдущий шаг">◀ Назад</button><span class="dmpos">шаг 0 из 0</span><button class="btn dm-next" title="Следующий шаг">Далее ▶</button><button class="btn primary dm-play">▶ Играть</button><button class="btn dm-end" title="Показать итог">⏭ Итог</button>
       <select class="dm-speed" aria-label="Скорость">${SPEEDS.map(s => `<option value="${s[0]}"${s[0] === '1' ? ' selected' : ''}>${s[1]}</option>`).join('')}</select></div>
       <div class="dmleg">${dmLegend}</div></div><!--dmend-->`;
@@ -362,8 +362,9 @@ const VIEWS = (() => {
     const { html, script, opts = {} } = spec;
     const stage = root.querySelector('.dmstage'), capEl = root.querySelector('.dmcap'), posEl = root.querySelector('.dmpos'), barEl = root.querySelector('.dmprog i');
     const $b = c => root.querySelector('.' + c);
-    let token = 0, total = 0, cur = 0, playing = false, speed = 1, detail = false, fastNow = true, curCfg = null, rtimer = null, io = null, disposed = false;
+    let token = 0, total = 0, cur = 0, playing = false, speed = 1, detail = !!opts.detail, fastNow = true, curCfg = null, rtimer = null, io = null, disposed = false;
     const pend = new Set();
+    const cameraState = {};
     const reduce = reduceMotion();
     const clearPending = () => { pend.forEach(r => { clearTimeout(r[0]); r[1](); }); pend.clear(); };
     const ui = () => {
@@ -376,6 +377,8 @@ const VIEWS = (() => {
     const run = async cfg => {
       const my = ++token; curCfg = cfg; clearPending();
       stage.innerHTML = html; capEl.innerHTML = '';
+      const plane=stage.querySelector('svg.gsvg');
+      if(plane) GraphCamera.attach(plane,cameraState);
       let k = 0; fastNow = true;
       const alive = () => { if (my !== token || disposed || !root.isConnected) throw DM_STOP; };
       const kf = (el, frames, o = {}) => el.animate(frames, { duration: fastNow ? 0 : (o.d || 450) * speed, delay: fastNow ? 0 : (o.delay || 0) * speed, easing: o.ease || 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
@@ -389,13 +392,14 @@ const VIEWS = (() => {
         hide: (el, o) => A.anim(el, [{ opacity: 1 }, { opacity: 0 }], { d: 300, ...o }),
         pulse: (el, o) => A.anim(el, [{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { d: 420, ...o }),
         swap: async (el, h, d = 420) => {
-          if (!el) return; if (fastNow) { el.innerHTML = h; return; }
+          if (!el) return; if (fastNow) { el.innerHTML = h; CellOrigin.save(el,capEl.textContent); return; }
           await el.animate([{ transform: 'rotateX(0)' }, { transform: 'rotateX(90deg)' }], { duration: d / 2 * speed, fill: 'forwards' }).finished.then(alive, alive);
-          el.innerHTML = h;
+          el.innerHTML = h; CellOrigin.save(el,capEl.textContent);
           await el.animate([{ transform: 'rotateX(90deg)' }, { transform: 'rotateX(0)' }], { duration: d / 2 * speed, fill: 'forwards' }).finished.then(alive, alive);
         },
-        set: (el, h) => { if (el) el.innerHTML = h; },
+        set: (el, h) => { if (el) {el.innerHTML = h; CellOrigin.save(el,capEl.textContent);} },
         fly: (from, to, h, o = {}) => {
+          CellOrigin.source(from,to,capEl.textContent);
           if (fastNow || !from || !to) return Promise.resolve();
           const sr = stage.getBoundingClientRect(), a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
           const c = document.createElement('span'); c.className = 'dmfly'; c.innerHTML = h == null ? from.innerHTML : h;
@@ -405,14 +409,14 @@ const VIEWS = (() => {
             { duration: (o.d || 750) * speed, delay: (o.delay || 0) * speed, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove(), () => c.remove()).then(alive);
         },
         // перелёт копии в ячейку и запись в неё значения (h; по умолчанию — содержимое источника)
-        put: async (from, to, h, o) => { await A.fly(from, to, h == null ? null : h, o); if (to) { to.innerHTML = h == null ? from.innerHTML : h; await A.pop(to, { d: 300 }); } },
+        put: async (from, to, h, o) => { await A.fly(from, to, h == null ? null : h, o); if (to) { to.innerHTML = h == null ? from.innerHTML : h; CellOrigin.save(to,capEl.textContent); await A.pop(to, { d: 300 }); } },
         draw: (el, o) => { if (!el) return Promise.resolve(); el.classList.remove('dh'); return A.anim(el, [{ strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, opacity: 1 }], { d: 700, ease: 'ease-in-out', ...o }); },
         cls: (el, c, on = true) => { if (el) (Array.isArray(el) ? el : [el]).forEach(e => e && e.classList.toggle(c, on)); },
         cap: h => {
           k++;
           if (k > curCfg.stop) throw DM_HALT;
           fastNow = reduce || k < curCfg.anim;
-          cur = k; capEl.innerHTML = h; ui();
+          cur = k; stage.dataset.frame=k; capEl.innerHTML = h; ui();
           if (!fastNow) capEl.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 300 });
         },
         seq: (list, gap, fn) => Promise.all(list.map((x, i) => A.wait(i * gap).then(() => fn(x, i)))),
@@ -430,6 +434,7 @@ const VIEWS = (() => {
     };
     const halt = () => { token++; clearPending(); clearTimeout(rtimer); rtimer = null; playing = false; };
     const goTo = (n, animate) => { halt(); n = Math.max(0, Math.min(total, n)); cur = n; ui(); return run({ stop: n, anim: animate ? n : Infinity }); };
+    root.replayCell=frame=>goTo(frame,true);
     const toEnd = () => { halt(); return run({ stop: Infinity, anim: Infinity }).then(() => { cur = total; ui(); }); };
     const playFrom = from => {
       if (DM.active && DM.active !== ctl) DM.active.settle();
@@ -468,6 +473,7 @@ const VIEWS = (() => {
     $b('dm-end').onclick = () => toEnd();
     $b('dm-speed').onchange = e => { speed = +e.target.value; };
     const det = $b('dm-det');
+    if(det) det.checked=detail;
     if (det) det.onchange = () => { detail = det.checked; total = 0; toEnd(); };
     toEnd().then(() => {
       if (disposed) return;
@@ -482,7 +488,9 @@ const VIEWS = (() => {
   }
   function demo(title, html, script, opts = {}) {
     const id = 'dm' + (++dmUid);
-    R.hooks.push(() => { const root = document.getElementById(id); if (root) mountDemo(root, { html, script, opts }); });
+    R.hooks.push(() => { const root = document.getElementById(id); if (!root) return;
+      if(opts.galleryLazy) root.activateHandbook=()=>{delete root.activateHandbook;mountDemo(root,{html,script,opts});};
+      else mountDemo(root, { html, script, opts }); });
     return dmShell(id, title, opts);
   }
   // динамическая сцена (степпер таблиц): монтируется в готовый контейнер
@@ -503,7 +511,7 @@ const VIEWS = (() => {
   function dtb(st, o = {}) {
     const m = st.rows.length, cols = st.cols, fq = o.fq || R.fq;
     const hlc = (i, j) => o.hl && st.q != null ? (j === st.q && i === st.p ? ' pe' : j === st.q ? ' pc' : i === st.p ? ' pr' : '') : '';
-    const cell = (v, i, j, cls) => `<td class="${(cls || '') + hlc(i, j)}" data-i="${i}" data-j="${j}"><span class="cv">${v == null ? '' : fq(v)}</span></td>`;
+    const cell = (v, i, j, cls) => `<td class="${(cls || '') + hlc(i, j)}" data-i="${i}" data-j="${j}" ${v==null?'':`tabindex="0" data-origin="${R.originFor(st,i,j,v)}"`}><span class="cv">${v == null ? '' : fq(v)}</span></td>`;
     let h = `<div class="tblwrap ${o.cls || ''}"><table class="sx dmsx"><thead><tr><th class="bh">Базис</th><th data-j="-1">b</th>${cols.map(j => `<th data-j="${j}" class="${vkClass(st.vars, j)}">${vname(st.vars, j)}<span class="vtag">${vkTag(st.vars, j)}</span></th>`).join('')}${o.ratio ? '<th class="rth">b ÷ a</th>' : ''}</tr></thead><tbody>`;
     st.rows.forEach((r, i) => {
       h += `<tr data-i="${i}"><td class="bas" data-i="${i}" data-j="bas"><span class="cv">${vK(st.vars, st.basis[i])}</span></td>` + cell(o.blank ? null : r.b, i, -1, 'bcol') + cols.map(j => cell(o.blank ? null : r.a[j], i, j)).join('') + (o.ratio ? `<td class="rt" data-i="${i}"><span class="cv dh"></span></td>` : '') + '</tr>';
@@ -522,6 +530,7 @@ const VIEWS = (() => {
   /* =================== Пересчёт симплекс-таблицы =================== */
   // s — таблица с выбранными q, p; nxt — таблица после пересчёта. opts.drive — вывод искусственной переменной.
   function pivotSpec(s, nxt, o = {}) {
+    R.rememberTables([s,nxt]);
     const fq = o.fq || R.fq, par = o.par || R.par;
     const m = s.rows.length, q = s.q, p = s.p, vars = s.vars, cols = s.cols, zl = zlab(s.z.label);
     const enter = vK(vars, q), leave = p != null ? vK(vars, s.basis[p]) : '';
@@ -1436,13 +1445,26 @@ const VIEWS = (() => {
       piv.push(c); r++;
     }
     const incons = M.slice(r).some(row => !row[k].isZero()), free = [...Array(k).keys()].filter(c => !piv.includes(c));
-    const tbl = (S, tag) => `<table class="sx dmsx gm"><thead><tr><th></th>${names.map(n => `<th>${n}</th>`).join('')}<th>b</th></tr></thead><tbody>${S.map((row, i) => `<tr data-r="${i}"><td class="bas">(${i + 1})</td>${row.map((v, j) => `<td data-r="${i}" data-c="${j}"><span class="cv">${fq(v)}</span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    const tbl = (S, tag) => `<table class="sx dmsx gm"><thead><tr><th></th>${names.map(n => `<th>${n}</th>`).join('')}<th>b</th></tr></thead><tbody>${S.map((row, i) => `<tr data-r="${i}"><td class="bas">(${i + 1})</td>${row.map((v, j) => `<td data-r="${i}" data-c="${j}" tabindex="0" data-origin="В уравнении ${i+1} системы ${j===names.length?'правая часть':'коэффициент при неизвестной № '+(j+1)} равен ${v.toText()}."><span class="cv">${fq(v)}</span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
     const html = `<div class="tblwrap">${tbl(M0)}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
     const script = async A => {
       const T = A.q('table.gm'), fm = A.q('.pvfm'), sum = A.q('.pvsum');
       const cellAt = (i, j) => T.querySelector(`td[data-r="${i}"][data-c="${j}"]`);
       const rowCells = i => [...T.querySelectorAll(`td[data-r="${i}"]`)];
-      const setRow = async (i, S, d) => { await A.seq([...Array(k + 1).keys()], 60, j => A.swap(cellAt(i, j).querySelector('.cv'), fq(S[i][j]), d || 420)); };
+      const setRow = async (i,S,previous,operation)=>{
+        for(let j=0;j<=k;j++){
+          const old=previous[i][j],after=S[i][j],col=j===k?'b':plain(names[j]);
+          let calculation;
+          if(operation.t==='swap'){
+            const from=i===operation.p?operation.r:operation.p;
+            calculation=`из строки ${from+1} переносим ${fq(previous[from][j])}`;
+          }else if(operation.t==='div') calculation=`${fq(old)} ÷ ${par(operation.pv)}`;
+          else calculation=`${fq(old)} − ${par(operation.f)} × ${par(previous[operation.r][j])}`;
+          A.cap(`Строка ${i+1}, столбец ${col}: ${calculation}.`);
+          A.set(fm,`<span class="fmh">${calculation} = <b class="calc-result">${fq(after)}</b></span>`);
+          await A.put(A.q('.pvfm .calc-result'),cellAt(i,j).querySelector('.cv'),fq(after));
+        }
+      };
       await A.wait(250);
       A.cap('Записываем систему в виде таблицы: строки — уравнения, столбцы — неизвестные');
       A.cls(rowCells(0), 'k-sel'); await A.wait(200); A.cls(rowCells(0), 'k-sel', false);
@@ -1451,16 +1473,16 @@ const VIEWS = (() => {
         const o = ops[s], S = snaps[s + 1];
         if (o.t === 'swap') {
           A.cap(`В столбце ${plain(names[o.c])} на месте ведущего 0 — меняем строки (${o.r + 1}) и (${o.p + 1})`);
-          A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act'); await Promise.all([setRow(o.r, S), setRow(o.p, S)]); A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act', false);
+          A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act'); await setRow(o.r,S,prev,o); await setRow(o.p,S,prev,o); A.cls([...rowCells(o.r), ...rowCells(o.p)], 'k-act', false);
         } else if (o.t === 'div') {
           A.cap(`Делим строку (${o.r + 1}) на ведущий элемент ${plain(fq(o.pv))}`);
           A.cls(cellAt(o.r, o.c), 'k-pe'); A.cls(rowCells(o.r), 'k-sel');
-          await setRow(o.r, S); A.cls(cellAt(o.r, o.c), 'k-pe', false); A.cls(rowCells(o.r), 'k-sel', false); A.cls(rowCells(o.r), 'k-ok');
+          await setRow(o.r,S,prev,o); A.cls(cellAt(o.r, o.c), 'k-pe', false); A.cls(rowCells(o.r), 'k-sel', false); A.cls(rowCells(o.r), 'k-ok');
         } else {
           A.cap(`Из строки (${o.i + 1}) вычитаем ${plain(fq(o.f))} × строку (${o.r + 1}) — обнуляем столбец ${plain(names[o.c])}`);
           A.cls(rowCells(o.r), 'k-sel'); A.cls(rowCells(o.i), 'k-act'); A.cls(cellAt(o.i, o.c), 'k-del');
           A.set(fm, `<span class="fmh">строка (${o.i + 1}) − ${par(o.f)} × строка (${o.r + 1})</span>`);
-          await setRow(o.i, S);
+          await setRow(o.i,S,prev,o);
           A.cls(rowCells(o.r), 'k-sel', false); A.cls(rowCells(o.i), 'k-act', false); A.cls(cellAt(o.i, o.c), 'k-del', false);
         }
         prev = S;
@@ -1531,8 +1553,8 @@ const VIEWS = (() => {
   function demoBuild(P, D) {
     const n = P.c.length, m = P.rows.length, yS = D.signs || [...Array(m)].map(() => '>=');
     let t = `<table class="sx dmt"><tr><th></th>${[...Array(n)].map((_, j) => `<th data-cj="${j}">${xv(j + 1)}</th>`).join('')}<th></th><th>b</th></tr>`;
-    P.rows.forEach((r, i) => { t += `<tr><td class="bas">${yv(i + 1)}</td>${r.a.map((v, j) => `<td data-cj="${j}"><span class="ch" data-i="${i}" data-j="${j}">${fq(v)}</span></td>`).join('')}<td>${sg(r.s)}</td><td class="bcol" data-bb="1"><span class="ch" data-b="${i}">${fq(r.b)}</span></td></tr>`; });
-    t += `<tr class="zrow"><td class="bas"><i>c</i></td>${P.c.map((v, j) => `<td data-cj="${j}"><span class="ch" data-c="${j}">${fq(v)}</span></td>`).join('')}<td colspan="2">→ ${P.sense}</td></tr></table>`;
+    P.rows.forEach((r, i) => { t += `<tr><td class="bas">${yv(i + 1)}</td>${r.a.map((v, j) => `<td data-cj="${j}" tabindex="0" data-origin="Коэффициент при x${j+1} из условия ${i+1} прямой задачи. Во второй записи он умножается на y${i+1} в условии ${j+1}."><span class="ch" data-i="${i}" data-j="${j}">${fq(v)}</span></td>`).join('')}<td>${sg(r.s)}</td><td class="bcol" data-bb="1" tabindex="0" data-origin="Правая часть строки ${i+1} в исходной задаче. Станет коэффициентом при y${i+1} в двойственной цели."><span class="ch" data-b="${i}">${fq(r.b)}</span></td></tr>`; });
+    t += `<tr class="zrow"><td class="bas"><i>c</i></td>${P.c.map((v, j) => `<td data-cj="${j}" tabindex="0" data-origin="Коэффициент цели при x${j+1}. Станет правой частью двойственного условия ${j+1}."><span class="ch" data-c="${j}">${fq(v)}</span></td>`).join('')}<td colspan="2">→ ${P.sense}</td></tr></table>`;
     const gl = `<div class="dl" data-g="1"><i>g</i> = ${TM(D.c, ylab, 'dh')} → <span class="ch gs">${P.sense}</span></div>`;
     const rows = D.rows.map((r, j) => `<div class="dl" data-d="${j}">${TM(r.a, ylab, 'dh')} <span class="ch dh rs">${sg(r.s)}</span> <span class="ch dh" data-r="${j}">${fq(r.b)}</span> <span class="kbd">(Д${j + 1})</span></div>`).join('');
     const sl = `<div class="dl">${yS.map((s, i) => `<span class="ch dh ysg">${signTxt(s, yv(i + 1))}${i < m - 1 ? ',' : ''}</span>`).join(' ')}</div>`;

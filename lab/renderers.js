@@ -44,6 +44,27 @@ const R = (() => {
   };
 
   /* ---------- симплекс-таблица ---------- */
+  const priorTable=new WeakMap();
+  function rememberTables(steps) {
+    steps.forEach((s,i)=>{
+      const next=steps[i+1];
+      if(next && s.p!=null && s.q!=null && s.kind!=='cut' && s.z.label===next.z.label && s.cols.length===next.cols.length && s.rows.length===next.rows.length && next.basis[s.p]===s.q)
+        priorTable.set(next.rows,s);
+    });
+  }
+  function originFor(st,i,j,value) {
+    const prior=priorTable.get(st.rows);
+    const get=(t,k,l)=>{const row=t.rows[k]||t.z;return l<0?row.b:row.a[l];};
+    if(prior) {
+      const old=get(prior,i,j).toText(), pivot=get(prior,prior.p,prior.q).toText();
+      if(i===prior.p)return `Делим прежнее значение ведущей строки на ведущий элемент: (${old}) ÷ (${pivot}) = ${value.toText()}.`;
+      return `Из прежнего числа вычитаем произведение коэффициента ведущего столбца и числа из новой ведущей строки: (${old}) − (${get(prior,i,prior.q).toText()}) × (${get(st,prior.p,j).toText()}) = ${value.toText()}.`;
+    }
+    const row=st.rows[i]||st.z;
+    const terms=row.a.map((v,k)=>!v.isZero()?`(${v.toText()})·${st.vars[k].kind==='t'?'t':'x'}${st.vars[k].k}`:null).filter(Boolean);
+    if(i===st.rows.length)return (j<0?'Правая часть':'Коэффициент переменной')+' в уравнении цели для этого базиса: '+row.label+(terms.length?' + '+terms.join(' + '):'')+' = '+row.b.toText()+'.';
+    return (j<0?'Правая часть равенства':'Коэффициент переменной в равенстве')+' строки '+(i+1)+': '+terms.join(' + ')+' = '+row.b.toText()+'.';
+  }
   function table(st, o = {}) {
     const hl = o.hl && st.q != null, rat = o.ratio && st.q != null;
     let h = '<table class="sx"><thead><tr><th>Базис</th><th>b</th>' + st.cols.map(j => { const v = st.vars[j], kc = v.kind === 'x' ? 'vk-x' : v.kind === 't' ? 'vk-t' : v.sign < 0 ? 'vk-e' : 'vk-s', kt = v.kind === 'x' ? 'исходная' : v.kind === 't' ? 'искусств.' : v.sign < 0 ? 'излишек' : 'остаток'; return `<th class="${v.kind === 't' ? 'tcol ' : ''}${kc}">${vname(st.vars, j)}<span class="vtag">${kt}</span></th>`; }).join('') + (rat ? '<th>b ÷ ведущий столбец</th>' : '') + '</tr></thead><tbody>';
@@ -53,7 +74,7 @@ const R = (() => {
       if (hl) { if (j === st.q && i === st.p) c += ' pe'; else if (j === st.q) c += ' pc'; else if (i === st.p) c += ' pr'; }
       if (o.mark) { const mk = o.mark(i, j); if (mk) c += ' ' + mk; }
       if (o.click && (o.clickRow == null || o.clickRow === i)) c += ' click';
-      return `<td class="${c}" data-i="${i}" data-j="${j}">${fq(v)}</td>`;
+      return `<td class="${c}" data-i="${i}" data-j="${j}" tabindex="0" data-origin="${originFor(st,i,j,v)}">${fq(v)}</td>`;
     };
     st.rows.forEach((r, i) => {
       h += `<tr><td class="bas">${vname(st.vars, st.basis[i])}</td>` + cell(r.b, i, -1) + st.cols.map(j => cell(r.a[j], i, j)).join('');
@@ -123,6 +144,7 @@ const R = (() => {
     return { html: h, value: nw };
   }
   function stepper(steps, title) {
+    rememberTables(steps);
     const id = 'st' + (++uid);
     R_last.id = id;
     hooks.push(() => {
@@ -637,8 +659,18 @@ const R = (() => {
         S.test = p; redraw();
       }
       let drag = null;
-      svgEl.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, v: S.v.slice(), moved: false }; try { svgEl.setPointerCapture(e.pointerId); } catch (_) { /* синтетические события */ } });
+      const fingers=new Map();
+      const distance=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+      svgEl.addEventListener('pointerdown', e => { fingers.set(e.pointerId,e); drag = { x: e.clientX, y: e.clientY, v: S.v.slice(), moved: false }; try { svgEl.setPointerCapture(e.pointerId); } catch (_) { /* синтетические события */ } });
       svgEl.addEventListener('pointermove', e => {
+        const last=fingers.get(e.pointerId);
+        if(last) fingers.set(e.pointerId,e);
+        if(last && fingers.size===2){
+          const other=[...fingers.values()].find(f=>f.pointerId!==e.pointerId);
+          const was=distance(last,other), now=distance(e,other);
+          if(was>1 && now>1){const mid=toData({clientX:(e.clientX+other.clientX)/2,clientY:(e.clientY+other.clientY)/2});zoom(was/now,mid[0],mid[1]);}
+          drag=null;return;
+        }
         const d = toData(e);
         coord.textContent = inPlot(d) ? `${ax[0]} = ${fmtN(d[0])}; ${ax[1]} = ${fmtN(d[1])}` : '';
         if (!drag) return;
@@ -650,7 +682,7 @@ const R = (() => {
         S.v = [drag.v[0] - ux, drag.v[1] - ux, drag.v[2] + uy, drag.v[3] + uy]; redraw();
       });
       svgEl.addEventListener('pointerup', e => {
-        svgEl.classList.remove('dragging');
+        fingers.delete(e.pointerId);svgEl.classList.remove('dragging');
         if (drag && !drag.moved) {
           const c = e.target.closest && e.target.closest('circle.spt');
           if (c) { const Pt = cfg.paths[+c.dataset.path]; if (Pt && Pt.from) document.dispatchEvent(new CustomEvent('sxgo', { detail: { id: Pt.from, k: +c.dataset.k } })); }
@@ -659,7 +691,8 @@ const R = (() => {
         drag = null;
       });
       svgEl.addEventListener('pointerleave', () => { coord.textContent = ''; });
-      svgEl.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); const d = toData(e); zoom(e.deltaY > 0 ? 1.15 : 1 / 1.15, d[0], d[1]); }, { passive: false });
+      svgEl.addEventListener('pointercancel',e=>{fingers.delete(e.pointerId);drag=null;});
+      svgEl.addEventListener('wheel', e => { e.preventDefault(); const d = toData(e); zoom(e.deltaY > 0 ? 1.15 : 1 / 1.15, d[0], d[1]); }, { passive: false });
       root.querySelector('.tclear').onclick = () => { S.test = null; testBox.innerHTML = '<span class="kbd">Щёлкните по графику — проверим любую точку.</span>'; redraw(); };
       (cfg.paths || []).forEach((Pt, pi) => { if (Pt.from) on('sxstep', e => { if (e.detail.id === Pt.from) { S.cur[pi] = e.detail.k; redraw(); } }); });
       if (S.lvl != null) linfo.innerHTML = `${fname} = ${fmtN(S.lvl + f0)}`;
@@ -724,7 +757,7 @@ const R = (() => {
     return `<div class="plotwrap" id="${id}w">
       <div class="btnrow ptool"><span class="seg"><button class="btn mode on" data-m="region">Вся область</button><button class="btn mode" data-m="steps">Построить по шагам</button></span>
         <span class="seg"><button class="btn zout" title="отдалить">−</button><button class="btn zin" title="приблизить">+</button><button class="btn zhome" title="вернуть исходный вид">Вписать</button><button class="btn zall" title="показать все четыре четверти">±</button></span>
-        <span class="kbd">перетаскивайте график мышью · Ctrl + колесо — масштаб · щелчок — проверить точку</span></div>
+        <span class="kbd">перетаскивайте поле · колесо или два пальца — масштаб · щелчок — проверить точку</span></div>
       ${!trainer && cfg.purpose ? guideBar(cfg.purpose) : ''}
       <div class="stepbox" style="display:none"><div class="btnrow"><button class="btn st-p">← Назад</button><input type="range" class="steprange" min="0" max="${order.length}" value="0"><button class="btn primary st-n">Следующее ограничение →</button><button class="btn st-auto">▶ Авто</button></div><div class="steptxt note"></div></div>
       ${trainer ? '<div class="ptrain"></div>' : ''}
@@ -902,6 +935,6 @@ const R = (() => {
         <div class="legend col"><span style="--c:#c9d1ff">грани допустимой области</span><span style="--c:#e8456b">вершины, которые проходит симплекс-метод (номер = номер таблицы)</span><span style="--c:#e8456b">● оптимальная вершина</span><span style="--c:#f7a8bb">плоскость уровня c·x = const</span></div></div></div></div>`;
   }
 
-  return { fq, approx, par, xv, tv, yv, vname, zlab, sg, lin, vec, sec, table, basicSol, stepText, stepper, allTables, plot, plot3d, hooks, R_last, spark, offAll, TR, bridge };
+  return { originFor, rememberTables, fq, approx, par, xv, tv, yv, vname, zlab, sg, lin, vec, sec, table, basicSol, stepText, stepper, allTables, plot, plot3d, hooks, R_last, spark, offAll, TR, bridge };
 })();
 

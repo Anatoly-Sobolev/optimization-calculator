@@ -52,6 +52,8 @@ const LessonVisuals = (() => {
         lines[i].style.strokeWidth = Math.max(1,quantity+1);
         lines[i].setAttribute('class',quantity < 0 ? 'invalid' : quantity === 0 ? 'empty' : '');
         row.querySelector('b').textContent = quantity;
+        CellOrigin.register(row.cells[1],'Тариф этого маршрута задан в примере: '+routes[i][2]+' ₽ за ящик.');
+        CellOrigin.register(row.cells[2],routes[i][1]+(routes[i][3]>0?' + ':' − ')+t+' = '+quantity+' ящиков.');
         row.querySelector('.box-strip').style.width = Math.max(0,loads[i])*12+'px';
         row.classList.toggle('impossible',loads[i]<0);
       });
@@ -67,6 +69,7 @@ const LessonVisuals = (() => {
       ];
       host.querySelector('.cycle-caption').textContent = explanation[t];
       host.querySelector('.delivery-matrix').innerHTML = '<table><thead><tr><th>План при θ = '+t+'</th><th>Парк</th><th>Мир</th></tr></thead><tbody><tr><th>Склад 1</th><td>'+loads[0]+'</td><td>'+loads[1]+'</td></tr><tr><th>Склад 2</th><td>'+loads[2]+'</td><td>'+loads[3]+'</td></tr></tbody></table>';
+      host.querySelectorAll('.delivery-matrix tbody td').forEach((td,i)=>CellOrigin.register(td,routes[i][1]+(routes[i][3]>0?' + ':' − ')+t+' = '+loads[i]+' ящиков.'));
       button.textContent = ['Обменять два маршрута','Повторить обмен','Сделать третий обмен','Проверить ещё один обмен','Вернуться к началу'][t];
       range.setAttribute('aria-valuetext',t+' обменов');
     }
@@ -153,7 +156,15 @@ const LessonVisuals = (() => {
       if(cycle && frame>0) note+=frame===length?' Цикл завершён: общий груз каждого склада и заказ каждого магазина сохранились.':' Это часть пересчёта. Балансы проверим после всего цикла.';
       for(let i=0;i<cells.length;i++) for(let j=0;j<cells[i].length;j++){
         const cell=cells[i][j], token=active.find(c=>c.i===i&&c.j===j);
-        cell.textContent=values[i][j]??'—';cell.classList.toggle('trace-active',Boolean(token));
+        cell.textContent=values[i][j]??'—';
+        if(cycle){
+          const op=cycle.path.slice(0,frame*2).find(c=>c.i===i&&c.j===j);
+          CellOrigin.register(cell,op?(initial[i][j]||'0')+' '+op.sign+' '+cycle.amount+' = '+(values[i][j]||'0'):'Исходный план перед этим циклом: '+(initial[i][j]||'0')+' единиц.');
+        } else {
+          const entry=fill.entries.slice(0,frame).find(e=>e.i===i&&e.j===j);
+          CellOrigin.register(cell,entry?'Берём меньшее из запаса и спроса: min('+entry.stock+'; '+entry.need+') = '+entry.x+'.':'На этом шаге поставка сюда ещё не записана.');
+        }
+        cell.classList.toggle('trace-active',Boolean(token));
         const sign=cycle?.path.find(c=>c.i===i&&c.j===j)?.sign;
         if(sign){const mark=document.createElement('small');mark.textContent=' '+sign;cell.append(mark);}
         if(token && !matchMedia('(prefers-reduced-motion: reduce)').matches)

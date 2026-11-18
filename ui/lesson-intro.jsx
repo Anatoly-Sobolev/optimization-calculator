@@ -1,4 +1,5 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect,useRef} from 'react';
+import {Workshop,CutPieces,PayoffBalance} from './teaching-figures.jsx';
 import {Button} from '@heroui/react/button';
 
 const show = LU.txt, num = LU.num, vec = LU.vec;
@@ -74,6 +75,8 @@ function transport(d) {
 }
 function PlanMap({d,index,choose}) {
   const vertices=d.rec.graph.verts;
+  const plane=useRef(null);
+  useEffect(()=>GraphCamera.attach(plane.current,{},true),[d]);
   const [picked,setPicked]=useState(null);
   const point=picked||vertices[index].p;
   const maxX=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[0])))),maxY=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[1]))));
@@ -94,12 +97,13 @@ function PlanMap({d,index,choose}) {
     e.preventDefault();
     setPicked(point.map((v,i)=>Q.of(Math.max(0,Math.min(i?maxY:maxX,Math.round(num(v)*10+delta[i])/10)))));
   }
-  return <><svg className="primer-plot" tabIndex="0" onKeyDown={movePoint} viewBox="0 0 294 180" role="img" aria-label={'Координаты '+vec(point)+'. Стрелки перемещают точку.'}
+  return <><svg ref={plane} className="primer-plot" tabIndex="0" onKeyDown={movePoint} viewBox="0 0 294 180" role="img" aria-label={'Координаты '+vec(point)+'. Стрелки перемещают точку.'}
       onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);place(e);}} onPointerMove={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId)) place(e);}}>
     {[.25,.5,.75,1].map(f=><path key={f} d={'M'+sx(f*maxX)+' 29V149 M35 '+sy(f*maxY)+'H257'} fill="none" stroke="#cfdbcc"/>)}
     <path d="M35 12V149H282" className="primer-axis"/><text x="273" y="162">x₁</text><text x="10" y="18">x₂</text><text x="18" y="166">0</text>
     <text x="257" y="168" textAnchor="middle">{maxX}</text><text x="27" y="33" textAnchor="end">{maxY}</text>
-    <polygon points={polygon} fill="#b9decc" stroke="#30694f"/>
+    {GraphCamera.halfplanes(d.P.rows,maxX,maxY,sx,sy).map(({i,points,edge})=>{const color=['#657fc3','#ba793a','#4b916f','#c16883'][i%4];return <g key={i}>{points&&<polygon className="gh" data-i={i} points={points} fill={color} opacity=".14"/>}<polyline points={edge} fill="none" stroke={color} strokeWidth="1.2"/></g>;})}
+    <polygon className="primer-region" points={polygon} fill="#b9decc" stroke="#30694f"/>
     {vertices.map((v,i)=><circle key={i} cx={sx(v.p[0])} cy={sy(v.p[1])} r="4" fill="#295e44"/>)}
     <path d={'M35 '+sy(point[1])+'H'+sx(point[0])+'V149'} fill="none" stroke="#664b35" strokeDasharray="3 3"/>
     <circle cx={sx(point[0])} cy={sy(point[1])} r="6" stroke="white" strokeWidth="2" fill={valid?'#235e44':'#a44626'}/>
@@ -122,7 +126,7 @@ function simplex(d) {
   return [
     frame('Что выбираем','Представьте, что мастерская выпускает несколько видов изделий. Количество первого обозначим x₁. В первой строке каждое такое изделие расходует '+show(p.rows[0].a[0])+' единиц ресурса, а всего доступно '+show(p.rows[0].b)+'. Увеличьте выпуск и посмотрите на остаток. Здесь остальные количества равны нулю.',(n,set)=>{
       const row=p.rows[0], remainder=row.b.sub(row.a[0].mul(n));
-      return <><Points values={[row.b,row.a[0].mul(n)]} names={['Доступно','Израсходовано']}/><Gauge label="Свободный остаток" value={remainder} extent={num(row.b)} caption={remainder.s<0?'Выпуск превышает доступный запас.':'Первое ограничение выполнено.'}/><Dial label="Выпуск первого изделия" max={Math.ceil(num(row.b)/num(row.a[0]))+1} value={n} change={set}/></>;
+      return <><Workshop count={n} capacity={num(row.b)} rate={num(row.a[0])}/><Points values={[row.b,row.a[0].mul(n)]} names={['Доступно','Израсходовано']}/><Gauge label="Свободный остаток" value={remainder} extent={num(row.b)} caption={remainder.s<0?'Выпуск превышает доступный запас.':'Первое ограничение выполнено.'}/><Dial label="Выпуск первого изделия" max={Math.ceil(num(row.b)/num(row.a[0]))+1} value={n} change={set}/></>;
     }),
     frame('Что меняет один шаг','Теперь учитываем все изделия и все ограничения сразу. Каждая плитка показывает количество одного изделия. Ползунок переключает допустимые планы из расчёта. Сравните, как меняется результат: здесь его нужно '+(p.sense==='max'?'увеличить':'уменьшить')+'.',desk),
     {...frame('Как прочитать ответ','Каждая плитка показывает количество одного вида в лучшем плане. Подстановка этих количеств в целевое выражение даёт '+show(d.f)+'. В подробном разборе видно, как выбрать каждый переход.',desk),start:plans.length-1}
@@ -176,7 +180,7 @@ function integer(d) {
     const plan=d.lpX.map((q,i)=>i===j?options[n]:q);
     const failed=ALG.check(d.P,plan).findIndex(r=>!r.ok);
     const verdict=failed>=0?'Нарушено условие '+(failed+1)+'.':plan.every(v=>v.isInt())?'Все количества целые, условия выполнены.':'Условия выполнены, но в плане есть дробные количества.';
-    return <><svg viewBox="0 0 300 90" role="img" aria-label={'На числовой оси '+show(options[n])}><path d="M24 46H276 M55 40v12 M245 40v12" className="primer-axis"/><text x="55" y="72" textAnchor="middle">{floor}</text><text x="245" y="72" textAnchor="middle">{ceil}</text><circle cx={55+190*(num(options[n])-floor)} cy="46" r="7" fill="#b15b34"/><text x={55+190*(num(options[n])-floor)} y="26" textAnchor="middle">{show(options[n])}</text></svg>
+    return <><CutPieces amount={num(options[n])}/><svg viewBox="0 0 300 90" role="img" aria-label={'На числовой оси '+show(options[n])}><path d="M24 46H276 M55 40v12 M245 40v12" className="primer-axis"/><text x="55" y="72" textAnchor="middle">{floor}</text><text x="245" y="72" textAnchor="middle">{ceil}</text><circle cx={55+190*(num(options[n])-floor)} cy="46" r="7" fill="#b15b34"/><text x={55+190*(num(options[n])-floor)} y="26" textAnchor="middle">{show(options[n])}</text></svg>
     <Choices labels={['Без округления','Округлить вниз','Округлить вверх']} selected={n} change={set}/><small>План {vec(plan)} · {verdict}</small></>;};
   return [frame('Когда часть изделия заказать нельзя','Представьте заказ из неделимых изделий. Количества должны быть целыми. Расчёт без этого требования дал '+x(j)+' = '+show(raw)+'. На оси видно, почему этот план приходится изменить.',draw),
     frame('Почему округления недостаточно','Округляя одну координату, мы меняем весь план. Он может выйти за пределы запаса или ухудшить результат. Метод Гомори добавляет условие, которое исключает найденную дробную точку и сохраняет допустимые целые планы.',draw),
@@ -198,7 +202,7 @@ function network(d) {
 }
 function game(d) {
   const g=d.G;
-  const board=(n,set)=>{const i=Math.floor(n/g.n),j=n%g.n;return <><div className="primer-payoffs" style={{'--columns':g.n}}><b aria-hidden="true">A / B</b>{g.C[0].map((_,l)=><b key={l}>B{l+1}</b>)}{g.C.map((row,k)=><React.Fragment key={k}><b>A{k+1}</b>{row.map((val,l)=><button type="button" key={l} aria-label={'A'+(k+1)+', B'+(l+1)+', выигрыш '+show(val)} aria-pressed={i===k&&j===l} onClick={()=>set(k*g.n+l)}>{show(val)}</button>)}</React.Fragment>)}</div>
+  const board=(n,set)=>{const i=Math.floor(n/g.n),j=n%g.n;return <><PayoffBalance value={num(g.C[i][j])} limit={Math.max(...g.C.flat().map(v=>Math.abs(num(v))))}/><div className="primer-payoffs" style={{'--columns':g.n}}><b aria-hidden="true">A / B</b>{g.C[0].map((_,l)=><b key={l}>B{l+1}</b>)}{g.C.map((row,k)=><React.Fragment key={k}><b>A{k+1}</b>{row.map((val,l)=><button type="button" key={l} aria-label={'A'+(k+1)+', B'+(l+1)+', выигрыш '+show(val)} aria-pressed={i===k&&j===l} onClick={()=>set(k*g.n+l)}>{show(val)}</button>)}</React.Fragment>)}</div>
     <Formula>A{i+1} и B{j+1} · {g.C[i][j].s<0?'проигрыш':'выигрыш'} A {show(g.C[i][j].abs())}</Formula><small>Худшее для A значение в этой строке · {show(g.rowMin[i])}</small></>;};
   return [frame('Как читать результат игры','Игрок A выбирает строку, соперник B — столбец. Число на пересечении показывает выигрыш A. Отрицательное число означает потерю. Нажмите любую клетку, чтобы разыграть эту пару ходов.',board),
     frame('Что гарантирует один ход','Если A заранее выбрал строку, соперник может выбрать в ней самое маленькое число. Сравнив эти минимумы, A получает лучший гарантированный результат для постоянного хода: '+show(g.lower)+'.',board),

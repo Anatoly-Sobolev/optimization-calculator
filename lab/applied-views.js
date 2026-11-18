@@ -17,6 +17,10 @@ const VIEWS2 = (() => {
 
   /* ---------- Универсальный пошаговый просмотр: кнопки/список + анимация выбранного шага ---------- */
   function stepperOf(items, o = {}) {
+    if(Handbook.inLesson) return items.map(item=>{
+      const scene=item.build();
+      return demo(scene.title||item.title,scene.html,scene.script,{...scene.opts,galleryLazy:true});
+    }).join('');
     const id = 'sx' + (++uid2);
     R.hooks.push(() => {
       const root = document.getElementById(id); if (!root) return;
@@ -45,9 +49,9 @@ const VIEWS2 = (() => {
     const m = P.m, n = P.n, nm = i => (P.fict === 'row' && i === m - 1) ? 'A<sub>ф</sub>' : `A<sub>${i + 1}</sub>`, nn = j => (P.fict === 'col' && j === n - 1) ? 'B<sub>ф</sub>' : `B<sub>${j + 1}</sub>`;
     let h = `<div class="tblwrap"><table class="sx tg ${o.cls || 'tT'}"><thead><tr><th></th>${[...Array(n).keys()].map(j => `<th data-j="${j}">${nn(j)}</th>`).join('')}<th class="tha">запас <i>a</i></th>${o.pot ? '<th class="thp">u</th>' : ''}</tr></thead><tbody>`;
     for (let i = 0; i < m; i++) {
-      h += `<tr data-i="${i}"><th class="trh" data-i="${i}">${nm(i)}</th>` + [...Array(n).keys()].map(j => `<td class="tcell" data-i="${i}" data-j="${j}"><span class="tdl"><span class="cv"></span></span><span class="tcc">${fq(P.c[i][j])}</span><span class="tsg"></span><span class="tvv"><span class="cv"></span></span></td>`).join('') + `<td class="ta" data-i="${i}"><span class="cv">${fq(P.a[i])}</span></td>${o.pot ? `<td class="tu" data-i="${i}"><span class="cv dh"></span></td>` : ''}</tr>`;
+      h += `<tr data-i="${i}"><th class="trh" data-i="${i}">${nm(i)}</th>` + [...Array(n).keys()].map(j => `<td class="tcell" data-i="${i}" data-j="${j}" tabindex="0" data-origin="Тариф маршрута A${i+1} → B${j+1}: ${P.c[i][j].toText()} за единицу груза."><span class="tdl"><span class="cv"></span></span><span class="tcc" tabindex="0" data-origin="Тариф на этом маршруте: ${P.c[i][j].toText()} за единицу груза.">${fq(P.c[i][j])}</span><span class="tsg"></span><span class="tvv"><span class="cv"></span></span></td>`).join('') + `<td class="ta" data-i="${i}" tabindex="0" data-origin="Запас склада A${i+1} перед распределением: ${P.a[i].toText()}."><span class="cv">${fq(P.a[i])}</span></td>${o.pot ? `<td class="tu" data-i="${i}"><span class="cv dh"></span></td>` : ''}</tr>`;
     }
-    h += `<tr class="tbrow"><th class="trh">спрос <i>b</i></th>${[...Array(n).keys()].map(j => `<td class="tb" data-j="${j}"><span class="cv">${fq(P.b[j])}</span></td>`).join('')}<td class="tsum">Σ</td>${o.pot ? '<td></td>' : ''}</tr>`;
+    h += `<tr class="tbrow"><th class="trh">спрос <i>b</i></th>${[...Array(n).keys()].map(j => `<td class="tb" data-j="${j}" tabindex="0" data-origin="Потребность пункта B${j+1} в сбалансированном плане: ${P.b[j].toText()}."><span class="cv">${fq(P.b[j])}</span></td>`).join('')}<td class="tsum">Σ</td>${o.pot ? '<td></td>' : ''}</tr>`;
     if (o.pot) h += `<tr class="tvrow"><th class="trh">v</th>${[...Array(n).keys()].map(j => `<td class="tvp" data-j="${j}"><span class="cv dh"></span></td>`).join('')}<td></td><td></td></tr>`;
     return h + '</tbody></table></div>';
   }
@@ -262,16 +266,16 @@ const VIEWS2 = (() => {
     const edge = a => { const p = pos.get(a.i), q = pos.get(a.j), dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d; return { x1: p.x + ux * r, y1: p.y + uy * r, x2: q.x - ux * (r + 4), y2: q.y - uy * (r + 4), mx: (p.x + q.x) / 2, my: (p.y + q.y) / 2 }; };
     let s = `<svg class="netsvg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6b6f7c"/></marker></defs>`;
     res.arcs.forEach((a, k) => { const e = edge(a); s += `<g class="nar" data-a="${k}"><line class="nal" x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" marker-end="url(#arr)"/><rect class="nbg" x="${e.mx - 17}" y="${e.my - 10}" width="34" height="19" rx="5"/><text class="ntd" x="${e.mx}" y="${e.my + 4}" text-anchor="middle">${t2(a.d)}</text><text class="ncand" data-a="${k}" x="${e.mx}" y="${e.my - 16}" text-anchor="middle"></text></g>`; });
-    res.events.forEach(e => { const p = pos.get(e); s += `<g class="nnd" data-e="${e}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/><text class="nne" x="${p.x}" y="${p.y + 5}" text-anchor="middle">${e}</text><rect class="ntb" x="${p.x - 31}" y="${p.y + r + 5}" width="62" height="20" rx="5"/><text class="ntp" x="${p.x - 15}" y="${p.y + r + 19}" text-anchor="middle"></text><text class="nsp" x="${p.x}" y="${p.y + r + 19}" text-anchor="middle">|</text><text class="ntn" x="${p.x + 15}" y="${p.y + r + 19}" text-anchor="middle"></text></g>`; });
+    res.events.forEach(e => { const p = pos.get(e); s += `<g class="nnd" data-e="${e}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/><text class="nne" x="${p.x}" y="${p.y + 5}" text-anchor="middle">${e}</text><g class="net-times"><rect class="ntb" x="${p.x - 36}" y="${p.y + r + 4}" width="72" height="21" rx="5"/><text class="ntp" x="${p.x - 17}" y="${p.y + r + 19}" text-anchor="middle"></text><text class="ntn" x="${p.x + 17}" y="${p.y + r + 19}" text-anchor="middle"></text></g></g>`; });
     return s + '</svg>';
   }
   const nsel = A => ({ nd: e => A.q(`.netsvg g.nnd[data-e="${e}"]`), ar: k => A.q(`.netsvg g.nar[data-a="${k}"]`), cand: k => A.q(`.netsvg .ncand[data-a="${k}"]`), tp: e => A.q(`.netsvg g.nnd[data-e="${e}"] .ntp`), tn: e => A.q(`.netsvg g.nnd[data-e="${e}"] .ntn`) });
-  const setT = (el, v) => { if (el) el.textContent = v; };
+  const setT = (el, v) => { if (el) el.textContent = (el.classList.contains('ntp')?'Р ':el.classList.contains('ntn')?'П ':'') + v; };
 
   function netScene(res, kind) {
     const evI = e => res.events.indexOf(e);
     const list = `<div class="nlist">${res.arcs.map((a, k) => `<span class="nli" data-a="${k}">(${a.i}, ${a.j}, ${t2(a.d)})</span>`).join('')}</div>`;
-    const html = `${list}<div class="netbox">${netSvg(res)}</div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const html = `${list}<div class="netbox">${netSvg(res)}</div><p class="net-key">${kind==='build'?'Круг — событие. Число на стрелке — длительность работы.':'Под событием: Р — самый ранний срок, П — самый поздний срок без задержки проекта.'}</p><div class="pvfm"></div><div class="pvsum dh"></div>`;
     let script;
     if (kind === 'build') {
       script = async A => {
@@ -417,7 +421,7 @@ const VIEWS2 = (() => {
   const mtbl = (G, o = {}) => {
     const m = G.m, n = G.n, M = o.matrix || G.C;
     let h = `<div class="tblwrap"><table class="sx gmx ${o.cls || ''}"><thead><tr><th></th>${[...Array(n).keys()].map(j => `<th data-j="${j}">B<sub>${j + 1}</sub></th>`).join('')}${o.rowmin ? '<th class="gmin">min по строке</th>' : ''}${o.xs ? '<th class="gxs">x</th>' : ''}</tr></thead><tbody>`;
-    for (let i = 0; i < m; i++) h += `<tr data-i="${i}"><th class="trh" data-i="${i}">A<sub>${i + 1}</sub></th>${[...Array(n).keys()].map(j => `<td class="gc" data-i="${i}" data-j="${j}"><span class="cv">${fq(M[i][j])}</span></td>`).join('')}${o.rowmin ? `<td class="gr" data-i="${i}"><span class="cv dh"></span></td>` : ''}${o.xs ? `<td class="gx" data-i="${i}"><span class="cv dh"></span></td>` : ''}</tr>`;
+    for (let i = 0; i < m; i++) h += `<tr data-i="${i}"><th class="trh" data-i="${i}">A<sub>${i + 1}</sub></th>${[...Array(n).keys()].map(j => `<td class="gc" data-i="${i}" data-j="${j}" ${o.cls==='gp2'?'':`tabindex="0" data-origin="Дано в условии: выигрыш игрока A для строки A${i+1} и столбца B${j+1} равен ${M[i][j].toText()}."`}><span class="cv">${o.cls==='gp2'?'':fq(M[i][j])}</span></td>`).join('')}${o.rowmin ? `<td class="gr" data-i="${i}"><span class="cv dh"></span></td>` : ''}${o.xs ? `<td class="gx" data-i="${i}"><span class="cv dh"></span></td>` : ''}</tr>`;
     if (o.colmax) h += `<tr class="gcmrow"><th class="trh gmax">max по столбцу</th>${[...Array(n).keys()].map(j => `<td class="gm" data-j="${j}"><span class="cv dh"></span></td>`).join('')}${o.rowmin ? '<td></td>' : ''}${o.xs ? '<td></td>' : ''}</tr>`;
     if (o.ys) h += `<tr class="gyrow"><th class="trh">y</th>${[...Array(n).keys()].map(j => `<td class="gy" data-j="${j}"><span class="cv dh"></span></td>`).join('')}${o.rowmin ? '<td></td>' : ''}${o.xs ? '<td></td>' : ''}</tr>`;
     return h + '</tbody></table></div>';
@@ -482,7 +486,13 @@ const VIEWS2 = (() => {
       await A.wait(250);
       A.cap(`Чтобы свести игру к ЛП, делаем все выигрыши положительными: наименьшее число матрицы ${plain(fq(G.C.flat().reduce((a, v) => v.lt(a) ? v : a)))}, прибавляем k = ${plain(fq(G.k))}`);
       A.set(fm, `<span class="fmh">k = 1 − min C = <b>${fq(G.k)}</b> (цена игры при сдвиге меняется на k)</span>`);
-      for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) { A.cls(cl(L, i, j).parentNode, 'k-act'); await A.put(cl(L, i, j), cl(Pm, i, j), fq(G.P[i][j]), { d: 260 }); A.cls(cl(L, i, j).parentNode, 'k-act', false); }
+      for (let i=0;i<m;i++) for(let j=0;j<n;j++){
+        A.cap(`Строка A${i+1}, столбец B${j+1}: к исходному выигрышу прибавляем один и тот же сдвиг.`);
+        A.set(fm,`<span class="fo">□</span> + ${fq(G.k)} = <b class="calc-result">□</b>`);
+        await A.put(cl(L,i,j),A.q('.pvfm .fo'),fq(G.C[i][j]));
+        await A.swap(A.q('.pvfm .calc-result'),fq(G.P[i][j]));
+        await A.put(A.q('.pvfm .calc-result'),cl(Pm,i,j),fq(G.P[i][j]));
+      }
       A.cap('Игрок 1 ищет p<sub>i</sub> = x<sub>i</sub>/v′ (v′ = u + k): тогда Σp<sub>i</sub> = 1/v′, а выигрыш в каждом столбце не меньше 1');
       lp.innerHTML = `<div class="sys"><i>g</i> = ${G.lp.c.map((_, i) => `p<sub>${i + 1}</sub>`).join(' + ')} → min<br>${G.lp.rows.map((r, j) => `${lin(r.a, i => `p<sub>${i + 1}</sub>`)} ≥ 1 <span class="kbd">(столбец ${j + 1})</span>`).join('<br>')}<br>${G.lp.c.map((_, i) => `p<sub>${i + 1}</sub>`).join(', ')} ≥ 0</div>`;
       await A.show(lp);
@@ -495,23 +505,53 @@ const VIEWS2 = (() => {
   /* Сцена 3: чтение стратегий из итоговой таблицы и проверка. */
   function gameAnswer(G) {
     const m = G.m, n = G.n;
-    const html = `<div class="pvwrap one"><div>${mtbl(G, { xs: true, ys: true })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
+    const strip=(name,caption,values)=>`<div class="weight-line weights-${name}"><strong>${caption}</strong>${values.map((v,i)=>`<span data-index="${i}"><small>${name==='x'?'A':'B'}${i+1}</small> ${fq(v)}</span>`).join('')}</div>`;
+    const last=G.sol.table;
+    const rowSources=G.sol.x.map((v,i)=>{
+      const row=last.basis.indexOf(i);
+      return `<li>p<sub>${i+1}</sub>: ${row<0?'вне базиса, поэтому 0':`строка ${row+1}, столбец b → ${fq(v)}`}.</li>`;
+    });
+    const colSources=G.yprime.map((v,j)=>{
+      const k=G.sol.prep.work[j].slackVar;
+      return `<li>y′<sub>${j+1}</sub>: строка цели, столбец ${vname(last.vars,k)} → ${fq(v)}.</li>`;
+    });
+    const sources=`<details class="weight-key"><summary>Как прочитать веса из итоговой таблицы</summary><ul>${rowSources.concat(colSources).join('')}</ul><p>Сумма весов строк: ${G.sol.x.map(fq).join(' + ')} = ${fq(G.sumP)}.</p></details>`;
+    const html = `<div class="weight-source">${strip('x','Веса строк из решения ЛП',G.sol.x)}${strip('y','Оценки столбцов из итоговой таблицы',G.yprime)}<p>Цена после сдвига · 1 ÷ ${fq(G.sumP)} = <b class="normal-price">${fq(G.vprime)}</b></p>${sources}</div><div class="pvwrap one"><div>${mtbl(G, { xs: true, ys: true })}</div></div><div class="pvfm"></div><div class="pvsum dh"></div>`;
     const script = async A => {
       const T = gsel(A), fm = A.q('.pvfm'), sum = A.q('.pvsum');
       await A.wait(250);
       A.cap(`Из итоговой таблицы: p = (${G.sol.x.map(v => plain(fq(v))).join('; ')}), Σp = ${plain(fq(G.sumP))}, v′ = 1/Σp = ${plain(fq(G.vprime))}`);
       A.set(fm, `<span class="fmh">v′ = 1 / ${fq(G.sumP)} = <b>${fq(G.vprime)}</b></span>`);
       await A.wait(300);
-      A.cap('Стратегия первого игрока: x<sub>i</sub> = p<sub>i</sub>·v′');
-      for (let i = 0; i < m; i++) { A.set(T.x(i), fq(G.x[i])); await A.pop(T.x(i), { d: 250 }); }
-      A.cap('Стратегия второго игрока — из оценок d итоговой таблицы под добавочными переменными (двойственные значения): y<sub>j</sub> = y′<sub>j</sub>·v′');
-      for (let j = 0; j < n; j++) { A.set(T.y(j), fq(G.y[j])); await A.pop(T.y(j), { d: 250 }); }
+      const normalize=async (name,weights,probabilities,target,sourceName)=>{
+        for(let i=0;i<weights.length;i++) {
+          const label=name+'<sub>'+(i+1)+'</sub>';
+          A.cap(label+': '+sourceName+' умножаем на цену сдвинутой игры.');
+          const weight=A.q('.weights-'+name+' [data-index="'+i+'"]'), price=A.q('.normal-price');
+          A.set(fm,'<span class="fmh">'+label+' = <span class="fo">□</span> × <span class="fp">□</span> = <b class="calc-result">□</b></span>');
+          A.cls(weight,'k-act');await A.put(weight,A.q('.pvfm .fo'),fq(weights[i]));
+          await A.put(price,A.q('.pvfm .fp'),fq(G.vprime));
+          await A.swap(A.q('.pvfm .calc-result'),fq(probabilities[i]));
+          await A.put(A.q('.pvfm .calc-result'),target(i),fq(probabilities[i]));A.cls(weight,'k-act',false);
+        }
+      };
+      await normalize('x',G.sol.x,G.x,T.x,'Вес строки из решения вспомогательной задачи');
+      await normalize('y',G.yprime,G.y,T.y,'Оценку столбца из итоговой таблицы');
       A.cap(`Цена игры: u = v′ − k = ${plain(fq(G.vprime))} − ${plain(fq(G.k))} = ${plain(fq(G.value))}`);
       A.set(fm, `<span class="fmh">u* = ${fq(G.vprime)} − ${fq(G.k)} = <b>${fq(G.value)}</b></span>`);
       const V = ALGG.verify(G.C, G.x, G.y, G.value);
       A.cap('Проверка: при x выигрыш по каждому столбцу не меньше u*; при y проигрыш по каждой строке не больше u*');
-      for (let j = 0; j < n; j++) { A.cls(T.col(j), 'k-act'); await A.wait(120); A.cls(T.col(j), 'k-act', false); A.cls(T.col(j), V.colPay[j].ge(G.value) ? 'k-ok' : 'k-del'); }
-      for (let i = 0; i < m; i++) { A.cls(T.row(i), 'k-act'); await A.wait(120); A.cls(T.row(i), 'k-act', false); A.cls(T.row(i), V.rowPay[i].le(G.value) ? 'k-ok' : 'k-del'); }
+      const verify=async (label,weights,entries,value,relation,highlight,heading,ok)=>{
+        A.cap(`Проверяем ${label}. Умножаем каждый выигрыш на вероятность и складываем.`);
+        A.cls(highlight,'k-act');
+        const terms=weights.map((w,i)=>`${fq(w)} × ${fqp(entries[i])}`);
+        A.set(fm,`<span class="fmh">${terms.join(' + ')} = <b>${fq(value)}</b> ${relation} ${fq(G.value)}</span>`);
+        await A.wait(450);A.cls(highlight,'k-act',false);A.cls(heading,ok?'k-ok':'k-del');
+      };
+      for(let j=0;j<n;j++) await verify('столбец B'+(j+1),G.x,G.C.map(row=>row[j]),V.colPay[j],'≥',T.col(j),A.q(`.gmx th[data-j="${j}"]`),V.colPay[j].ge(G.value));
+      for(let i=0;i<m;i++) await verify('строку A'+(i+1),G.y,G.C[i],V.rowPay[i],'≤',T.row(i),A.q(`.gmx th.trh[data-i="${i}"]`),V.rowPay[i].le(G.value));
+      A.cap('Итог: обе стратегии прошли проверку. Возвращаемся к исходной цене игры.');
+      A.set(fm,`<span class="fmh">u* = ${fq(G.vprime)} − ${fq(G.k)} = <b>${fq(G.value)}</b></span>`);
       sum.innerHTML = `x* = ${vec(G.x)}, y* = ${vec(G.y)}, <b>u* = ${fq(G.value)}</b>`; await A.show(sum);
     };
     return { title: 'стратегии игроков и цена игры', html, script, opts: {} };
