@@ -32,6 +32,23 @@ const { chromium } = require('playwright');
             assert.ok((await primer.locator('.primer-copy h2').innerText()).length>5);
             assert.doesNotMatch(await primer.innerText(),/undefined|NaN/);
             assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),topic);
+            if(n===0)assert.equal(await primer.locator('.intro-key dt').count(),2,topic);
+            if(n===1){
+              const sheet=primer.locator('.reading-diagram');
+              assert.ok(await sheet.getByRole('table').isVisible(),topic);
+              const frames=sheet.getByRole('group',{name:'Кадры схемы'}).getByRole('button');
+              for(let frame=0;frame<3;frame++){
+                await frames.nth(frame).click();
+                assert.equal(await frames.nth(frame).getAttribute('aria-pressed'),'true',topic);
+                assert.doesNotMatch(await sheet.innerText(),/undefined|NaN|\[object Object\]/);
+              }
+              if(topic.includes('transp')){
+                const amount=await primer.getByRole('slider').inputValue();
+                assert.equal(await sheet.locator('[data-flight=to]').innerText(),amount);
+                await primer.getByRole('slider').press('Home');
+                assert.equal(await sheet.locator('[data-flight=to]').innerText(),'0');
+              }
+            }
             const dial=primer.getByRole('slider'), choice=primer.locator('.primer-art button[aria-pressed="false"]').first();
             if(await dial.count()) await dial.press('End');
             else if(await choice.count()) await choice.click();

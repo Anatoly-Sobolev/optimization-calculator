@@ -1,3 +1,4 @@
+import {ReadingDiagram} from './reading-diagram.jsx';
 import {CoordinateField} from './coordinate-field.jsx';
 import React,{useState} from 'react';
 import {Workshop,CutPieces,PayoffBalance,MethodMark} from './teaching-figures.jsx';
@@ -58,6 +59,14 @@ function dualSimplex(d) {
     })
   ];
 }
+function DeliveryLedger({model,best}){
+  const [route,setRoute]=useState([0,0]),[i,j]=route;
+  const matrix=best?model.X:model.X0,qty=matrix[i][j]||zero(),tariff=model.P.c[i][j];
+  return <div className="reading-grid route-ledger"><table><caption>Перевозки по маршрутам, ящики</caption>
+    <thead><tr><th scope="col">Склад</th>{model.P.b.map((_,j)=><th key={j} scope="col">{j<model.P.n0?'B'+LU.sub(j+1):'Резерв'}</th>)}</tr></thead>
+    <tbody>{matrix.map((row,i)=><tr key={i}><th scope="row">A{LU.sub(i+1)}</th>{row.map((q,j)=><td key={j}><button type="button" aria-label={'Склад '+(i+1)+', '+(j<model.P.n0?'магазин '+(j+1):'неиспользованный запас')} aria-pressed={i===route[0]&&j===route[1]} onClick={()=>setRoute([i,j])}>{show(q||zero())}</button></td>)}</tr>)}</tbody></table>
+    <small>{j<model.P.n0?'Стоимость выбранного маршрута':'Стоимость хранения в модели'} · {show(qty)} × {show(tariff)} = {show(qty.mul(tariff))}. Общие затраты складываются из стоимостей всех маршрутов.</small></div>;
+}
 function transport(d) {
   const t=d.T,s=t.first.steps[0],a='Склад '+(s.i+1),b='Магазин '+(s.j+1);
   const boxes=(n,set)=><><svg className="cargo-scene" viewBox="0 0 300 76" aria-label={'В пути от склада к магазину отправлено '+n+' ящиков'} role="img">
@@ -70,13 +79,12 @@ function transport(d) {
     <Dial label="Отправлено ящиков" max={num(s.x)} value={n} change={set}/><small>Осталось доставить в этот магазин · {num(s.b0)-n}</small></>;
   return [
     frame('Откуда и куда везти груз','У складов есть запас, у магазинов — заказы. На всех складах '+show(t.P.sa)+' единиц груза, а общий заказ равен '+show(t.P.sb)+'. Нужно закрыть заказы и потратить на перевозку как можно меньше.',boxes),
-    frame('Как заполняется одна клетка',a+' располагает '+show(s.a0)+' ящиками, а заказ магазина равен '+show(s.b0)+'. В клетке на пересечении их строки и столбца записываем число отправленных ящиков. Верхний предел этой поставки — '+show(s.x)+'.',(n,set)=><>{boxes(n,set)}<Formula>Клетка A{ s.i+1 }B{ s.j+1 } · {n} ящиков</Formula></>),
-    frame('Почему одного плана мало','Даже если все заказы закрыты, маршруты могут быть дорогими. Метод меняет поставки между маршрутами, сохраняя суммы по складам и магазинам. Сравните стоимость первого и лучшего планов.',(n,set)=><><Gauge label="Общие затраты" value={n?t.cost:t.cost0} extent={num(t.cost0)} caption={'Экономия после перераспределения · '+show(t.cost0.sub(t.cost))}/><Choices labels={['Первый план','Лучший план']} selected={n} change={set}/></>)
+    frame('Как заполняется одна клетка',a+' располагает '+show(s.a0)+' ящиками, а заказ магазина равен '+show(s.b0)+'. Найдите склад в левом столбце, а магазин — в верхней строке. На их пересечении указывают число отправленных ящиков. Для этого маршрута предел — '+show(s.x)+'. Проследите отправку по кадрам или измените её ползунком.',(n,set)=><>{boxes(n,set)}<Formula>Клетка A{ s.i+1 }B{ s.j+1 } · {n} ящиков</Formula></>),
+    frame('Почему одного плана мало','Даже если все заказы закрыты, маршруты могут быть дорогими. Метод меняет поставки между маршрутами, сохраняя суммы по складам и магазинам. Переключите план и нажмите на клетку: число ящиков умножается на тариф этого маршрута.',(n,set)=><><DeliveryLedger model={t} best={n===1}/><Gauge label="Общие затраты" value={n?t.cost:t.cost0} extent={num(t.cost0)} caption={'Экономия после перераспределения · '+show(t.cost0.sub(t.cost))}/><Choices labels={['Первый план','Лучший план']} selected={n} change={set}/></>)
   ];
 }
-function PlanMap({d,index,choose}) {
+function PlanMap({d,index,choose,picked,setPicked}) {
   const vertices=d.rec.graph.verts;
-  const [picked,setPicked]=useState(null);
   const point=picked||vertices[index].p;
   const maxX=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[0])))),maxY=Math.ceil(Math.max(1,...vertices.map(v=>num(v.p[1]))));
   const negative=point.some(v=>num(v)<0), valid=!negative&&ALG.check(d.P,point).every(row=>row.ok);
@@ -96,9 +104,9 @@ function PlanMap({d,index,choose}) {
 }
 function graph(d) {
   const vs=d.rec.graph.verts,best=vs.findIndex(v=>v.f.eq(d.f));
-  const diagram=(n,set)=><PlanMap d={d} index={n} choose={set}/>;
+  const diagram=(n,set,probe)=><PlanMap d={d} index={n} choose={set} {...probe}/>;
   return [
-    frame('Каждая точка — один план','По горизонтали откладываем первое количество x₁, по вертикали — второе x₂. Закрашены точки, в которых выполняются все ограничения. Перетащите точку внутрь фигуры и за её границу. Кнопки под графиком ставят точку точно в угол.',diagram),
+    frame('Каждая точка — один план','По горизонтали откладываем первое количество x₁, по вертикали — второе x₂. Каждая цветная полуплоскость показывает, где выполнено одно условие. Зелёный многоугольник — их общая допустимая область. Перетащите точку внутрь фигуры и за её границу. Кнопки под графиком ставят точку точно в угол.',diagram),
     frame('Как сравнить два плана','Цель задаёт число для каждой точки. Подставляем обе координаты в выражение '+expression(d.P.c)+'. Среди допустимых планов ищем '+aim(d.P)+' значение.',diagram),
     frame('Где достигается лучшее значение','У линейной цели на этом многоугольнике достаточно сравнить углы. На рисунке выбран один из лучших планов. Переключитесь на соседний и сравните значения.',diagram)
   ].map((f,i)=>({...f,start:i===2?best:i===1&&vs.length>1?1:0}));
@@ -132,11 +140,11 @@ function dual(d) {
   const board=(n,set)=>{
     const i=Math.floor(n/p.c.length),j=n%p.c.length;
     function matrix(rows,transposed) {
-      return <div><small>{transposed?'Вторая запись':'Исходная запись'}</small><div className="primer-matrix" style={{'--columns':rows[0].a.length}}>
-        {rows.map((row,k)=>row.a.map((v,l)=>{
+      return <div className="reading-grid route-ledger"><table><caption>{transposed?'Двойственная задача':'Прямая задача'}</caption><thead><tr><th scope="col">№</th>{rows[0].a.map((_,l)=><th key={l} scope="col">{transposed?y(l):x(l)}</th>)}</tr></thead>
+        <tbody>{rows.map((row,k)=><tr key={k}><th scope="row">{k+1}</th>{row.a.map((v,l)=>{
           const sourceRow=transposed?l:k,sourceCol=transposed?k:l;
-          return <button type="button" key={k+'-'+l} aria-label={(transposed?'Вторая':'Исходная')+', строка '+(k+1)+', столбец '+(l+1)+', число '+show(v)} aria-pressed={i===sourceRow&&j===sourceCol} onClick={()=>set(sourceRow*p.c.length+sourceCol)}>{show(v)}</button>;
-        }))}</div></div>;
+          return <td key={l}><button type="button" aria-label={(transposed?'Вторая':'Исходная')+', строка '+(k+1)+', столбец '+(l+1)+', число '+show(v)} aria-pressed={i===sourceRow&&j===sourceCol} onClick={()=>set(sourceRow*p.c.length+sourceCol)}>{show(v)}</button></td>;
+        })}</tr>)}</tbody></table></div>;
     }
     return <><div className="primer-transpose">{matrix(p.rows,false)}{matrix(dual.rows,true)}</div>
       <div className="primer-pair"><span>Строка {i+1} ↔ {y(i)}</span><span>{x(j)} ↔ условие {j+1}</span></div>
@@ -154,7 +162,7 @@ function canonical(d) {
   const material=(n,set)=><><Points values={[bound.lo,Q.of(n),bound.lo.add(n)]} names={['Обязательный минимум','Сверх минимума','Всего '+x(j)]}/><Dial label="Добавить сверх минимума" max={5} value={n} change={set}/><Formula>{x(j)} = {show(bound.lo)} + {n} = {show(bound.lo.add(n))}</Formula></>;
   const terms=r=>expression(r.terms.map(t=>t.c),k=>r.terms[k].v.replace(/\d+/g,LU.sub).replace('p','′'));
   return [frame('Как считать только добавку','В этом варианте '+x(j)+' должно быть не меньше '+show(bound.lo)+'. Удобно отделить обязательную часть и считать, сколько добавлено сверх неё. Подвигайте ползунок: исходное количество и добавка описывают один и тот же выбор.',material),
-    frame('Как превратить ограничение в равенство','Первая строка задаёт верхний предел. Назовём неиспользованную часть остатком. Если к использованному количеству прибавить остаток, получится весь предел.',()=><><Formula>{terms(row)} {R.sg(row.s)} {show(row.b)}</Formula><div className="primer-arrow">↓ прибавляем остаток</div><Formula>{terms(c.steps[0].state.rows[0])} = {show(row.b)}</Formula></>),
+    frame('Как превратить ограничение в равенство','Первая строка задаёт верхний предел. Назовём неиспользованную часть остатком. Если к использованному количеству прибавить остаток, получится весь предел. Ползунок задаёт долю использованного ресурса в этой строке.',(n,set)=><><Formula>{terms(row)} {R.sg(row.s)} {show(row.b)}</Formula><div className="primer-arrow">↓ прибавляем остаток</div><Formula>{terms(c.steps[0].state.rows[0])} = {show(row.b)}</Formula><Dial label="Доля использованного ресурса" max={4} value={n} change={set} display={n*25+' %'}/></>),
     frame('Что получилось после записи','Канонической здесь называют запись с равенствами и неотрицательными переменными. Подстановка добавки меняет вид первой строки. По любому значению добавки можно восстановить исходное количество.',(n,set)=><><Formula>{terms(c.final.rows[0])} = {show(c.final.rows[0].b)}</Formula>{material(n,set)}</>)];
 }
 function integer(d) {
@@ -167,7 +175,7 @@ function integer(d) {
     return <><CutPieces amount={num(options[n])}/><svg viewBox="0 0 300 90" role="img" aria-label={'На числовой оси '+show(options[n])}><path d="M24 46H276 M55 40v12 M245 40v12" className="primer-axis"/><text x="55" y="72" textAnchor="middle">{floor}</text><text x="245" y="72" textAnchor="middle">{ceil}</text><circle cx={55+190*(num(options[n])-floor)} cy="46" r="7" fill="#b15b34"/><text x={55+190*(num(options[n])-floor)} y="26" textAnchor="middle">{show(options[n])}</text></svg>
     <Choices labels={['Без округления','Округлить вниз','Округлить вверх']} selected={n} change={set}/><small>План {vec(plan)} · {verdict}</small></>;};
   return [frame('Когда часть изделия заказать нельзя','Представьте заказ из неделимых изделий. Количества должны быть целыми. Расчёт без этого требования дал '+x(j)+' = '+show(raw)+'. На оси видно, почему этот план приходится изменить.',draw),
-    frame('Почему округления недостаточно','Округляя одну координату, мы меняем весь план. Он может выйти за пределы запаса или ухудшить результат. Метод Гомори добавляет условие, которое исключает найденную дробную точку и сохраняет допустимые целые планы.',draw),
+    frame('Почему округления недостаточно','Проверьте на оси, что случится при округлении. Метод Гомори использует дробную часть числа из таблицы, чтобы добавить ограничение. Оно исключает текущий дробный план и сохраняет допустимые целые планы.',draw),
     frame('Как прочитать целый план','После добавления условий и пересчёта все количества стали целыми. Плитки показывают лучший план этого варианта.',()=><><Points values={r.x}/><Formula>Значение цели · {show(r.f)}</Formula></>)];
 }
 function optimality(d) {
@@ -179,7 +187,15 @@ function optimality(d) {
 }
 function network(d) {
   const net=d.N,merge=net.fwd.find(e=>e.inc.length>1), path=net.paths[0];
-  const draw=(n,set)=>{const branch=merge.inc[n], arc=branch.a;return <><div className="primer-branches">{merge.inc.map(({a,v},i)=><div key={a.i} className={'primer-events '+(i===n?'active':'')}><b>{a.i}</b><span>{show(a.d)} ед. времени</span><b>{a.j}</b><small>к {show(v)}</small></div>)}</div><Choices labels={merge.inc.map(({a})=>'Ход '+a.i+' → '+a.j)} selected={n} change={set}/><Formula>{show(branch.v.sub(arc.d))} + {show(arc.d)} = {show(branch.v)}</Formula><small>Начало работы + длительность = время её завершения.</small></>;};
+  const draw=(n,set)=>{const branch=merge.inc[n],arc=branch.a,h=Math.max(100,merge.inc.length*46),end=h/2;
+    return <><svg className="merge-diagram" viewBox={'0 0 300 '+h} role="img" aria-label={'В событие '+merge.e+' ведут работы '+merge.inc.map(({a})=>a.i+' → '+a.j).join(', ')}>
+      {merge.inc.map(({a},i)=>{const top=(i+.5)*h/merge.inc.length,col=i===n?'#21664c':'#91a69b';return <g key={a.i}>
+        <path d={'M49 '+top+' C130 '+top+' 168 '+end+' 235 '+end} fill="none" stroke={col} strokeWidth={i===n?3:1.4}/>
+        <path d={'M230 '+(end-4)+'l8 4-8 4'} fill={col}/>
+        <circle cx="34" cy={top} r="15" fill="#fdfaf0" stroke={col} strokeWidth="2"/><text x="34" y={top+4} textAnchor="middle">{a.i}</text>
+        <rect x="77" y={top-11} width="45" height="19" rx="6" fill="#fffdf7" stroke={col}/><text x="99" y={top+3} textAnchor="middle">{show(a.d)}</text></g>;})}
+      <circle cx="257" cy={end} r="19" fill="#21664c"/><text x="257" y={end+4} textAnchor="middle" style={{fill:'white'}}>{merge.e}</text></svg>
+      <Choices labels={merge.inc.map(({a})=>'Работа '+a.i+' → '+a.j)} selected={n} change={set}/><Formula>{show(branch.v.sub(arc.d))} + {show(arc.d)} = {show(branch.v)}</Formula><small>Начало выбранной работы + длительность = время её завершения.</small></>;};
   return [frame('Почему работы приходится ждать','Представьте сборку: начать следующий этап можно, только когда готовы все детали. Круг на схеме — момент готовности, стрелка — работа между двумя такими моментами. На стрелке указана её длительность.',draw),
     frame('Почему берём более поздний срок','В событие '+merge.e+' ведут несколько работ. Завершения одной недостаточно: нужно дождаться остальных. По очереди выберите входящие стрелки. Самая поздняя готова к моменту '+show(merge.val)+'.',draw),
     frame('Какие работы определяют срок','У выделенной цепочки нет запаса времени. Задержка любой её работы задержит весь проект. Сумма длительностей на этом критическом пути равна сроку проекта.',()=><><div className="primer-chain">{path.map(a=><span key={a.i+'-'+a.j}>{a.i} → {a.j}<b>{show(a.d)}</b></span>)}</div><Formula>{path.map(a=>show(a.d)).join(' + ')} = {show(net.T)}</Formula></>)];
@@ -193,15 +209,41 @@ function game(d) {
     frame('Зачем чередовать ходы','В этом варианте выгодно случайно выбирать строку с рассчитанными вероятностями. На плитках указаны доли ходов A. Цена игры — средний выигрыш при оптимальной игре обоих участников.',()=><><Points values={g.x} names={g.x.map((_,i)=>'Доля A'+(i+1))}/><Formula>Цена игры · {show(g.value)}</Formula></>)];
 }
 const stories={graph,simplex,artificial,transp:transport,dual,duality:dual,dsx:dualSimplex,dsimplex:dualSimplex,canon:canonical,ilp:integer,gomory:integer,optcheck:optimality,netw:network,game};
+function IntroLegend({data:d}){
+  let entries;
+  switch(d.type){
+    case 'transp': {
+      const s=d.T.first.steps[0];
+      entries=[['A'+LU.sub(s.i+1),'склад отправления, запас '+show(s.a0)],['B'+LU.sub(s.j+1),'магазин назначения, заказ '+show(s.b0)]];
+      break;
+    }
+    case 'graph': entries=[['x₁','количество по горизонтали'],['x₂','количество по вертикали']];break;
+    case 'simplex': entries=[['x₁','выпуск первого изделия'],['Остаток','доступный ресурс за вычетом расхода']];break;
+    case 'artificial': entries=[['t','временное количество в одной строке'],['h','сумма всех временных количеств']];break;
+    case 'dual': case 'duality': entries=[['x','количества в исходном плане'],['y','оценки условий этого плана']];break;
+    case 'dsx': case 'dsimplex': entries=[['Клетка','одна требуемая деталь'],['Минус','деталей пока меньше, чем требуется']];break;
+    case 'canon': entries=[['Минимум','количество, обязательное по условию'],['Добавка','сколько берём сверх минимума']];break;
+    case 'ilp': case 'gomory': entries=[['Целая часть','число полных изделий'],['Дробная часть','доля следующего изделия']];break;
+    case 'optcheck': entries=[['План','предложенные количества'],['Условие','граница, с которой сравнивают расход или выпуск']];break;
+    case 'netw': entries=[['Круг','событие, когда предшествующие работы готовы'],['Стрелка','работа, число на ней — длительность']];break;
+    case 'game': entries=[['A','выбирает строку'],['B','выбирает столбец']];break;
+  }
+  return <dl className="intro-key">{entries.map(([label,meaning])=><div key={label}><dt>{label}</dt><dd>{meaning}</dd></div>)}</dl>;
+}
 const parts=['Условие','Схема','Результат'];
 export function LessonIntro({data,onOpen}) {
-  const [page,setPage]=useState(0),[values,setValues]=useState({});
+  const [page,setPage]=useState(()=>new URLSearchParams(location.search).get('part')==='scheme'?1:0),[values,setValues]=useState({});
+  const [picked,setPicked]=useState(null);
+  function openPage(i){setPicked(null);setPage(i);}
+  function choose(v){setValues(prev=>({...prev,[page]:v}));}
   const frames=stories[data.type](data), current=frames[page], n=values[page]??current.start??0;
   return <section className="lesson-primer" aria-label="Знакомство с вариантом">
-    <div className="primer-pages" role="group" aria-label="Части наглядного примера">{parts.map((p,i)=><button type="button" key={p} aria-current={page===i?'step':undefined} onClick={()=>setPage(i)}><MethodMark type={['brief',data.type,'optcheck'][i]}/>{i+1}. {p}</button>)}</div>
-    <div className="primer-spread"><div className="primer-copy" aria-live="polite"><h2>{current.title}</h2><p>{current.copy}</p></div>
-    <div className="primer-art" key={page}>{current.draw(n,v=>setValues({...values,[page]:v}))}</div></div>
-    <div className="primer-nav">{page>0&&<Button variant="ghost" onPress={()=>setPage(page-1)}>← Назад</Button>}
-    <Button className="primer-next" onPress={()=>page<2?setPage(page+1):onOpen()}>{['Как читать схему →','Посмотреть результат →','Открыть пошаговое решение →'][page]}</Button>
+    <div className="primer-pages" role="group" aria-label="Части наглядного примера">{parts.map((p,i)=><button type="button" key={p} aria-current={page===i?'step':undefined} onClick={()=>openPage(i)}><MethodMark type={['brief',data.type,'optcheck'][i]}/>{i+1}. {p}</button>)}</div>
+    <div className={'primer-spread'+(page===1?' with-reading':'')}><div className="primer-copy"><h2>{current.title}</h2><p>{current.copy}</p>
+      {page===0&&<IntroLegend data={data}/>}
+      {page===1&&<ReadingDiagram data={data} value={n} choose={choose} point={picked}/>}</div>
+    <div className="primer-art" key={page}>{current.draw(n,choose,{picked,setPicked})}</div></div>
+    <div className="primer-nav">{page>0&&<Button variant="ghost" onPress={()=>openPage(page-1)}>← Назад</Button>}
+    <Button className="primer-next" onPress={()=>page<2?openPage(page+1):onOpen()}>{['Как читать схему →','Посмотреть результат →','Открыть пошаговое решение →'][page]}</Button>
     {page<2&&<Button variant="ghost" onPress={onOpen}>Сразу к решению</Button>}</div></section>;
 }
