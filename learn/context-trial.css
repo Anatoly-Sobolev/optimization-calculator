@@ -464,3 +464,63 @@
 
 .freight-grid td[data-closed=true]{background:#f2f2ed;color:#7c857f}
 .freight-grid td[data-next=true]{outline:2px dashed #a26920;outline-offset:-3px;background:#fff6db}
+
+/* Keep the lesson navigation on the same line while each shipment plays. */
+.freight-reader{overflow-anchor:none}
+#lesson-body .freight-reader #step-foot{border:0;margin:0 0 .6rem;padding:0;gap:.45rem;flex-wrap:nowrap}
+.freight-position{margin-right:auto;font-variant-numeric:tabular-nums;color:#456756}
+.freight-reader #step-foot button,.freight-reader #step-foot a{padding:.4em .8em}
+.freight-film .film-heading{display:flex;align-items:baseline;justify-content:space-between;gap:.4rem}
+.freight-film .film-heading h3{margin:0;font-weight:650;font-size:clamp(1.05rem,2.5vw,1.35rem);line-height:1.25}
+#book .film-playback{display:inline-flex;align-items:center;gap:.25rem;white-space:nowrap;box-shadow:none;padding:.3em .5em;border:1px solid #c5d5ca;background:#fff;color:#315843;font-size:.8rem}
+.freight-film .freight-lesson-board{margin:.6rem 0 0}
+.film-notes{display:grid;gap:.4rem;align-content:start}
+.film-cue{border-left:2px solid #c2d4c7;padding:.15rem .65rem;line-height:1.3;font-size:.9em}
+.film-cue[data-current=true]{border-color:#218260;background:#eff6ee}
+.film-cue[data-shown=false]{visibility:hidden}
+.film-cue p{margin:.12em 0 .25em}
+.film-arithmetic{font-weight:620;font-variant-numeric:tabular-nums}
+.freight-inquiry{color:#173d32;margin:.6rem 0;max-width:64rem}
+.inquiry-heading small{color:#466553}
+.freight-inquiry h4{font-size:clamp(1.17rem,2.3vw,1.55rem);margin:.15em 0}
+.freight-inquiry p{margin:.3em 0 .7em;max-width:70ch;line-height:1.4}
+.inquiry-board{display:grid;gap:clamp(.65rem,2vw,1.35rem);align-items:center;padding:.8rem;background:#f5f7f0;border:1px solid #d2decf;border-radius:12px}
+.inquiry-round-0,.inquiry-round-1{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+.inquiry-trip{display:grid;grid-template-columns:minmax(0,1fr) minmax(3rem,.75fr) minmax(0,1fr);gap:.3rem;align-items:center;margin:0}
+.inquiry-end{display:grid;justify-items:center;align-content:center;gap:.12rem;min-height:7.5rem;padding:.45rem .2rem;background:#fffdf8;border:1px solid #c6d7c9;border-radius:.65rem;text-align:center;font-size:.9rem}
+.inquiry-end svg,.inquiry-prices span>svg{width:1.8rem;height:1.8rem;color:#536b58}
+.inquiry-end span,.inquiry-end small{font-size:.8em}
+.inquiry-end[data-empty=true]{border:2px solid #a86e2d;background:#fdf1da}
+.inquiry-meter{height:.35rem;width:70%;border-radius:.5rem;overflow:hidden;background:#d5dfd5}
+.inquiry-meter i{height:100%;display:block;background:#638b6e}
+.inquiry-road{display:grid;justify-items:center;font-size:.83em;gap:.2rem}
+.inquiry-road span{display:block;width:100%;padding-bottom:.1rem;border-bottom:2px dashed #709079}
+.inquiry-road span svg{height:1.6rem;width:1.6rem;display:block;margin-left:calc(100% - 1.6rem);color:#235b49}
+.inquiry-pick-grid{border-collapse:collapse;text-align:center;color:#224b3c}
+#book .inquiry-pick-grid{width:100%!important;table-layout:fixed}
+.inquiry-pick-grid caption{text-align:left;font-size:.85em;color:#536d5d;padding-bottom:.35em}
+.inquiry-pick-grid :is(th,td){border:1px solid #c7d5cb;padding:.15rem;background:white}
+.inquiry-pick-grid th[data-guide=true]{background:#d7e8cc}
+.inquiry-pick-grid td[data-guide=true]{background:#f1f6eb}
+#book .inquiry-pick-grid button{width:100%;min-height:2.6rem;border:1px dashed #97b09b;background:transparent;color:#224b3c;font-size:1.08rem}
+.inquiry-answers,.inquiry-prices{display:grid;gap:.4rem}
+#book .freight-inquiry :is(.inquiry-answers,.inquiry-prices) button{padding:.55rem .7rem;border:1px solid #a7c2b0;border-radius:.55rem;color:#204835;background:#fffefa;text-align:left}
+#book .freight-inquiry button[data-answer=right]{background:#daeddb;border:2px solid #307651;color:#244d36;opacity:1}
+#book .freight-inquiry button[data-answer=wrong]{background:#fff0de;border-color:#ad682b}
+.inquiry-prices button{display:grid;grid-template-columns:1fr minmax(5rem,1fr) 1fr;align-items:center;text-align:center;gap:.4rem}
+.inquiry-prices button span{display:grid;justify-items:center;font-size:.9em}
+.inquiry-ticket{border-bottom:2px dashed #77987d;color:#30593e}
+.inquiry-feedback:not(:empty){padding:.45rem .65rem;margin:.5rem 0;border-left:3px solid #a87338;background:#fff5e5}
+.inquiry-feedback[data-answer=right]{border-color:#3b8059;background:#edf6eb}
+@media(prefers-reduced-motion:no-preference){
+ .inquiry-road span svg{animation:inquiry-trip 1.25s ease-out both}
+ @keyframes inquiry-trip{from{margin-left:0}to{margin-left:calc(100% - 1.6rem)}}
+ .film-cue[data-current=true]{animation:freight-cue-in .35s ease-out}
+ @keyframes freight-cue-in{from{background:#dcebd5}to{background:#eff6ee}}
+}
+@media(max-width:740px){.inquiry-round-0,.inquiry-round-1{grid-template-columns:minmax(0,1fr)}.inquiry-board{padding:.55rem}.freight-film .film-notes{gap:.24rem}.inquiry-end{min-height:6.2rem}}
+
+.freight-film .film-heading{min-height:2rem;align-items:flex-start}
+#book .film-playback{width:7.8em;justify-content:center;flex-shrink:0}
+.freight-inquiry .inquiry-heading{margin-bottom:.65rem}
+@media(max-width:500px){.freight-film .film-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;min-height:4.15rem}.freight-film .film-heading h3{font-size:1rem}.freight-position{font-size:.88rem}}

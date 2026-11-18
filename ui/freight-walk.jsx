@@ -1,6 +1,6 @@
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Play,Pause,RotateCcw} from 'lucide-react';
-import {FreightGrid,depot,shop,route,display} from './freight-grid.jsx';
+import {FreightGrid,depot,shop,route} from './freight-grid.jsx';
 
 const t=LU.txt;
 const list=xs=>xs.map(t).join(' + ');
@@ -94,32 +94,62 @@ function CycleTrail({path,frame}){
   },[path,frame]);
   return <svg className="cycle-trail" ref={svg} aria-hidden="true"><path key={frame} pathLength="1"/></svg>;
 }
-export function FreightWalk({model:T,step}){
-  const [f,frame]=useState(0),[playing,play]=useState(false),host=useRef(null);
+export function FreightReader({model,steps,initial,onMove,finish}){
+  const [position,setPosition]=useState(initial);
+  const step=steps[position],root=useRef(null);
+  function move(to){
+    if(to<0||to>=steps.length)return;
+    // Keep the viewport at its current scroll offset even when the next
+    // explanation is shorter and the reader is near the bottom of the page.
+    const el=root.current;
+    const roomBelow=document.documentElement.scrollHeight-window.innerHeight-window.scrollY;
+    el.style.minHeight=window.scrollY>0?Math.ceil(Math.max(0,el.getBoundingClientRect().height-roomBelow+1))+'px':'';
+    setPosition(to);onMove(to);
+  }
+  return <section className="freight-reader" ref={root}>
+    <nav id="step-foot" aria-label="Шаги транспортной задачи">
+      <span className="freight-position">Шаг {position+1} из {steps.length}</span>
+      <button type="button" disabled={position===0} onClick={()=>move(position-1)}>Назад</button>
+      {position+1<steps.length?<button type="button" className="book-primary" onClick={()=>move(position+1)}>Далее →</button>:<a className="book-cta" href={finish}>К практике →</a>}
+    </nav>
+    <FreightWalk key={step.id} model={model} step={step}/>
+  </section>;
+}
+function FreightWalk({model:T,step}){
+  const [f,frame]=useState(()=>LU.reduced()?2:0),[paused,pause]=useState(false);
+  const [visible,setVisible]=useState(false),host=useRef(null);
   const page=step.freightLeg!=null||step.title==='Выбор начальной клетки'?distribution(T,step,f):step.freightIteration!=null?improvement(T,step,f):step.title==='Баланс перевозок'?balance(T,f):optimal(T,f);
   useEffect(()=>{
-    if(!playing)return;
-    const timer=setTimeout(()=>{if(host.current?.closest('[hidden]')){play(false);return;}frame(f+1);if(f===1)play(false);},3400);
+    const article=host.current;let onScreen=false;
+    const sync=()=>setVisible(onScreen&&!document.hidden);
+    const observer=new IntersectionObserver(([entry])=>{onScreen=entry.isIntersecting;sync();});
+    observer.observe(article);document.addEventListener('visibilitychange',sync);
+    return ()=>{observer.disconnect();document.removeEventListener('visibilitychange',sync);};
+  },[]);
+  useEffect(()=>{
+    if(paused||!visible||f===2)return;
+    const timer=setTimeout(()=>frame(f+1),f===0?2200:2700);
     return ()=>clearTimeout(timer);
-  },[f,playing]);
+  },[f,paused,visible]);
   useLayoutEffect(()=>{
     if(f===0||page.quantity==null||LU.reduced())return;
-    const root=host.current,from=root.querySelector(f===1?'[data-source="'+page.source+'"]':'[data-payload]'),to=root.querySelector(f===1?'[data-payload]':'[data-write]');
+    const root=host.current,from=root.querySelector(f===1?'[data-source="'+page.source+'"]':'[data-cue="1"] [data-payload]'),to=root.querySelector(f===1?'[data-cue="1"] [data-payload]':'[data-write]');
     if(!from||!to)return;
     const start=from.getBoundingClientRect(),end=to.getBoundingClientRect();
     const chip=document.createElement('span');chip.className='freight-moving-number';chip.setAttribute('aria-hidden','true');chip.textContent=t(page.quantity);
     root.append(chip);const rect=root.getBoundingClientRect();
     chip.style.left=(end.left+end.width/2-rect.left)+'px';chip.style.top=(end.top+end.height/2-rect.top)+'px';
-    const motion=chip.animate([{transform:'translate(-50%,-50%) translate('+(start.left+start.width/2-end.left-end.width/2)+'px,'+(start.top+start.height/2-end.top-end.height/2)+'px)'},{transform:'translate(-50%,-50%)'}],{duration:800,easing:'ease-in-out'});
+    const motion=chip.animate([{transform:'translate(-50%,-50%) translate('+(start.left+start.width/2-end.left-end.width/2)+'px,'+(start.top+start.height/2-end.top-end.height/2)+'px)'},{transform:'translate(-50%,-50%)'}],{duration:720,easing:'ease-in-out'});
     motion.onfinish=()=>chip.remove();return ()=>{motion.cancel();chip.remove();};
   },[step,f]);
-  const go=k=>{play(false);frame(k);};
-  return <article className="freight-walk worked-step" ref={host}><h4>{page.title}</h4>
-    {step.title==='Баланс перевозок'&&T.first&&<p className="freight-first-rule">Сначала проверим, хватит ли груза. Затем распределим его методом {T.init==='mc'?'минимальной стоимости':'северо-западного угла'}. В конце метод потенциалов покажет, можно ли выполнить те же заказы дешевле.</p>}
-    <div className="walk-rail" role="group" aria-label="Кадры разбора">{page.labels.map((label,k)=><button key={label} aria-pressed={k===f} onClick={()=>go(k)}>{k+1}. {label}</button>)}</div>
-    <div className="freight-lesson-board"><div className="freight-grid-wrap" data-locate={step.title==='Выбор начальной клетки'||step.freightLeg!=null}><FreightGrid {...page.grid}/>{page.grid.marks&&<CycleTrail path={page.grid.marks} frame={f}/>}</div><section className="walk-current freight-explanation" aria-live="polite">
-      <strong>{page.labels[f]}</strong><p>{page.notes[f]}</p><div className="freight-arithmetic" key={f}>{page.sums[f]}</div>{page.detail}</section></div>
-    <div className="walk-controls">{f<2?<button className="trial-primary" onClick={()=>go(f+1)}>{page.labels[f+1]} →</button>:<button onClick={()=>go(0)}><RotateCcw size={15}/>Сначала</button>}
-    <button onClick={()=>{if(playing)play(false);else{if(f===2)frame(0);play(true);}}}>{playing?<Pause size={15}/>:<Play size={15}/>} {playing?'Пауза':'Проиграть шаг'}</button></div>
+  function playback(){
+    if(f===2){frame(0);pause(false);}else pause(!paused);
+  }
+  return <article className="freight-walk worked-step freight-film" ref={host} data-frame={f}>
+    <div className="film-heading"><h3>{page.title}</h3><button type="button" className="film-playback" onClick={playback}>{f===2?<RotateCcw size={15}/>:paused?<Play size={15}/>:<Pause size={15}/>} {f===2?'Повторить':paused?'Продолжить':'Пауза'}</button></div>
+    {step.title==='Баланс перевозок'&&T.first&&<p className="freight-first-rule">Сначала проверим, хватит ли груза. Затем распределим его методом {T.init==='mc'?'минимальной стоимости':'северо-западного угла'}. В конце проверим, можно ли выполнить те же заказы дешевле.</p>}
+    <div className="freight-lesson-board"><div className="freight-grid-wrap" data-locate={step.title==='Выбор начальной клетки'||step.freightLeg!=null}><FreightGrid {...page.grid}/>{page.grid.marks&&<CycleTrail path={page.grid.marks} frame={f}/>}</div>
+      <div className="walk-current film-notes" aria-live="polite" aria-relevant="additions text">{page.labels.map((label,k)=><div key={label} className="film-cue" data-cue={k} data-shown={k<=f} data-current={f===k} aria-hidden={k>f}><strong>{label}</strong><p>{page.notes[k]}</p><div className="film-arithmetic">{page.sums[k]}</div></div>)}{page.detail}</div>
+    </div>
   </article>;
 }

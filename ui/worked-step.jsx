@@ -1,6 +1,5 @@
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Play,Pause,RotateCcw} from 'lucide-react';
-import {FreightWalk} from './freight-walk.jsx';
 import {lessonContext} from './lesson-context.jsx';
 
 const t=LU.txt,sub=LU.sub;
@@ -144,10 +143,6 @@ function story(step,data){
 
 // Keep the preceding calculation visible while its values move into the next one.
 export function WorkedStep({step,data}){
-  if(data.T && (step.freightLeg!=null || step.freightIteration!=null || ['Баланс перевозок','Выбор начальной клетки','Оптимальность плана'].includes(step.title)))return <FreightWalk model={data.T} step={step}/>;
-  return <GeneralWalk step={step} data={data}/>;
-}
-function GeneralWalk({step,data}){
   const {title,frames}=story(step,data);
   const [frame,setFrame]=useState(0),[playing,setPlaying]=useState(false);
   const host=useRef(null);

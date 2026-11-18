@@ -1,3 +1,5 @@
+import {FreightReader} from './freight-walk.jsx';
+import {FreightInquiry} from './freight-inquiry.jsx';
 import {WorkedStep} from './worked-step.jsx';
 import React, {useRef, useState} from 'react';
 import {ArrowLeft,ChevronLeft,ChevronRight,ListVideo} from 'lucide-react';
@@ -207,3 +209,6 @@ export const shipmentExample = host => mount(host,<ShipmentExample/>);
 export const planProbe = (host,data) => mount(host,<PlanProbe data={data}/>);
 
 export const workedStep = (host,props) => mount(host,<WorkedStep {...props}/>);
+
+export const freightReader=(host,props)=>mount(host,<FreightReader {...props}/>);
+export const freightInquiry=(host,model)=>mount(host,<FreightInquiry model={model}/>);
