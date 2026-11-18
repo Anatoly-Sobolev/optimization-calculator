@@ -25,7 +25,7 @@ const Handbook = (() => {
   }
   function write(id, value) {
     saved[id] = value;
-    try { localStorage.setItem('handbook.1.' + id, JSON.stringify(value)); } catch { /* In-memory session. */ }
+    try { localStorage.setItem('handbook.1.' + id, JSON.stringify(value)); return true; } catch { return false; }
   }
   const lab = () => chapter ? '?lab#' + new URLSearchParams({s:chapter.src,t:chapter.type,v:current.v,b:chapter.base || 'graph'}) : '?lab';
   function mast() {
@@ -97,7 +97,7 @@ const Handbook = (() => {
   function stepState() { return read(key(chapter))[phase] || {}; }
   function remember(patch) {
     const history=read(key(chapter));
-    history[phase]={...history[phase],...patch,position}; write(key(chapter),history);
+    history[phase]={...history[phase],...patch,position}; return write(key(chapter),history);
   }
   function draw() {
     const host = book.querySelector('#lesson-body');
@@ -108,30 +108,39 @@ const Handbook = (() => {
     if (phase === 1) {
       const map=LPROFILES.profileFor(chapter.type).map;
       const q=map.q;
-      host.innerHTML='<div class="book-callout">' + esc(q.q) + '</div><label for="book-reason">Объясните своими словами</label><textarea id="book-reason" rows="3"></textarea><button class="book-primary" id="book-compare">Сверить с принципом</button><div id="principle"></div>';
+      host.innerHTML='<div class="book-callout">' + esc(q.q) + '</div><label for="book-reason">Ваша заметка (по желанию)</label><p id="draft-help">Здесь можно сформулировать причину про себя или записать её для самопроверки. Преподавателю текст не отправляется. Заметка сохраняется в этом браузере до удаления данных сайта.</p><textarea aria-describedby="draft-help" id="book-reason" rows="3"></textarea><button class="book-primary" id="book-compare">Посмотреть объяснение и сравнить</button><div id="principle"></div>';
       host.insertAdjacentHTML('afterbegin','<details class="book-map"><summary>Схема метода</summary><ol>' + map.nodes.map(([name,description])=>'<li><strong>'+esc(name)+'</strong><p>'+esc(description)+'</p></li>').join('') + '</ol></details>');
       const input=host.querySelector('textarea');
       input.value=progress.draft || '';
-      input.oninput=()=>remember({draft:input.value});
-      const compare=()=>{ if(!input.value.trim()){input.focus();return;} remember({draft:input.value,compared:true});const result=host.querySelector('#principle');result.innerHTML='<p class="book-callout">' + esc(q.why) + '</p>';footer(result); };
+      input.oninput=()=>{
+        if(!remember({draft:input.value})) host.querySelector('#draft-help').textContent='Браузер блокирует сохранение. Эта заметка доступна до ухода со страницы. Преподавателю она не отправляется.';
+      };
+      const compare=()=>{ remember({draft:input.value,compared:true});const result=host.querySelector('#principle');result.innerHTML='<p class="book-callout">' + esc(q.why) + '</p>';footer(result); };
       host.querySelector('#book-compare').onclick=compare;
-      if(progress.compared && input.value.trim()) compare();
+      if(progress.compared) compare();
       return;
     }
     const firstMissing = steps.findIndex(step => practiceStart[chapter.type]?.test(step.title));
     const shown = phase === 0 || phase === 2 && position < (firstMissing < 0 ? steps.length-1 : firstMissing);
     const solved=Boolean(progress.answers?.[position]);
-    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><h3 tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.prompt) + '</p><div class="book-state">' + s.before + '</div><div id="response"></div><div role="status" id="book-feedback"></div><div id="step-foot"></div>';
+    host.innerHTML='<div class="step-line"><span>Переход ' + (position+1) + ' из ' + steps.length + '</span><progress max="' + steps.length + '" value="' + (position+1) + '"></progress></div><div id="step-foot"></div><h3 tabindex="-1">' + esc(s.title) + '</h3><p>' + esc(s.prompt) + '</p><div class="book-state">' + s.before + '</div><div id="response"></div><div role="status" id="book-feedback"></div>';
     const response=host.querySelector('#response'), foot=host.querySelector('#step-foot');
     const next=() => {
       if(position+1===steps.length){footer(foot);return;}
-      const b=document.createElement('button');b.className='book-primary';b.textContent='Следующий переход →';b.onclick=()=>move(1);foot.append(b);
+      const b=document.createElement('button');b.className='book-primary';b.textContent='Далее: '+steps[position+1].title;b.onclick=()=>move(1);foot.append(b);
     };
-    function move(amount){position+=amount;remember({});draw();book.querySelector('#lesson-body h3')?.focus();}
+    function move(amount){position+=amount;remember({});draw();const bar=book.querySelector('#step-foot'); (bar.querySelector('.book-primary') || bar.querySelector('button'))?.focus({preventScroll:true});}
     if(position>0){const prev=document.createElement('button');prev.textContent='← Предыдущий';prev.onclick=()=>move(-1);foot.append(prev);}
     function reveal(){
       response.innerHTML='<div class="book-rule"><strong>' + esc(s.answer) + '</strong><p>' + esc(s.reason) + '</p></div><details class="book-change"><summary>Сравнить с состоянием после шага</summary><div class="book-state">' + s.after + '</div></details>';
       const change = response.querySelector('.book-change');
+      if (s.cycleTrace || (s.allocation && phase===0)) {
+        const visual=host.querySelector('.book-state');
+        LessonVisuals.transportTable(visual,s);
+        change.remove();
+        next();
+        return;
+      }
       if (s.resourceLimits) {
         const figure=document.createElement('figure');
         change.before(figure);

@@ -83,5 +83,77 @@ const LessonVisuals = (() => {
     names.forEach((label,i)=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>paint(i);controls.append(b);});
     paint(0);
   }
-  return {cycleFigure,limits};
+  function transportTable(host, step) {
+    const cycle = step.cycleTrace, fill = step.allocation;
+    const initial = cycle ? cycle.plan : fill.stocks.map(() => fill.needs.map(()=>null));
+    const length = cycle ? cycle.path.length/2 : fill.entries.length;
+    let frame = 0;
+    host.innerHTML = '<div class="trace-controls"><button type="button">← Кадр</button><button type="button" class="book-primary"></button><output></output></div><p class="trace-note" aria-live="polite"></p><div class="book-state trace-grid"><table></table></div>';
+    const [back,next] = host.querySelectorAll('button');
+    const table = host.querySelector('table');
+    const header = table.createTHead().insertRow();
+    for(const label of ['Склад',...initial[0].map((_,i)=>'B'+(i+1))]){
+      const th=document.createElement('th');th.scope='col';th.textContent=label;header.append(th);
+    }
+    const body=table.createTBody();
+    const cells=initial.map((row,i)=>{
+      const tr=body.insertRow(), th=document.createElement('th');
+      th.scope='row';th.textContent='A'+(i+1);tr.append(th);
+      return row.map(()=>tr.insertCell());
+    });
+    const at = c => 'A'+(c.i+1)+'B'+(c.j+1);
+    function paint(){
+      const values=initial.map(row=>row.slice());
+      let note=cycle
+        ? 'Это действующий план. В клетках указаны объёмы перевозок, прочерк означает пустой маршрут. По клеткам со знаком минус выбираем наименьший объём: '+cycle.path.filter(c=>c.sign!=='+' ).map(c=>initial[c.i][c.j]||'0').join(', ')+'. Поэтому переносим '+cycle.amount+'.'
+        : 'Начинаем с пустого плана. Строка — склад, столбец — магазин. Нажмите «Заполнить клетку», чтобы увидеть первую поставку.';
+      let active=[];
+      for(let n=0;n<frame;n++){
+        if(cycle){
+          const pair=cycle.path.slice(n*2,n*2+2);
+          active=pair;
+          const calculations=pair.map(c=>{
+            const old=values[c.i][c.j]||'0', delta=Q.parse(cycle.amount);
+            const result=c.sign==='+'?Q.parse(old).add(delta):Q.parse(old).sub(delta);
+            values[c.i][c.j]=result.toText();
+            return at(c)+': '+old+' '+c.sign+' '+cycle.amount+' = '+result.toText();
+          });
+          note='Переносим '+cycle.amount+' с '+at(pair[1])+' на '+at(pair[0])+'. '+calculations.join('. ')+'.';
+        }else{
+          const e=fill.entries[n];active=[e];values[e.i][e.j]=e.x;
+          note='На складе A'+(e.i+1)+' осталось '+e.stock+', магазину B'+(e.j+1)+' нужно '+e.need+'. Записываем меньшее число, '+e.x+', в '+at(e)+'.';
+        }
+      }
+      if(cycle && frame>0) note+=frame===length?' Цикл завершён: общий груз каждого склада и заказ каждого магазина сохранились.':' Это часть пересчёта. Балансы проверим после всего цикла.';
+      for(let i=0;i<cells.length;i++) for(let j=0;j<cells[i].length;j++){
+        const cell=cells[i][j], token=active.find(c=>c.i===i&&c.j===j);
+        cell.textContent=values[i][j]??'—';cell.classList.toggle('trace-active',Boolean(token));
+        const sign=cycle?.path.find(c=>c.i===i&&c.j===j)?.sign;
+        if(sign){const mark=document.createElement('small');mark.textContent=' '+sign;cell.append(mark);}
+        if(token && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+          cell.animate([{backgroundColor:'#f6da80',transform:'scale(.91)'},{backgroundColor:'#dbecc9',transform:'scale(1)'}],{duration:520});
+      }
+      host.querySelector('.trace-note').textContent=note;
+      host.querySelector('output').textContent=frame+' / '+length;
+      back.disabled=frame===0;next.textContent=frame===length?'Повторить с начала':cycle?'Перенести '+cycle.amount:'Заполнить клетку';
+    }
+    next.onclick=()=>{
+      frame=frame===length?0:frame+1;paint();
+      if(!cycle || !frame || matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const [to,from]=cycle.path.slice(2*(frame-1),2*frame);
+      const grid=host.querySelector('.trace-grid');
+      grid.querySelector('.transfer-token')?.remove();
+      const origin=cells[from.i][from.j].getBoundingClientRect();
+      const end=cells[to.i][to.j].getBoundingClientRect();
+      const box=grid.getBoundingClientRect();
+      const token=document.createElement('span');
+      token.className='transfer-token';token.textContent=cycle.amount;token.setAttribute('aria-hidden','true');
+      token.style.left=(origin.left-box.left+grid.scrollLeft)+'px';
+      token.style.top=(origin.top-box.top+grid.scrollTop)+'px';grid.append(token);
+      const flight=token.animate([{transform:'translate(0,0)'},{transform:'translate('+(end.left-origin.left)+'px,'+(end.top-origin.top)+'px)'}],{duration:700,easing:'ease-in-out'});
+      flight.onfinish=()=>token.remove();
+    };
+    back.onclick=()=>{frame--;paint();};paint();
+  }
+  return {cycleFigure,limits,transportTable};
 })();
