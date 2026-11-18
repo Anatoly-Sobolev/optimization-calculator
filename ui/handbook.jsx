@@ -1,3 +1,4 @@
+import {WorkedStep} from './worked-step.jsx';
 import React, {useRef, useState} from 'react';
 import {ArrowLeft,ChevronLeft,ChevronRight,ListVideo} from 'lucide-react';
 import './scene-shipment.jsx';
@@ -56,7 +57,7 @@ function Home({groups,first,recent,lab}) {
 }
 
 function Lesson({title,summary,source,variant,phases,active,lab,data}) {
-  const [view,setView]=useState(active!==0?'method':new URLSearchParams(location.search).get('view')==='example'?'example':'context');
+  const [view,setView]=useState(()=>{const mode=new URLSearchParams(location.search).get('view');return active!==0||['steps','explore'].includes(mode)?'method':mode==='example'?'example':'context';});
   const reading=view==='method';
   const heading=useRef(null), back=useRef(null);
   function openReading() {
@@ -112,8 +113,8 @@ function Gallery({titles,onSelect}) {
   </div>;
 }
 
-function StudyViews({onChange,items}) {
-  const [view,setView] = useState(items[0][0]);
+function StudyViews({onChange,items,initial}) {
+  const [view,setView] = useState(initial);
   return <div className="study-views" role="group" aria-label="Как посмотреть пример">
     {items.map(([key,title,id])=><Button key={key} variant="ghost" aria-controls={id}
       aria-pressed={view===key} onPress={()=>{onChange(key);setView(key);}}><MethodMark type={key}/>{title}</Button>)}
@@ -204,3 +205,5 @@ export const answer = (host,props) => mount(host,<Answer {...props}/>);
 export const shipmentExample = host => mount(host,<ShipmentExample/>);
 
 export const planProbe = (host,data) => mount(host,<PlanProbe data={data}/>);
+
+export const workedStep = (host,props) => mount(host,<WorkedStep {...props}/>);

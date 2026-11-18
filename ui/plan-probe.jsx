@@ -1,26 +1,29 @@
 import React,{useState} from 'react';
-import {Button} from '@heroui/react/button';
-
 import {CoordinateField} from './coordinate-field.jsx';
-
 import {lessonContext} from './lesson-context.jsx';
-export function PlanProbe({data}) {
-  const model=data.P,world=lessonContext(data);
-  const [point,setPoint] = useState([0,0]);
-  const cuts = model.rows.map(row=>[...row.a.slice(0,2).map(LU.num),LU.num(row.b)]);
-  const intercepts = cuts.flatMap(([a,b,c])=>[a?c/a:0,b?c/b:0]).filter(v=>v>0);
-  const unit = Math.max(1,Math.ceil(Math.max(4,...intercepts)/4)), extent = 4*unit;
-  const x = model.c.map((_,j)=>Q.of(point[j] || 0));
-  const checks = ALG.check(model,x), negative=point.some(v=>v<0), valid = !negative && checks.every(c=>c.ok);
-  return <div><h4>Проверить план по координатам</h4>
-    <p>По горизонтали — {world.variables[0][0].toLowerCase()} ({world.variables[0][2]}), по вертикали — {world.variables[1][0].toLowerCase()} ({world.variables[1][2]}). Передвигайте точку и смотрите, какой выпуск можно выполнить.
-      {model.c.length>2 && ' В этом сечении остальные переменные равны нулю.'}</p>
-    <div className="probe-layout"><div><CoordinateField model={model} maxX={extent} maxY={extent} tall region label={'План ('+point.join('; ')+')'} onPlace={setPoint}>
-      {({sx,sy})=><circle data-plan-point="" cx={sx(point[0])} cy={sy(point[1])} r="5" fill={valid?'#215a41':'#ad5233'} stroke="white" strokeWidth="2"/>}
-    </CoordinateField></div><div className="probe-values">
-      {world.variables.slice(0,2).map(([name,Icon,unit],i)=><label key={name}><span><Icon size={16}/> {name} · {unit}</span><input type="range" min={Math.min(0,point[i])} max={Math.max(extent,point[i])} step=".1" value={point[i]} onChange={e=>setPoint(point.map((n,j)=>j===i?+e.target.value:n))}/><output>{point[i]}</output></label>)}
-      <p role="status">{valid?'План допустим':negative?'Количество должно быть неотрицательным':'Есть нарушение'} · {world.objective} {LU.txt(LSCENE.objValue(model,x))} {world.money}</p>
-      <table><thead><tr><th>№ и условие</th><th>Проверка в точке</th><th>Итог</th></tr></thead><tbody>{checks.map((c,i)=><tr key={i}><th scope="row"><span>{i+1}. </span><span dangerouslySetInnerHTML={{__html:R.lin(model.rows[i].a.slice(0,2),j=>R.xv(j+1))}}/> {R.sg(model.rows[i].s)} {LU.txt(model.rows[i].b)}</th><td tabIndex="0" data-origin={model.rows[i].a.map((a,j)=>'('+LU.txt(a)+') × ('+LU.txt(x[j])+')').join(' + ')+' = '+LU.txt(c.lhs)}>{LU.txt(c.lhs)} {R.sg(model.rows[i].s)} {LU.txt(model.rows[i].b)}</td><td>{c.ok?'✓ Да':'× Нет'}</td></tr>)}</tbody></table>
-      <Button variant="secondary" onPress={()=>setPoint([0,0])}>В начало координат</Button>
-    </div></div></div>;
+import {SubstitutionSystem} from './substitution-system.jsx';
+
+// For a multi-variable problem start at the actual first feasible basis.
+function initialPlan(data){
+  const first=data.type==='simplex'&&data.rec.lp?.phase2?.steps[0];
+  return data.P.c.map((_,j)=>{
+    const i=first?first.basis.findIndex(k=>first.vars[k].kind==='x'&&first.vars[k].k===j+1):-1;
+    return i<0?Q.of(0):first.rows[i].b;
+  });
+}
+export function PlanProbe({data}){
+  const p=data.P,world=lessonContext(data),graph=data.type==='graph';
+  const [plan,setPlan]=useState(()=>initialPlan(data)),[active,setActive]=useState(null);
+  const [label,,unit]=world.variables[0];
+  const checks=ALG.check(p,plan),fail=checks.findIndex(row=>!row.ok);
+  const bad=plan.some(x=>x.s<0),total=LSCENE.objValue(p,plan);
+  const extent=Math.ceil(Math.max(3,...p.rows.flatMap(r=>r.a.slice(0,2).map(a=>a.s?LU.num(r.b.div(a)):0))));
+  function change(j,n){setActive(j);setPlan(prev=>prev.map((v,k)=>k===j?n:v));}
+  return <section className="guided-probe" data-plan-desk=""><h4>{graph?'Какие заказы попадают в зелёную область?':'Сколько можно прибавить к первому выпуску?'}</h4>
+    <p>{graph?'Точка — один заказ ткани. Нажмите на график. Справа видно, какие ограничения выполняются при этих метрах льна и шёлка.':'Начните с плана первой таблицы. Прибавьте 1 '+unit+' в поле «'+label+'». Остальные значения останутся прежними. Узнайте, какая строка первой помешает увеличению.'}</p>
+    <div className="probe-spread"><div>{graph&&<CoordinateField model={p} maxX={extent} maxY={extent} wide region label="Заказ ткани на плоскости" onPlace={xy=>{setActive(null);setPlan(xy.map(v=>Q.of(v)));}}>{({sx,sy})=><circle data-plan-point="" cx={sx(plan[0])} cy={sy(plan[1])} r="5" fill={fail<0&&!bad?'#21634d':'#ad5436'} stroke="white" strokeWidth="2"/>}</CoordinateField>}
+    <dl className="probe-amounts">{world.variables.map(([name,Icon,u],j)=><div key={j}><dt><Icon size={16}/> {name} <small>x{LU.sub(j+1)}</small></dt><dd><output data-source={j}>{LU.txt(plan[j])}</output> {u}</dd></div>)}</dl>
+    <div className="trial-actions">{!graph&&<button className="trial-primary" onClick={()=>change(0,plan[0].add(1))}>Прибавить 1 {unit} · {label}</button>}<button onClick={()=>{setActive(null);setPlan(initialPlan(data));}}>Начать сначала</button></div>
+    <p role="status">{bad?'Выпуск должен быть неотрицательным.':fail<0?'Все условия выполнены.':'Нарушено условие «'+world.rows[fail][0]+'».'} {world.objective} · {LU.txt(total)} {world.money}.</p></div>
+    <SubstitutionSystem model={p} world={world} plan={plan} active={active} change={active==null?null:plan}/></div></section>;
 }

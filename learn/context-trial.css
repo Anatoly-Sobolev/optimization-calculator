@@ -316,3 +316,55 @@
  @keyframes truck-delivery{from{left:0;transform:translateX(0)}to{left:100%;transform:translateX(-100%)}}
  .art-route .truck-arrival{animation:truck-delivery .7s ease-in-out}
 }
+
+/* Keep the decision and its arithmetic on the same reading line. */
+.lesson-page .linear-workbench{grid-template-columns:minmax(240px,.85fr) minmax(0,1.4fr);gap:clamp(12px,2vw,28px)}
+.linear-workbench .trial-board{background:#f7f8f3}
+.lesson-page .linear-workbench .trial-values{display:grid;grid-template-columns:1fr;gap:0;margin:9px 0;border-block:1px solid #ccd7cd}
+.lesson-page .linear-workbench .variable-control{grid-template-columns:minmax(0,1fr) minmax(99px,32%);align-items:center;gap:1px 7px;padding:5px 6px;border:0;border-radius:0}
+.variable-control+.variable-control{border-top:1px solid #d7dfd6!important}
+.linear-workbench .variable-control .trial-stepper{grid-column:2;grid-row:1/span 2}
+.linear-workbench .variable-control>small{grid-column:1}
+.linear-workbench .effect-receipt{font-size:13px;gap:0}
+.sub-system{min-width:0;text-align:left}
+.sub-system h4,.guided-probe h4,.worked-step h4{font:650 clamp(17px,1.55vw,22px)/1.22 system-ui,sans-serif;margin:0 0 4px}
+.sub-system>p,.guided-probe>p{font:400 14px/1.4 system-ui,sans-serif;margin:3px 0 8px;color:#3f594b}
+.sub-system ol{border-inline-start:3px solid #54806b;list-style:none;padding:0 0 0 10px;margin:5px 0 8px}
+.sub-system li{padding:5px 0;border-top:1px solid #d3dccf;line-height:1.4}
+.sub-system .calc-heading,.probe-amounts div{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sub-system .calc-heading b{font:650 14px system-ui,sans-serif}.sub-system .calc-heading small{white-space:nowrap}
+.sub-system [data-ok=true]{color:#205b45}.sub-system [data-ok=false]{color:#a13824}
+.calc-symbols,.calc-values,.walk-equation{font-variant-numeric:tabular-nums}
+.calc-symbols{color:#45594e;font-size:.9em}.calc-term{display:inline-block;white-space:nowrap;margin-inline-end:.22em}
+.calc-values mark,.worked-step mark{position:relative;background:#e1e9dc;color:#204c3c;border-radius:3px;padding:0 3px}
+.calc-values [data-current=true],.worked-step .walk-current mark{background:#cae5cf;color:#183e30}
+.calc-symbols [data-current=true]{font-weight:bold;text-decoration:underline;text-decoration-color:#6d947a}
+.substitution-flight{position:absolute;pointer-events:none;z-index:5;inset:0 auto auto 0;white-space:nowrap;background:#285940;color:white;border-radius:3px;padding:0 3px;font-style:normal}
+.probe-spread{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.1fr);gap:16px;align-items:start}
+.probe-amounts{margin:6px 0}.probe-amounts div{border-bottom:1px solid #d4ddcf;padding:4px 0}
+.probe-amounts dt{display:flex;align-items:center;gap:5px}.probe-amounts dd{margin:0;font-weight:bold}
+.guided-probe .probe-spread p{font-size:.9em}.guided-probe .wide-plot{display:block;width:100%}
+.worked-step{border-top:2px solid #456952;padding:12px 0 4px}.worked-step h4{margin-bottom:9px}
+.walk-controls,.walk-rail{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#book :is(.walk-controls,.walk-rail) button{background:#fafbf6;border:1px solid #bacabb;border-radius:7px;padding:6px 9px;color:#28513f;display:inline-flex;align-items:center;gap:4px;font:600 14px/1.3 system-ui,sans-serif}
+#book .walk-rail button[aria-pressed=true],#book .walk-controls .trial-primary{background:#255d47;color:#fff}
+.walk-page{margin:8px 0;background:#f4f7ef;border-radius:8px;padding:10px 12px;min-width:0}
+.walk-page:has(.walk-previous){display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:12px}
+.walk-previous{border-inline-end:1px solid #c7d4c6;padding-inline-end:10px;color:#495e50}
+.walk-previous>small{display:block;font:600 12px system-ui,sans-serif;margin-bottom:7px}
+.walk-current p,.walk-previous p,.walk-equation p{margin:2px 0 6px}.walk-equation{font-size:1.03em}.walk-page .worked-math{display:inline;overflow-wrap:anywhere}
+.worked-step details{margin:8px 0}.worked-step summary{font-size:.85em}
+@media(prefers-reduced-motion:no-preference){.walk-current{animation:trial-step .3s ease-out}}
+@media(max-width:740px){.lesson-page .linear-workbench,.probe-spread{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:540px){.walk-page:has(.walk-previous){grid-template-columns:1fr}.walk-previous{border:0;padding:0}.walk-rail{gap:3px}#book .walk-rail button{padding:5px;font-size:12px}}
+
+.walk-current,.walk-previous,.walk-equation,.worked-math{min-width:0;overflow-wrap:anywhere}
+.walk-page .learn-scroll{max-width:100%;min-width:0}
+.walk-page .sx{width:100%;table-layout:fixed;font-size:clamp(10px,1.6vw,16px)}
+.walk-page .sx :is(td,th){min-width:0;padding:2px;overflow-wrap:anywhere}
+#lesson-body:has(.worked-step) #step-foot{border-top:1px solid #d0d9ce;margin:10px 0 0;padding-top:7px}
+
+.walk-cells{display:flex;gap:3px;flex-wrap:wrap}.walk-cells>span{display:grid;justify-items:center;min-width:36px;border:1px solid #bdcdbb;border-radius:4px;padding:2px 5px}
+.walk-cells small{font:600 12px system-ui,sans-serif;color:#4b6557}
+
+.linear-workbench .variable-control[data-invalid=true]{box-shadow:inset 3px 0 #a74428;background:#fff2eb}.sub-system .calc-heading small{white-space:normal;text-align:right}

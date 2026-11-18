@@ -230,8 +230,9 @@ const Handbook = (() => {
       for (const [id,panel] of Object.entries(panels)) panel.hidden=id!==key;
       if (key==='explore' && !explorer.hasChildNodes()) mountExplorer(explorer);
     }
-    select(items[0][0]);
-    BookUI.views(views,{items,onChange:select});
+    const initial=items.find(([mode])=>mode===query.get('view'))?.[0]||items[0][0];
+    select(initial);
+    BookUI.views(views,{items,initial,onChange:select});
   }
   function footer(parent) {
     parent.insertAdjacentHTML('beforeend','<p><a class="book-cta" href="' + (phase < 3 ? url(chapter,phase+1) : 'index.html#contents') + '">' + (phases[phase+1] || 'К оглавлению') + ' →</a></p>');
@@ -277,10 +278,19 @@ const Handbook = (() => {
       }
     }
     if(position>0){const prev=document.createElement('button');prev.textContent='← Предыдущий';prev.onclick=()=>move(-1);foot.append(prev);}
+    if(phase===0){
+      host.querySelector('.step-line span').textContent='Шаг '+(position+1)+' из '+steps.length;
+      host.append(foot);
+      host.querySelector('.book-state').remove();
+      host.querySelector('#answer-controls').remove();
+      unmountAnswer=BookUI.workedStep(response,{step:s,data:LEARN.sceneData});
+      next();
+      return;
+    }
     function reveal(){
       response.innerHTML='<div class="book-rule"><strong>' + esc(s.answer) + '</strong><p>' + esc(s.reason) + '</p></div><details class="book-change"><summary>Сравнить с состоянием после шага</summary><div class="book-state">' + s.after + '</div></details>';
       const change = response.querySelector('.book-change');
-      if (s.cycleTrace || (s.allocation && phase===0)) {
+      if (s.cycleTrace) {
         const visual=host.querySelector('.book-state');
         LessonVisuals.transportTable(visual,s);
         change.remove();
@@ -306,7 +316,6 @@ const Handbook = (() => {
         }
         if (count) change.insertAdjacentHTML('beforeend','<p>Рамкой отмечены изменившиеся значения. Ячеек: '+count+'.</p>');
       }
-      if(shown && phase===0 && chapter.type==='transp' && position===0){const figure=document.createElement('div');response.append(figure);figure.innerHTML='<h4>Отдельный пример цикла 2 × 2</h4><div></div>';LessonVisuals.cycleFigure(figure.lastElementChild);}
       next();
     }
     if(shown || solved){ reveal();return; }
